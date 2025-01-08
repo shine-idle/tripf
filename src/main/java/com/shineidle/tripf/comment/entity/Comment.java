@@ -7,7 +7,7 @@ import lombok.Getter;
 @Entity
 @Getter
 @Table(name = "`comment`")
-public class CommentEntity {
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

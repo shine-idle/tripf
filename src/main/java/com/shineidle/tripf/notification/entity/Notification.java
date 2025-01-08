@@ -7,7 +7,7 @@ import lombok.Getter;
 @Entity
 @Getter
 @Table(name = "`notification`")
-public class NotificationEntity {
+public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
