@@ -14,3 +14,7 @@ spring:
     database: postgresql
     hibernate:
       ddl-auto: create
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiry-millis: 300000 # 토큰 만료시간 (밀리초)
