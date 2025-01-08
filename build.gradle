@@ -41,6 +41,11 @@ dependencies {
     //공간 데이터를 다루기 위한 Hibernate 확장
     implementation 'org.hibernate:hibernate-spatial:6.6.4.Final'
 
+    // JWT
+    compileOnly 'io.jsonwebtoken:jjwt-api:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'

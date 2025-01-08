@@ -4,9 +4,11 @@ import com.shineidle.tripf.common.BaseEntity;
 import com.shineidle.tripf.user.UserAuth;
 import com.shineidle.tripf.user.UserStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter
 @Entity
 @Table(name = "users")
 public class User extends BaseEntity {
