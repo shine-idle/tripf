@@ -7,7 +7,7 @@ import lombok.Getter;
 @Entity
 @Getter
 @Table(name = "`activity`")
-public class ActivityEntity extends BaseEntity {
+public class Activity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -15,7 +15,7 @@ public class ActivityEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "days_id", nullable = false)
-    private DaysEntity days;
+    private Days days;
 
     private String title;
 
