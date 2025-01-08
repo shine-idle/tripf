@@ -1,5 +1,6 @@
 package com.shineidle.tripf.comment.entity;
 
+import com.shineidle.tripf.feed.entity.Feed;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -14,7 +15,7 @@ public class CommentEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id", nullable = false)
-    private FeedEntity feed;
+    private Feed feed;
 
     private String comment;
 }

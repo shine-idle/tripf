@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @Table(name = "`days`")
-public class DaysEntity extends BaseEntity {
+public class Days extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -17,7 +17,7 @@ public class DaysEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id", nullable = false)
-    private FeedEntity feed;
+    private Feed feed;
 
     private LocalDate date;
 }

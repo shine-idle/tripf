@@ -1,7 +1,7 @@
 package com.shineidle.tripf.cart.entity;
 
-import com.shineidle.tripf.cart.dto.CartCreateRequestDto;
 import com.shineidle.tripf.common.BaseEntity;
+import com.shineidle.tripf.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -1,6 +1,7 @@
 package com.shineidle.tripf.feed.entity;
 
 import com.shineidle.tripf.common.BaseEntity;
+import com.shineidle.tripf.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.OnDelete;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Table(name = "`feed`")
-public class FeedEntity extends BaseEntity {
+public class Feed extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -19,7 +20,7 @@ public class FeedEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
+    private User user;
 
     private String city;
 
