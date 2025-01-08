@@ -6,7 +6,7 @@ import com.shineidle.tripf.product.ProductStatus;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Products")
+@Table(name = "product")
 public class Product extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
