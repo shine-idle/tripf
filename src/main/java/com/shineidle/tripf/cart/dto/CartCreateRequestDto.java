@@ -1,6 +1,6 @@
 package com.shineidle.tripf.cart.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -8,6 +8,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CartCreateRequestDto {
 
-    @NotBlank(message = "상품 수량을 입력해주세요.")
+    @NotNull(message = "상품 수량을 입력해주세요.")
     private final Long quantity;
 }
