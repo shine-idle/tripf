@@ -1,5 +1,6 @@
 package com.shineidle.tripf.notification.entity;
 
+import com.shineidle.tripf.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -14,7 +15,7 @@ public class NotificationEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
+    private User user;
 
     private String notifyContext;
 }

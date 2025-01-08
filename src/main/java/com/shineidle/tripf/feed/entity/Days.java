@@ -1,13 +1,15 @@
-package com.shineidle.tripf.comment.entity;
+package com.shineidle.tripf.feed.entity;
 
-import com.shineidle.tripf.feed.entity.Feed;
+import com.shineidle.tripf.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
-@Table(name = "`comment`")
-public class CommentEntity {
+@Table(name = "`days`")
+public class Days extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -17,5 +19,5 @@ public class CommentEntity {
     @JoinColumn(name = "feed_id", nullable = false)
     private Feed feed;
 
-    private String comment;
+    private LocalDate date;
 }
