@@ -4,9 +4,11 @@ import com.shineidle.tripf.common.BaseEntity;
 import com.shineidle.tripf.product.ProductCategory;
 import com.shineidle.tripf.product.ProductStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
 
+@Getter
 @Entity
-@Table(name = "product")
+@Table(name = "`product`")
 public class Product extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
