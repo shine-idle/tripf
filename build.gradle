@@ -38,6 +38,9 @@ dependencies {
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
+    //공간 데이터를 다루기 위한 Hibernate 확장
+    implementation 'org.hibernate:hibernate-spatial:6.6.4.Final'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
