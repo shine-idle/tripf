@@ -7,4 +7,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ActivityRequestDto {
 
+    private final String title;
+
+    private final Integer star;
+
+    private final String memo;
+
+    private final String city;
+
+    private final Double latitude;
+
+    private final Double longitude;
+
 }

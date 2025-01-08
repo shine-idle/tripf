@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class FeedController {
 
     // 피드 작성
-    @PostMapping
-    public ResponseEntity<FeedResponseDto> createFeed(@RequestBody FeedRequestDto feedRequestDto) {
-
-    }
+//    @PostMapping
+//    public ResponseEntity<FeedResponseDto> createFeed(@RequestBody FeedRequestDto feedRequestDto) {
+//
+//    }
 
     // 피드 수정
 
