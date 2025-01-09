@@ -38,6 +38,8 @@ public class Feed extends BaseEntity {
 
     private LocalDateTime deleted_at;
 
+    public Feed() {}
+
     public Feed(String city, LocalDateTime started_at, LocalDateTime ended_at, String title, String content, Long cost, String tag) {
         this.city = city;
         this.started_at = started_at;
@@ -47,5 +49,17 @@ public class Feed extends BaseEntity {
         this.cost = cost;
         this.tag = tag;
         this.deleted_at = LocalDateTime.now();
+    }
+
+    public Feed update(String city, LocalDateTime started_at, LocalDateTime ended_at, String title, String content, Long cost, String tag) {
+        this.city = city;
+        this.started_at = started_at;
+        this.ended_at = ended_at;
+        this.title = title;
+        this.content = content;
+        this.cost = cost;
+        this.tag = tag;
+        this.deleted_at = LocalDateTime.now();
+        return this;
     }
 }

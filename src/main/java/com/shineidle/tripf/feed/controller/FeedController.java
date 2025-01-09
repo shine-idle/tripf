@@ -2,7 +2,6 @@ package com.shineidle.tripf.feed.controller;
 
 import com.shineidle.tripf.feed.dto.FeedRequestDto;
 import com.shineidle.tripf.feed.dto.FeedResponseDto;
-import com.shineidle.tripf.feed.entity.Feed;
 import com.shineidle.tripf.feed.service.FeedService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,26 +30,49 @@ public class FeedController {
     /**
      * 피드 수정
      */
-    @PutMapping
+    @PutMapping("/{feedId}")
     public ResponseEntity<FeedResponseDto> updateFeed(
+            @PathVariable Long feedId,
             @Valid @RequestBody FeedRequestDto feedRequestDto
     ) {
-        FeedResponseDto feedResponseDto = feedService.updateFeed(feedRequestDto);
+        FeedResponseDto feedResponseDto = feedService.updateFeed(feedId, feedRequestDto);
         return new ResponseEntity<>(feedResponseDto, HttpStatus.OK);
     }
 
     /**
     * 피드 상세 조회
     */
+    @GetMapping("/{feedId}")
+    public ResponseEntity<FeedResponseDto> findFeed(
+            @PathVariable Long feedId
+    ) {
+        FeedResponseDto feedResponseDto = feedService.findFeed(feedId);
+        return new ResponseEntity<>(feedResponseDto, HttpStatus.OK);
+    }
 
     /**
      * 피드 삭제
      */
+    @DeleteMapping("/{feedId}")
+    public ResponseEntity<String> deleteFeed(
+            @PathVariable Long feedId
+    ) {
+        String message = feedService.deleteFeed(feedId);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
 
     /**
      * 활동 삭제
      */
-
+    @DeleteMapping("/{feedId}/days/{daysId}/ativity/{activityId}")
+    public ResponseEntity<String> deleteActivity(
+            @PathVariable Long feedId,
+            @PathVariable Long daysId,
+            @PathVariable Long activityId
+    ) {
+        String message = feedService.deleteActivity(feedId, daysId, activityId);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
     /**
      * 국가별 피드 조회
      */

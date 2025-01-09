@@ -14,19 +14,22 @@ public interface FeedService {
     /**
      * 피드 수정
      */
-    FeedResponseDto updateFeed(@Valid FeedRequestDto feedRequestDto);
+    FeedResponseDto updateFeed(Long feedId, @Valid FeedRequestDto feedRequestDto);
 
     /**
      * 피드 상세 조회
      */
+    FeedResponseDto findFeed(Long feedId);
 
     /**
      * 피드 삭제
      */
+    String deleteFeed(Long feedId);
 
     /**
      * 활동 삭제
      */
+    String deleteActivity(Long feedId, Long daysId, Long activityId);
 
     /**
      * 국가별 피드 조회
