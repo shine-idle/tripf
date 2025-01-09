@@ -20,11 +20,20 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * 인증 관리자 (AuthenticationManager)
+     * @param config {@link AuthenticationConfiguration}
+     * @return 설정이 추가된 AuthenticationManager
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    /**
+     * 인증 공급자 (AuthenticationProvider)
+     * @return {@link AuthenticationProvider}
+     */
     @Bean
     AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
