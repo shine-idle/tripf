@@ -1,15 +1,16 @@
 package com.shineidle.tripf.common.exception;
 
-import org.springframework.http.ResponseEntity;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.io.IOException;
 
 
 @RestControllerAdvice
@@ -28,6 +29,8 @@ public class GlobalExceptionHandler {
             message = "로그인이 필요합니다.";
         }
 
+        response.getWriter().write("{\"error\": \"Authentication required\", \"message\": \"" + message + "\"}");
+    }
 
     @ExceptionHandler(GlobalException.class)
     public ResponseEntity<ExceptionResponseDto> CustomExceptionHandler(GlobalException e) {
@@ -41,7 +44,5 @@ public class GlobalExceptionHandler {
                 fieldErrors.put(error.getField(), error.getDefaultMessage())
         );
         return ResponseEntity.badRequest().body(fieldErrors);
-
-        response.getWriter().write("{\"error\": \"Authentication required\", \"message\": \"" + message + "\"}");
     }
 }
