@@ -28,4 +28,27 @@ public class Activity extends BaseEntity {
     private Double latitude;
 
     private Double longitude;
+
+    public Activity() {}
+
+    public Activity(Days Days, String title, Integer star, String memo, String city, Double latitude, Double longitude) {
+        this.days = Days;
+        this.title = title;
+        this.star = star;
+        this.memo = memo;
+        this.city = city;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
+    public Activity update(Days Days, String title, Integer star, String memo, String city, Double latitude, Double longitude) {
+        this.days = Days;
+        this.title = title;
+        this.star = star;
+        this.memo = memo;
+        this.city = city;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        return this;
+    }
 }

@@ -16,6 +16,4 @@ public enum PostMessage {
 
 
     private final String message;
-
-
 }

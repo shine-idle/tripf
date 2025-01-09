@@ -1,11 +1,14 @@
 package com.shineidle.tripf.feed.dto;
 
+import com.shineidle.tripf.feed.entity.Activity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
 public class ActivityResponseDto {
+
+    private final Long id;
 
     private final String title;
 
@@ -18,5 +21,4 @@ public class ActivityResponseDto {
     private final Double latitude;
 
     private final Double longitude;
-
 }
