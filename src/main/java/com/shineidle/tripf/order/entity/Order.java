@@ -25,7 +25,7 @@ public class Order extends BaseEntity {
     @NotNull(message = "총 가격을 입력해주세요")
     private Long totalPrice;
 
-    @Enumerated(EnumType.STRING) //이거 왜 쓰는거야?
+    @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus = OrderStatus.ORDER_RECEIVED;
 
     @Enumerated(EnumType.STRING)
@@ -42,10 +42,11 @@ public class Order extends BaseEntity {
     public Order() {
     }
 
-    public Order(Long quantity, Long totalPrice, OrderStatus orderStatus, Product product, User user, LocalDateTime createdAt) {
+    public Order(Long quantity, Long totalPrice, OrderStatus orderStatus, PayStatus payStatus, Product product, User user, LocalDateTime createdAt) {
         this.quantity = quantity;
         this.totalPrice = totalPrice;
         this.orderStatus = orderStatus;
+        this.payStatus = payStatus;
         this.product = product;
         this.user = user;
         this.createdAt = createdAt;
