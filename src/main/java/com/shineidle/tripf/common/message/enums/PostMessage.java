@@ -12,6 +12,4 @@ public enum PostMessage {
     PRODUCT_DELETED("상품이 삭제되었습니다.");
 
     private final String message;
-
-
 }

@@ -12,5 +12,5 @@ public class DaysRequestDto {
 
     private final LocalDate date;
 
-    private final List<ActivityRequestDto> activityRequestDto;
+    private final List<ActivityRequestDto> activity;
 }

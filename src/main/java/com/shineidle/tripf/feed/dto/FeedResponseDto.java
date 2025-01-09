@@ -1,5 +1,6 @@
 package com.shineidle.tripf.feed.dto;
 
+import com.shineidle.tripf.feed.entity.Feed;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -9,6 +10,8 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 public class FeedResponseDto {
+
+    private final Long id;
 
     private final String city;
 
@@ -28,6 +31,21 @@ public class FeedResponseDto {
 
     private final LocalDateTime updated_at;
 
-    private final List<DaysResponseDto> daysResponseDto;
+    private final List<DaysResponseDto> days;
 
+    public static FeedResponseDto toDto(Feed feed, List<DaysResponseDto> days) {
+        return new FeedResponseDto(
+                feed.getId(),
+                feed.getCity(),
+                feed.getStarted_at(),
+                feed.getEnded_at(),
+                feed.getTitle(),
+                feed.getContent(),
+                feed.getCost(),
+                feed.getTag(),
+                feed.getCreatedAt(),
+                feed.getModifiedAt(),
+                days
+        );
+    }
 }

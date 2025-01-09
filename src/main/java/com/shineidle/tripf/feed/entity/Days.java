@@ -20,4 +20,9 @@ public class Days extends BaseEntity {
     private Feed feed;
 
     private LocalDate date;
+
+    public Days(Feed feed, LocalDate date) {
+        this.feed = feed;
+        this.date = date;
+    }
 }
