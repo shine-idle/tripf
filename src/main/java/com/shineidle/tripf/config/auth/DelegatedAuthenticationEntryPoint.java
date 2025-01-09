@@ -13,12 +13,15 @@ import java.io.IOException;
 
 @Component
 public class DelegatedAuthenticationEntryPoint implements AuthenticationEntryPoint {
-
+    /**
+     * 스프링 시큐리티 예외를 처리하기 위한 resolver
+     */
     private final HandlerExceptionResolver resolver;
 
     public DelegatedAuthenticationEntryPoint(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
         this.resolver = resolver;
     }
+
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         resolver.resolveException(request, response, null, authException);

@@ -1,7 +1,7 @@
 package com.shineidle.tripf.user.dto;
 
-import com.shineidle.tripf.user.UserAuth;
-import com.shineidle.tripf.user.UserStatus;
+import com.shineidle.tripf.user.type.UserAuth;
+import com.shineidle.tripf.user.type.UserStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

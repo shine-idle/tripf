@@ -1,7 +1,6 @@
-package com.shineidle.tripf.user;
+package com.shineidle.tripf.user.type;
 
 import lombok.Getter;
-import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;

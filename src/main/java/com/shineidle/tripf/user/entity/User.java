@@ -1,8 +1,8 @@
 package com.shineidle.tripf.user.entity;
 
 import com.shineidle.tripf.common.BaseEntity;
-import com.shineidle.tripf.user.UserAuth;
-import com.shineidle.tripf.user.UserStatus;
+import com.shineidle.tripf.user.type.UserAuth;
+import com.shineidle.tripf.user.type.UserStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 
