@@ -21,18 +21,18 @@ public class FeedServiceImpl implements FeedService {
     private final ActivityRepository activityRepository;
 
     /**
-     *피드 생성
+     * 피드 생성
      *
      * @param feedRequestDto 피드 요청 Dto
      * @return feedResponseDto 피드 응답 Dto
      */
     @Override
     public FeedResponseDto createFeed(FeedRequestDto feedRequestDto) {
-        Feed feed = new Feed(feedRequestDto.getCity(), feedRequestDto.getStarted_at(), feedRequestDto.getEnded_at(), feedRequestDto.getTitle(),feedRequestDto.getContent(), feedRequestDto.getCost(), feedRequestDto.getTag());
+        Feed feed = new Feed(feedRequestDto.getCity(), feedRequestDto.getStarted_at(), feedRequestDto.getEnded_at(), feedRequestDto.getTitle(), feedRequestDto.getContent(), feedRequestDto.getCost(), feedRequestDto.getTag());
         Feed saveFeed = feedRepository.save(feed);
 
-        List<DaysResponseDto> daysResponseDto = feedRequestDto
-                .getDays()
+        List<DaysResponseDto> daysResponseDto = feedRequestDto.getDays() != null
+                ? feedRequestDto.getDays()
                 .stream()
                 .map(daysRequestDto -> {
                     Days days = new Days(
@@ -41,8 +41,8 @@ public class FeedServiceImpl implements FeedService {
                     );
                     Days savedDays = daysRepository.save(days);
 
-                    List<ActivityResponseDto> activityResponseDto = daysRequestDto
-                            .getActivity()
+                    List<ActivityResponseDto> activityResponseDto = daysRequestDto.getActivity() !=null
+                            ? daysRequestDto.getActivity()
                             .stream()
                             .map(activityRequestDto -> {
                                 Activity activity = new Activity(
@@ -65,11 +65,19 @@ public class FeedServiceImpl implements FeedService {
                                         savedActivity.getLatitude(),
                                         savedActivity.getLongitude()
                                 );
-                            }).toList();
+                            }).toList()
+                        :List.of();
 
-                    return new DaysResponseDto(savedDays.getId(),savedDays.getDate(), activityResponseDto);
-        }).toList();
+                    return new DaysResponseDto(savedDays.getId(), savedDays.getDate(), activityResponseDto);
+                }).toList()
+        :List.of();
 
         return FeedResponseDto.toDto(saveFeed, daysResponseDto);
+    }
+
+    // 피드 생성
+    @Override
+    public FeedResponseDto updateFeed(FeedRequestDto feedRequestDto) {
+        return null;
     }
 }

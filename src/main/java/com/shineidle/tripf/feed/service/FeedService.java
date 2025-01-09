@@ -14,6 +14,7 @@ public interface FeedService {
     /**
      * 피드 수정
      */
+    FeedResponseDto updateFeed(@Valid FeedRequestDto feedRequestDto);
 
     /**
      * 피드 상세 조회
