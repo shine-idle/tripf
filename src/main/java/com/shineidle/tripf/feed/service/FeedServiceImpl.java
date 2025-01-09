@@ -43,7 +43,7 @@ public class FeedServiceImpl implements FeedService {
                     );
                     Days savedDays = daysRepository.save(days);
 
-                    List<ActivityResponseDto> activityResponseDto = daysRequestDto.getActivity() !=null
+                    List<ActivityResponseDto> activityResponseDto = daysRequestDto.getActivity() != null
                             ? daysRequestDto.getActivity()
                             .stream()
                             .map(activityRequestDto -> {
@@ -67,71 +67,58 @@ public class FeedServiceImpl implements FeedService {
                                         savedActivity.getLongitude()
                                 );
                             }).toList()
-                        :List.of();
+                            : List.of();
                     return new DaysResponseDto(
                             savedDays.getId(),
                             savedDays.getDate(),
                             activityResponseDto
                     );
                 }).toList()
-        :List.of();
+                : List.of();
 
         return FeedResponseDto.toDto(saveFeed, daysResponseDto);
     }
 
-    // 피드 수정
+    /**
+     * 피드 수정
+     *
+     * @param feedId 피드 ID
+     * @param feedRequestDto 피드 요청 DTO
+     * @return feedResponseDto 수정된 피드 응답 DTO
+     */
     @Override
     public FeedResponseDto updateFeed(Long feedId, FeedRequestDto feedRequestDto) {
         Feed feed = findByIdOrElseThrow(feedId);
+        feed.update(
+                feedRequestDto.getCity(),
+                feedRequestDto.getStarted_at(),
+                feedRequestDto.getEnded_at(),
+                feedRequestDto.getTitle(),
+                feedRequestDto.getContent(),
+                feedRequestDto.getCost(),
+                feedRequestDto.getTag()
+        );
+        List<DaysResponseDto> daysResponseDto = daysRepository.findByFeed(feed).stream()
+                .map(days -> {
+                    List<ActivityResponseDto> activityResponseDto = activityRepository.findByDays(days).stream()
+                            .map(activity -> new ActivityResponseDto(
+                                    activity.getId(),
+                                    activity.getTitle(),
+                                    activity.getStar(),
+                                    activity.getMemo(),
+                                    activity.getCity(),
+                                    activity.getLatitude(),
+                                    activity.getLongitude()
+                            )).toList();
 
-        Feed updateFeed = feed.update(feedRequestDto.getCity(), feedRequestDto.getStarted_at(), feedRequestDto.getEnded_at(), feedRequestDto.getTitle(), feedRequestDto.getContent(), feedRequestDto.getCost(), feedRequestDto.getTag());
-        Feed saveFeed = feedRepository.save(updateFeed);
-
-        List<DaysResponseDto> daysResponseDto = feedRequestDto.getDays() != null
-                ? feedRequestDto.getDays()
-                .stream()
-                .map(daysRequestDto -> {
-                    Days days = new Days(
-                            saveFeed,
-                            daysRequestDto.getDate()
-                    );
-                    Days updateDays = days.update(saveFeed, daysRequestDto.getDate());
-
-                    List<ActivityResponseDto> activityResponseDto = daysRequestDto.getActivity() !=null
-                            ? daysRequestDto.getActivity()
-                            .stream()
-                            .map(activityRequestDto -> {
-                                Activity activity = new Activity(
-                                        updateDays,
-                                        activityRequestDto.getTitle(),
-                                        activityRequestDto.getStar(),
-                                        activityRequestDto.getMemo(),
-                                        activityRequestDto.getCity(),
-                                        activityRequestDto.getLatitude(),
-                                        activityRequestDto.getLongitude()
-                                );
-                                Activity updateActivity = activity.update(updateDays, activityRequestDto.getTitle(), activityRequestDto.getStar(), activityRequestDto.getMemo(),activityRequestDto.getCity(),activityRequestDto.getLatitude(),activityRequestDto.getLongitude());
-                                return new ActivityResponseDto(
-                                        updateActivity.getId(),
-                                        updateActivity.getTitle(),
-                                        updateActivity.getStar(),
-                                        updateActivity.getMemo(),
-                                        updateActivity.getCity(),
-                                        updateActivity.getLatitude(),
-                                        updateActivity.getLongitude()
-                                );
-                            }).toList()
-                            :List.of();
                     return new DaysResponseDto(
-                            updateDays.getId(),
-                            updateDays.getDate(),
+                            days.getId(),
+                            days.getDate(),
                             activityResponseDto
                     );
-                }).toList()
-                :List.of();
-
-        return FeedResponseDto.toDto(saveFeed, daysResponseDto);
-
+                }).toList();
+        feedRepository.save(feed);
+        return FeedResponseDto.toDto(feed, daysResponseDto);
     }
 
     // 피드 상세 조회
@@ -155,12 +142,6 @@ public class FeedServiceImpl implements FeedService {
     // 피드 findById
     public Feed findByIdOrElseThrow(Long feedId) {
         return feedRepository.findById(feedId)
-                .orElseThrow(() -> new GlobalException(FeedErrorCode.FEED_NOT_FOUND));
-    }
-
-    // 일정 findById
-    public Days findByIdOrElseThrow(Long feedId, Long daysId) {
-        return daysRepository.findByFeedIdAndDaysId(feedId,daysId)
                 .orElseThrow(() -> new GlobalException(FeedErrorCode.FEED_NOT_FOUND));
     }
 }

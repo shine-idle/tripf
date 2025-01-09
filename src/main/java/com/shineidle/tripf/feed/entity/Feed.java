@@ -18,7 +18,7 @@ public class Feed extends BaseEntity {
 
     // todo test를 위해 nullable = false 비활성화
     @ManyToOne(fetch = FetchType.LAZY)
-    //@JoinColumn(name = "user_id", nullable = false)
+//    @JoinColumn(name = "user_id", nullable = false)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -51,7 +51,7 @@ public class Feed extends BaseEntity {
         this.deleted_at = LocalDateTime.now();
     }
 
-    public Feed update(String city, LocalDateTime started_at, LocalDateTime ended_at, String title, String content, Long cost, String tag) {
+    public void update(String city, LocalDateTime started_at, LocalDateTime ended_at, String title, String content, Long cost, String tag) {
         this.city = city;
         this.started_at = started_at;
         this.ended_at = ended_at;
@@ -60,6 +60,5 @@ public class Feed extends BaseEntity {
         this.cost = cost;
         this.tag = tag;
         this.deleted_at = LocalDateTime.now();
-        return this;
     }
 }

@@ -1,6 +1,7 @@
 package com.shineidle.tripf.feed.entity;
 
 import com.shineidle.tripf.common.BaseEntity;
+import com.shineidle.tripf.feed.dto.ActivityResponseDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -41,14 +42,11 @@ public class Activity extends BaseEntity {
         this.longitude = longitude;
     }
 
-    public Activity update(Days Days, String title, Integer star, String memo, String city, Double latitude, Double longitude) {
-        this.days = Days;
-        this.title = title;
+    public void update(int star, String memo, String city, Double latitude, Double longitude) {
         this.star = star;
         this.memo = memo;
         this.city = city;
         this.latitude = latitude;
         this.longitude = longitude;
-        return this;
     }
 }

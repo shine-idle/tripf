@@ -28,8 +28,7 @@ public class Days extends BaseEntity {
         this.date = date;
     }
 
-    public Days update(Feed feed, LocalDate date) {
-        this.feed = feed;
+    public Days update(LocalDate date) {
         this.date = date;
         return this;
     }
