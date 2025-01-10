@@ -15,9 +15,9 @@ public class FeedResponseDto {
 
     private final String city;
 
-    private final LocalDateTime started_at;
+    private final LocalDateTime startedAt;
 
-    private final LocalDateTime ended_at;
+    private final LocalDateTime endedAt;
 
     private final String title;
 
@@ -27,9 +27,9 @@ public class FeedResponseDto {
 
     private final String tag;
 
-    private final LocalDateTime created_at;
+    private final LocalDateTime createdAt;
 
-    private final LocalDateTime updated_at;
+    private final LocalDateTime updatedAt;
 
     private final List<DaysResponseDto> days;
 
@@ -37,8 +37,8 @@ public class FeedResponseDto {
         return new FeedResponseDto(
                 feed.getId(),
                 feed.getCity(),
-                feed.getStarted_at(),
-                feed.getEnded_at(),
+                feed.getStartedAt(),
+                feed.getEndedAt(),
                 feed.getTitle(),
                 feed.getContent(),
                 feed.getCost(),

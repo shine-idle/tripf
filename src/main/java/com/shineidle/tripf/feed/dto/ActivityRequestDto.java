@@ -1,8 +1,6 @@
 package com.shineidle.tripf.feed.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -14,7 +12,8 @@ public class ActivityRequestDto {
     @Size(max = 20, message = "제목은 50자 이내로 입력해야 합니다.")
     private final String title;
 
-    @Size(max = 5, message = "별점은 5점 이내로 입력해야합니다.")
+    @Min(value = 1, message = "별점은 1 미만의 값은 입력할 수 없습니다.")
+    @Max(value = 5, message = "별점은 5점 이내여야 합니다.")
     private final Integer star;
 
     private final String memo;

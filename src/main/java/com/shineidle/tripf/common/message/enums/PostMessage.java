@@ -8,6 +8,8 @@ import lombok.Setter;
 @RequiredArgsConstructor
 public enum PostMessage {
     PEED_DELETED("피드가 삭제되었습니다."),
+    DAYS_DELETED("일정이 삭제되었습니다."),
+    ACTIVITY_DELETED("활동이 삭제되었습니다."),
     COMMENT_DELETED("댓글이 삭제되었습니다."),
     PRODUCT_DELETED("상품이 삭제되었습니다."),
     SIGNUP_SUCCESS("회원 가입이 완료되었습니다! 이제 모든 서비스를 마음껏 이용해 보세요."),

@@ -50,6 +50,10 @@ public class User extends BaseEntity {
     protected User() {
     }
 
+    public User(Long userId) {
+        this.id = userId;
+    }
+
 
     /**
      * 연관관계 - Foreign Key 값을 따로 컬럼으로 정의하지 않고 연관 관계로 정의합니다.
