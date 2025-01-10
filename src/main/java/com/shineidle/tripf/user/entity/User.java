@@ -65,7 +65,22 @@ public class User extends BaseEntity {
     /**
      * 서비스 메소드 - 외부에서 엔티티를 수정할 메소드를 정의합니다. (단일 책임을 가지도록 주의합니다.)
      */
-    // 닉네임 수정
-    // 비밀번호 수정
-    // 회원탈퇴
+
+    /**
+     * 닉네임 수정
+     */
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * 비밀번호 수정
+     */
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    /**
+     * 회원 탈퇴
+     */
 }

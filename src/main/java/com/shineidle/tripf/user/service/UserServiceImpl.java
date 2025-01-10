@@ -4,8 +4,7 @@ import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.common.message.enums.PostMessage;
 import com.shineidle.tripf.common.util.AuthenticationScheme;
 import com.shineidle.tripf.common.util.JwtProvider;
-import com.shineidle.tripf.user.dto.JwtResponseDto;
-import com.shineidle.tripf.user.dto.UserRequestDto;
+import com.shineidle.tripf.user.dto.*;
 import com.shineidle.tripf.user.entity.User;
 import com.shineidle.tripf.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +51,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public JwtResponseDto login(UserRequestDto dto) {
         User user = userRepository.findByEmail(dto.getEmail()).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."));
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."));
 
         validatePassword(dto.getPassword(), user.getPassword());
 
@@ -69,6 +68,41 @@ public class UserServiceImpl implements UserService {
         log.info("토큰: {}", accessToken);
 
         return new JwtResponseDto(AuthenticationScheme.BEARER.getName(), accessToken);
+    }
+
+    @Override
+    public UserResponseDto find(Long userId) {
+        User findUser = getUserById(userId);
+        return UserResponseDto.toDto(findUser);
+    }
+
+    @Override
+    @Transactional
+    public PostMessageResponseDto updatePassword(Long userId, PasswordUpdateRequestDto dto) {
+        User findUser = getUserById(userId);
+        validatePassword(dto.getPassword(), findUser.getPassword());
+        findUser.updatePassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(findUser);
+
+        return new PostMessageResponseDto(PostMessage.PASSWORD_UPDATED);
+    }
+
+    @Override
+    @Transactional
+    public PostMessageResponseDto updateName(Long userId, UsernameUpdateRequestDto dto) {
+        User findUser = getUserById(userId);
+        findUser.updateName(dto.getName());
+        userRepository.save(findUser);
+
+        //로그 아웃
+
+        return new PostMessageResponseDto(PostMessage.USERNAME_UPDATED);
+    }
+
+
+    private User getUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."));
     }
 
     private void validatePassword(String rawPassword, String encodedPassword) {
