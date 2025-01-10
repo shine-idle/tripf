@@ -4,6 +4,8 @@ import com.shineidle.tripf.common.BaseEntity;
 import com.shineidle.tripf.feed.dto.ActivityResponseDto;
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -16,6 +18,7 @@ public class Activity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "days_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Days days;
 
     private String title;

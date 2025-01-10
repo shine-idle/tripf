@@ -163,23 +163,50 @@ public class FeedServiceImpl implements FeedService {
         return FeedResponseDto.toDto(feed, daysResponseDto);
     }
 
-    // 피드 삭제
+    /**
+     * 피드 삭제
+     *
+     * @param feedId 피드 식별자
+     * @return PostMessageResponseDto(PostMessage.PEED_DELETED)
+     */
     @Override
     public PostMessageResponseDto deleteFeed(Long feedId) {
         checkUser(feedId);
         Feed feed = checkFeed(feedId);
-        if (feed.isDeleted()) {
-            throw new GlobalException(FeedErrorCode.FEED_ALREADY_DELETED);
-        }
         feed.markAsDeleted();
         feedRepository.save(feed);
         return new PostMessageResponseDto(PostMessage.PEED_DELETED);
     }
 
-    // 활동 삭제
+    /**
+     * 일정 삭제
+     *
+     * @param feedId 피드 식별자
+     * @param daysId 일정 식별자
+     * @return new PostMessageResponseDto(PostMessage.DAYS_DELETED);
+     */
+    @Override
+    public PostMessageResponseDto deleteDays(Long feedId, Long daysId) {
+        checkUser(feedId);
+        checkDays(feedId, daysId);
+        daysRepository.deleteById(daysId);
+        return new PostMessageResponseDto(PostMessage.DAYS_DELETED);
+    }
+
+    /**
+     * 활동 삭제
+     *
+     * @param feedId 피드 식별자
+     * @param daysId 일정 식별자
+     * @param activityId 활동 식별자
+     * @return PostMessageResponseDto(PostMessage.ACTIVITY_DELETED);
+     */
     @Override
     public PostMessageResponseDto deleteActivity(Long feedId, Long daysId, Long activityId) {
-        return null;
+        checkUser(feedId);
+        checkActivity(feedId, daysId, activityId);
+        activityRepository.deleteById(activityId);
+        return new PostMessageResponseDto(PostMessage.ACTIVITY_DELETED);
     }
 
     /**
@@ -209,14 +236,48 @@ public class FeedServiceImpl implements FeedService {
 
     /**
      * repository Service method
+     */
+
+    /**
      * 피드 Id로 피드 확인
      *
-     * @param feedId
-     * @return
+     * @param feedId 피드 식별자
+     * @return feed
      */
     public Feed checkFeed(Long feedId) {
-        return feedRepository.findById(feedId)
+        Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(() -> new GlobalException(FeedErrorCode.FEED_NOT_FOUND));
+
+        if (feed.isDeleted()) {
+            throw new GlobalException(FeedErrorCode.FEED_ALREADY_DELETED);
+        }
+
+        return feed;
+    }
+
+    /**
+     * 피드 및 일정 Id로 일정 확인
+     *
+     * @param feedId 피드 식별자
+     * @param daysId 일정 식별자
+     * @return days
+     */
+    public Days checkDays(Long feedId, Long daysId) {
+        return daysRepository.findByIdWithFeed(feedId, daysId)
+                .orElseThrow(() -> new GlobalException(FeedErrorCode.DAYS_NOT_FOUND));
+    }
+
+    /**
+     * 피드 및 일정 및 피드 Id로 활동 확인
+     *
+     * @param feedId 피드 식별자
+     * @param daysId 일정 식별자
+     * @param activityId 활동 식별자
+     * @return Activity
+     */
+    public Activity checkActivity(Long feedId, Long daysId, Long activityId) {
+        return activityRepository.findByIdWithFeedAndDays(feedId, daysId, activityId)
+                .orElseThrow(() -> new GlobalException(FeedErrorCode.ACTIVITY_NOT_FOUND));
     }
 
     /**

@@ -32,6 +32,11 @@ public interface FeedService {
     PostMessageResponseDto deleteFeed(Long feedId);
 
     /**
+     * 일정 삭제
+     */
+    PostMessageResponseDto deleteDays(Long feedId, Long daysId);
+
+    /**
      * 활동 삭제
      */
     PostMessageResponseDto deleteActivity(Long feedId, Long daysId, Long activityId);
