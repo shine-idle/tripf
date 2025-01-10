@@ -10,7 +10,11 @@ public interface UserService {
 
     UserResponseDto find(Long userId);
 
-    PostMessageResponseDto updatePassword(Long userId, PasswordUpdateRequestDto dto);
+    PostMessageResponseDto updatePassword(PasswordUpdateRequestDto dto);
 
-    PostMessageResponseDto updateName(Long userId, UsernameUpdateRequestDto dto);
+    PostMessageResponseDto updateName(UsernameUpdateRequestDto dto);
+
+    PostMessageResponseDto delete(UserRequestDto dto);
+
+    void verify(UserRequestDto dto);
 }

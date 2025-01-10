@@ -82,25 +82,42 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public PostMessageResponseDto updatePassword(Long userId, PasswordUpdateRequestDto dto) {
-        User findUser = getUserById(userId);
-        validatePassword(dto.getPassword(), findUser.getPassword());
-        findUser.updatePassword(passwordEncoder.encode(dto.getNewPassword()));
-        userRepository.save(findUser);
+    public PostMessageResponseDto updatePassword(PasswordUpdateRequestDto dto) {
+        User user = UserAuthorizationUtil.getLoginUser();
+        validatePassword(dto.getPassword(), user.getPassword());
+        user.updatePassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
+
+        // logout
 
         return new PostMessageResponseDto(PostMessage.PASSWORD_UPDATED);
     }
 
     @Override
     @Transactional
-    public PostMessageResponseDto updateName(Long userId, UsernameUpdateRequestDto dto) {
-        User findUser = getUserById(userId);
-        findUser.updateName(dto.getName());
-        userRepository.save(findUser);
-
-        //로그 아웃
-
+    public PostMessageResponseDto updateName(UsernameUpdateRequestDto dto) {
+        User user = UserAuthorizationUtil.getLoginUser();
+        user.updateName(dto.getName());
+        userRepository.save(user);
         return new PostMessageResponseDto(PostMessage.USERNAME_UPDATED);
+    }
+
+    @Override
+    public PostMessageResponseDto delete(UserRequestDto dto) {
+        User user = UserAuthorizationUtil.getLoginUser();
+        validatePassword(dto.getPassword(), user.getPassword());
+
+        user.deactivate();
+        userRepository.save(user);
+
+        // logout
+
+        return new PostMessageResponseDto(PostMessage.USER_DEACTIVATED);
+    }
+
+    @Override
+    public void verify(UserRequestDto dto) {
+        validatePassword(dto.getPassword(), UserAuthorizationUtil.getLoginUserPassword());
     }
 
 
