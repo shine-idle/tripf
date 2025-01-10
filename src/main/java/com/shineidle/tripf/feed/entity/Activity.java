@@ -61,7 +61,8 @@ public class Activity extends BaseEntity {
     /**
      * 서비스 메소드 - 외부에서 엔티티를 수정할 메소드를 정의합니다. (단일 책임을 가지도록 주의합니다.)
      */
-    public void update(int star, String memo, String city, Double latitude, Double longitude) {
+    public void update(String title, Integer star, String memo, String city, Double latitude, Double longitude) {
+        this.title = title;
         this.star = star;
         this.memo = memo;
         this.city = city;

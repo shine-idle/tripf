@@ -116,15 +116,16 @@ public class FeedController {
     }
 
     /**
-     * 일정, 활동 수정
+     * 활동 수정
      */
-    @PutMapping("/{feedId}/days/{daysId}")
-    public ResponseEntity<FeedResponseDto> updateDay(
+    @PutMapping("/{feedId}/days/{daysId}/activities/{activityId}")
+    public ResponseEntity<FeedResponseDto> updateActivity(
             @PathVariable Long feedId,
             @PathVariable Long daysId,
-            @Valid @RequestBody DaysRequestDto daysRequestDto
+            @PathVariable Long activityId,
+            @Valid @RequestBody ActivityRequestDto activityRequestDto
     ) {
-        FeedResponseDto feedResponseDto = feedService.updateDay(feedId,daysRequestDto);
+        FeedResponseDto feedResponseDto = feedService.updateActivity(feedId, daysId, activityId ,activityRequestDto);
         return new ResponseEntity<>(feedResponseDto, HttpStatus.OK);
     }
 

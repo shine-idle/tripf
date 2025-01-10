@@ -103,28 +103,8 @@ public class FeedServiceImpl implements FeedService {
                 feedRequestDto.getCost(),
                 feedRequestDto.getTag()
         );
-        List<DaysResponseDto> daysResponseDto = daysRepository.findByFeed(feed).stream()
-                .map(days -> {
-                    List<ActivityResponseDto> activityResponseDto = activityRepository.findByDays(days)
-                            .stream()
-                            .map(activity -> new ActivityResponseDto(
-                                    activity.getId(),
-                                    activity.getTitle(),
-                                    activity.getStar(),
-                                    activity.getMemo(),
-                                    activity.getCity(),
-                                    activity.getLatitude(),
-                                    activity.getLongitude()
-                            )).toList();
-
-                    return new DaysResponseDto(
-                            days.getId(),
-                            days.getDate(),
-                            activityResponseDto
-                    );
-                }).toList();
         feedRepository.save(feed);
-        return FeedResponseDto.toDto(feed, daysResponseDto);
+        return findFeed(feedId);
     }
 
     /**
@@ -274,12 +254,26 @@ public class FeedServiceImpl implements FeedService {
     }
 
     /**
-     * 일정, 활동 수정
+     * 활동 수정
      */
     @Override
-    public FeedResponseDto updateDay(Long feedId, DaysRequestDto daysRequestDto) {
-        return null;
+    public FeedResponseDto updateActivity(Long feedId, Long daysId, Long activityId, ActivityRequestDto activityRequestDto) {
+        checkUser(feedId);
+        Activity activity = checkActivity(feedId, daysId, activityId);
+
+        activity.update(
+                activityRequestDto.getTitle(),
+                activityRequestDto.getStar(),
+                activityRequestDto.getMemo(),
+                activityRequestDto.getCity(),
+                activityRequestDto.getLatitude(),
+                activityRequestDto.getLongitude()
+        );
+        activityRepository.save(activity);
+
+        return findFeed(feedId);
     }
+
 
     /**
      * 국가별 피드 조회

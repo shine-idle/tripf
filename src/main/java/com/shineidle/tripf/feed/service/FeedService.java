@@ -50,9 +50,9 @@ public interface FeedService {
     FeedResponseDto createActivity(Long feedId, Long daysId, @Valid ActivityRequestDto activityRequestDto);
 
     /**
-     * 일정, 활동 수정
+     * 활동 수정
      */
-    FeedResponseDto updateDay(Long feedId, @Valid DaysRequestDto daysRequestDto);
+    FeedResponseDto updateActivity(Long feedId, Long daysId, Long activityId, @Valid ActivityRequestDto activityRequestDto);
 
     /**
      * 국가별 피드 조회
