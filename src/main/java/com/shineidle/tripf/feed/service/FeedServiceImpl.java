@@ -16,6 +16,7 @@ import com.shineidle.tripf.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -52,9 +53,13 @@ public class FeedServiceImpl implements FeedService {
             feedRequestDto.getDays().forEach(daysRequestDto -> {
                 Days days = new Days(savedFeed, daysRequestDto.getDate());
 
-                if (days.getDate().isBefore(savedFeed.getStartedAt().toLocalDate()) ||
-                        days.getDate().isAfter(savedFeed.getEndedAt().toLocalDate())) {
+                LocalDate date = daysRequestDto.getDate();
+                if (days.getDate().isBefore(feed.getStartedAt().toLocalDate()) || days.getDate().isAfter(feed.getEndedAt().toLocalDate())) {
                     throw new GlobalException(FeedErrorCode.DATE_INVALID);
+                }
+
+                if (daysRepository.existsByFeedAndDate(feed, date)) {
+                    throw new GlobalException(FeedErrorCode.DATE_DUPLICATE);
                 }
 
                 Days savedDays = daysRepository.save(days);
@@ -189,8 +194,8 @@ public class FeedServiceImpl implements FeedService {
     /**
      * 활동 삭제
      *
-     * @param feedId 피드 식별자
-     * @param daysId 일정 식별자
+     * @param feedId     피드 식별자
+     * @param daysId     일정 식별자
      * @param activityId 활동 식별자
      * @return PostMessageResponseDto(PostMessage.ACTIVITY_DELETED);
      */
@@ -212,9 +217,13 @@ public class FeedServiceImpl implements FeedService {
         Feed feed = checkFeed(feedId);
         Days days = new Days(feed, daysRequestDto.getDate());
 
-        if (days.getDate().isBefore(feed.getStartedAt().toLocalDate()) ||
-                days.getDate().isAfter(feed.getEndedAt().toLocalDate())) {
+        LocalDate date = daysRequestDto.getDate();
+        if (days.getDate().isBefore(feed.getStartedAt().toLocalDate()) || days.getDate().isAfter(feed.getEndedAt().toLocalDate())) {
             throw new GlobalException(FeedErrorCode.DATE_INVALID);
+        }
+
+        if (daysRepository.existsByFeedAndDate(feed, date)) {
+            throw new GlobalException(FeedErrorCode.DATE_DUPLICATE);
         }
 
         Days savedDays = daysRepository.save(days);
@@ -222,18 +231,45 @@ public class FeedServiceImpl implements FeedService {
         if (daysRequestDto.getActivity() != null) {
             daysRequestDto.getActivity()
                     .forEach(activityRequestDto -> {
-                Activity activity = new Activity(
-                        savedDays,
-                        activityRequestDto.getTitle(),
-                        activityRequestDto.getStar(),
-                        activityRequestDto.getMemo(),
-                        activityRequestDto.getCity(),
-                        activityRequestDto.getLatitude(),
-                        activityRequestDto.getLongitude()
-                );
-                activityRepository.save(activity);
-            });
+                        Activity activity = new Activity(
+                                savedDays,
+                                activityRequestDto.getTitle(),
+                                activityRequestDto.getStar(),
+                                activityRequestDto.getMemo(),
+                                activityRequestDto.getCity(),
+                                activityRequestDto.getLatitude(),
+                                activityRequestDto.getLongitude()
+                        );
+                        activityRepository.save(activity);
+                    });
         }
+        return findFeed(feedId);
+    }
+
+    /**
+     * 활동 추가
+     *
+     * @param feedId 피드 식별자
+     * @param daysId 일정 식별자
+     * @param activityRequestDto 활동 요청 Dto
+     * @return findFeed(feedId);
+     */
+    @Override
+    public FeedResponseDto createActivity(Long feedId, Long daysId, ActivityRequestDto activityRequestDto) {
+        checkUser(feedId);
+        Days days = checkDays(feedId, daysId);
+
+        Activity activity = new Activity(
+                days,
+                activityRequestDto.getTitle(),
+                activityRequestDto.getStar(),
+                activityRequestDto.getMemo(),
+                activityRequestDto.getCity(),
+                activityRequestDto.getLatitude(),
+                activityRequestDto.getLongitude()
+        );
+        activityRepository.save(activity);
+
         return findFeed(feedId);
     }
 
@@ -289,8 +325,8 @@ public class FeedServiceImpl implements FeedService {
     /**
      * 피드 및 일정 및 피드 Id로 활동 확인
      *
-     * @param feedId 피드 식별자
-     * @param daysId 일정 식별자
+     * @param feedId     피드 식별자
+     * @param daysId     일정 식별자
      * @param activityId 활동 식별자
      * @return Activity
      */
@@ -302,6 +338,7 @@ public class FeedServiceImpl implements FeedService {
     /**
      * 작성자 검증 method
      * 로그인한 유저와 작성자가 다를 경우 exception
+     *
      * @param feedId
      */
     public void checkUser(Long feedId) {

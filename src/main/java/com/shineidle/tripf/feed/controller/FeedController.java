@@ -79,7 +79,7 @@ public class FeedController {
     /**
      * 활동 삭제
      */
-    @DeleteMapping("/{feedId}/days/{daysId}/ativities/{activityId}")
+    @DeleteMapping("/{feedId}/days/{daysId}/activities/{activityId}")
     public ResponseEntity<PostMessageResponseDto> deleteActivity(
             @PathVariable Long feedId,
             @PathVariable Long daysId,
@@ -99,6 +99,19 @@ public class FeedController {
             @Valid @RequestBody DaysRequestDto daysRequestDto
     ) {
         FeedResponseDto feedResponseDto = feedService.createDay(feedId,daysRequestDto);
+        return new ResponseEntity<>(feedResponseDto, HttpStatus.OK);
+    }
+
+    /**
+     * 활동 추가
+     */
+    @PostMapping("/{feedId}/days/{daysId}/activities")
+    public ResponseEntity<FeedResponseDto> createActivity(
+            @PathVariable Long feedId,
+            @PathVariable Long daysId,
+            @Valid @RequestBody ActivityRequestDto activityRequestDto
+    ) {
+        FeedResponseDto feedResponseDto = feedService.createActivity(feedId, daysId, activityRequestDto);
         return new ResponseEntity<>(feedResponseDto, HttpStatus.OK);
     }
 

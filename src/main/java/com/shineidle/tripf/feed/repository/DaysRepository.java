@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,4 +34,13 @@ public interface DaysRepository extends JpaRepository<Days, Long> {
             @Param("daysId") Long daysId,
             @Param("feedId") Long feedId
     );
+
+    /**
+     * 일정이 피드에 있는지 확인
+     *
+     * @param feed 피드
+     * @param date 일정
+     * @return existsByFeedAndDate
+     */
+    boolean existsByFeedAndDate(Feed feed, LocalDate date);
 }
