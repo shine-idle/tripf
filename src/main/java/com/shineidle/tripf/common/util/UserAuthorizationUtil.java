@@ -1,6 +1,7 @@
 package com.shineidle.tripf.common.util;
 
 import com.shineidle.tripf.config.auth.UserDetailsImpl;
+import com.shineidle.tripf.user.entity.User;
 import com.shineidle.tripf.user.type.UserAuth;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +21,10 @@ public class UserAuthorizationUtil {
     }
 
 
+    public static User getLoginUser() {
+        return getUserDetails().getUser();
+    }
+
     public static Long getLoginUserId() {
         return getUserDetails().getUserId();
     }
@@ -30,5 +35,9 @@ public class UserAuthorizationUtil {
 
     public static UserAuth getLoginUserAuthority() {
         return getUserDetails().getUserAuthority();
+    }
+
+    public static String getLoginUserPassword() {
+        return getUserDetails().getPassword();
     }
 }
