@@ -67,7 +67,7 @@ public class FeedController {
     /**
      * 일정 삭제
      */
-    @DeleteMapping("{feedId}/days/{daysId}")
+    @DeleteMapping("/{feedId}/days/{daysId}")
     public ResponseEntity<PostMessageResponseDto> deleteDays(
             @PathVariable Long feedId,
             @PathVariable Long daysId
