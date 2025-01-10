@@ -82,13 +82,13 @@ public class FeedServiceImpl implements FeedService {
     /**
      * 피드 수정
      *
-     * @param feedId 피드 ID
+     * @param feedId         피드 ID
      * @param feedRequestDto 피드 요청 DTO
      * @return feedResponseDto 수정된 피드 응답 DTO
      */
     @Override
     public FeedResponseDto updateFeed(Long feedId, FeedRequestDto feedRequestDto) {
-        Feed feed = findByIdOrElseThrow(feedId);
+        Feed feed = CheckFeed(feedId);
         feed.update(
                 feedRequestDto.getCity(),
                 feedRequestDto.getStarted_at(),
@@ -100,7 +100,8 @@ public class FeedServiceImpl implements FeedService {
         );
         List<DaysResponseDto> daysResponseDto = daysRepository.findByFeed(feed).stream()
                 .map(days -> {
-                    List<ActivityResponseDto> activityResponseDto = activityRepository.findByDays(days).stream()
+                    List<ActivityResponseDto> activityResponseDto = activityRepository.findByDays(days)
+                            .stream()
                             .map(activity -> new ActivityResponseDto(
                                     activity.getId(),
                                     activity.getTitle(),
@@ -121,10 +122,38 @@ public class FeedServiceImpl implements FeedService {
         return FeedResponseDto.toDto(feed, daysResponseDto);
     }
 
-    // 피드 상세 조회
+    /**
+     * 피드 상세조회
+     *
+     * @param feedId
+     * @return FeedResponseDto
+     */
     @Override
     public FeedResponseDto findFeed(Long feedId) {
-        return null;
+        Feed feed = CheckFeed(feedId);
+
+        List<Days> daysList = daysRepository.findByFeed(feed);
+
+        List<DaysResponseDto> daysResponseDto = daysList.stream()
+                .map(days -> {
+                    List<ActivityResponseDto> activityResponseDto = activityRepository.findByDays(days)
+                            .stream()
+                            .map(activity -> new ActivityResponseDto(
+                                    activity.getId(),
+                                    activity.getTitle(),
+                                    activity.getStar(),
+                                    activity.getMemo(),
+                                    activity.getCity(),
+                                    activity.getLatitude(),
+                                    activity.getLongitude()
+                            )).toList();
+                    return new DaysResponseDto(
+                            days.getId(),
+                            days.getDate(),
+                            activityResponseDto
+                    );
+                }).toList();
+        return FeedResponseDto.toDto(feed, daysResponseDto);
     }
 
     // 피드 삭제
@@ -139,9 +168,41 @@ public class FeedServiceImpl implements FeedService {
         return "";
     }
 
-    // 피드 findById
-    public Feed findByIdOrElseThrow(Long feedId) {
+    /**
+     * 일정 추가
+     * 일정 추가 시 활동도 같이 추가
+     */
+    @Override
+    public FeedResponseDto createDay(Long feedId, DaysRequestDto daysRequestDto) {
+        return null;
+    }
+
+    /**
+     * 일정, 활동 수정
+     */
+    @Override
+    public FeedResponseDto updateDay(Long feedId, DaysRequestDto daysRequestDto) {
+        return null;
+    }
+
+    /**
+     * 국가별 피드 조회
+     */
+    @Override
+    public List<RegionResponseDto> findRegion(String city) {
+        return List.of();
+    }
+
+    /**
+     * repository Service method
+     * 피드 Id로 피드 확인
+     *
+     * @param feedId
+     * @return
+     */
+    public Feed CheckFeed(Long feedId) {
         return feedRepository.findById(feedId)
                 .orElseThrow(() -> new GlobalException(FeedErrorCode.FEED_NOT_FOUND));
     }
+
 }

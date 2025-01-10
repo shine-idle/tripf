@@ -1,13 +1,14 @@
 package com.shineidle.tripf.feed.controller;
 
-import com.shineidle.tripf.feed.dto.FeedRequestDto;
-import com.shineidle.tripf.feed.dto.FeedResponseDto;
+import com.shineidle.tripf.feed.dto.*;
 import com.shineidle.tripf.feed.service.FeedService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class FeedController {
 
     /**
      * 피드 작성
+     * 피드 작성 시 피드, 일정, 활동 모두 작성
      */
     @PostMapping
     public ResponseEntity<FeedResponseDto> createFeed(
@@ -73,11 +75,41 @@ public class FeedController {
         String message = feedService.deleteActivity(feedId, daysId, activityId);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
+
+    /**
+     * 일정 추가
+     * 일정 추가 시 활동도 같이 추가
+     */
+    @PostMapping("/{feedId}/days")
+    public ResponseEntity<FeedResponseDto> createDay(
+            @PathVariable Long feedId,
+            @Valid @RequestBody DaysRequestDto daysRequestDto
+    ) {
+        FeedResponseDto feedResponseDto = feedService.createDay(feedId,daysRequestDto);
+        return new ResponseEntity<>(feedResponseDto, HttpStatus.OK);
+    }
+
+    /**
+     * 일정, 활동 수정
+     */
+    @PutMapping("/{feedId}/days/{daysId}")
+    public ResponseEntity<FeedResponseDto> updateDay(
+            @PathVariable Long feedId,
+            @PathVariable Long daysId,
+            @Valid @RequestBody DaysRequestDto daysRequestDto
+    ) {
+        FeedResponseDto feedResponseDto = feedService.updateDay(feedId,daysRequestDto);
+        return new ResponseEntity<>(feedResponseDto, HttpStatus.OK);
+    }
+
     /**
      * 국가별 피드 조회
      */
-
-    /**
-     * 홈페이지
-     */
+    @GetMapping
+    public ResponseEntity<List<RegionResponseDto>> findRegion(
+            @RequestParam(value = "region", required = false) String city
+    ) {
+        List<RegionResponseDto> regionResponseDto = feedService.findRegion(city);
+        return new ResponseEntity<>(regionResponseDto, HttpStatus.OK);
+    }
 }

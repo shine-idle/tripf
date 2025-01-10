@@ -1,8 +1,12 @@
 package com.shineidle.tripf.feed.service;
 
+import com.shineidle.tripf.feed.dto.DaysRequestDto;
 import com.shineidle.tripf.feed.dto.FeedRequestDto;
 import com.shineidle.tripf.feed.dto.FeedResponseDto;
+import com.shineidle.tripf.feed.dto.RegionResponseDto;
 import jakarta.validation.Valid;
+
+import java.util.List;
 
 public interface FeedService {
 
@@ -32,10 +36,18 @@ public interface FeedService {
     String deleteActivity(Long feedId, Long daysId, Long activityId);
 
     /**
-     * 국가별 피드 조회
+     * 일정 추가
+     * 일정 추가 시 활동도 같이 추가
      */
+    FeedResponseDto createDay(Long feedId, @Valid DaysRequestDto daysRequestDto);
 
     /**
-     * 홈페이지
+     * 일정, 활동 수정
      */
+    FeedResponseDto updateDay(Long feedId, @Valid DaysRequestDto daysRequestDto);
+
+    /**
+     * 국가별 피드 조회
+     */
+    List<RegionResponseDto> findRegion(String city);
 }
