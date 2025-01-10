@@ -7,6 +7,7 @@ import com.shineidle.tripf.common.util.JwtProvider;
 import com.shineidle.tripf.user.dto.*;
 import com.shineidle.tripf.user.entity.User;
 import com.shineidle.tripf.user.repository.UserRepository;
+import com.shineidle.tripf.common.util.UserAuthorizationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -66,6 +67,9 @@ public class UserServiceImpl implements UserService {
         // 토큰 생성
         String accessToken = jwtProvider.generateToken(authentication);
         log.info("토큰: {}", accessToken);
+        log.info("로그인 유저의 Id: {}", UserAuthorizationUtil.getLoginUserId());
+        log.info(UserAuthorizationUtil.getLoginUserEmail());
+        log.info(UserAuthorizationUtil.getLoginUserAuthority().toString());
 
         return new JwtResponseDto(AuthenticationScheme.BEARER.getName(), accessToken);
     }

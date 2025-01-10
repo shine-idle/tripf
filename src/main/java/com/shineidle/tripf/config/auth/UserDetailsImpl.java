@@ -40,4 +40,12 @@ public class UserDetailsImpl implements UserDetails {
     public String getUsername() {
         return this.user.getEmail();
     }
+
+    public Long getUserId() {
+        return this.user.getId();
+    }
+
+    public UserAuth getUserAuthority() {
+        return this.user.getAuth();
+    }
 }
