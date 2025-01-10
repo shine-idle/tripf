@@ -10,18 +10,25 @@ public class UserAuthorizationUtil {
         throw new AssertionError();
     }
 
-    final static Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    final static UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+    private static UserDetailsImpl getUserDetails() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalArgumentException("인증된 사용자가 없습니다.");
+        }
+
+        return (UserDetailsImpl) authentication.getPrincipal();
+    }
+
 
     public static Long getLoginUserId() {
-        return userDetails.getUserId();
+        return getUserDetails().getUserId();
     }
 
     public static String getLoginUserEmail() {
-        return userDetails.getUsername();
+        return getUserDetails().getUsername();
     }
 
     public static UserAuth getLoginUserAuthority() {
-        return userDetails.getUserAuthority();
+        return getUserDetails().getUserAuthority();
     }
 }
