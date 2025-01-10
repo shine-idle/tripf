@@ -1,5 +1,6 @@
 package com.shineidle.tripf.feed.controller;
 
+import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.feed.dto.*;
 import com.shineidle.tripf.feed.service.FeedService;
 import jakarta.validation.Valid;
@@ -56,24 +57,24 @@ public class FeedController {
      * 피드 삭제
      */
     @DeleteMapping("/{feedId}")
-    public ResponseEntity<String> deleteFeed(
+    public ResponseEntity<PostMessageResponseDto> deleteFeed(
             @PathVariable Long feedId
     ) {
-        String message = feedService.deleteFeed(feedId);
-        return new ResponseEntity<>(message, HttpStatus.OK);
+        PostMessageResponseDto postMessageResponseDto = feedService.deleteFeed(feedId);
+        return new ResponseEntity<>(postMessageResponseDto, HttpStatus.OK);
     }
 
     /**
      * 활동 삭제
      */
     @DeleteMapping("/{feedId}/days/{daysId}/ativity/{activityId}")
-    public ResponseEntity<String> deleteActivity(
+    public ResponseEntity<PostMessageResponseDto> deleteActivity(
             @PathVariable Long feedId,
             @PathVariable Long daysId,
             @PathVariable Long activityId
     ) {
-        String message = feedService.deleteActivity(feedId, daysId, activityId);
-        return new ResponseEntity<>(message, HttpStatus.OK);
+        PostMessageResponseDto postMessageResponseDto = feedService.deleteActivity(feedId, daysId, activityId);
+        return new ResponseEntity<>(postMessageResponseDto, HttpStatus.OK);
     }
 
     /**

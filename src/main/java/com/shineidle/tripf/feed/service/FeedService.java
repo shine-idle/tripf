@@ -1,5 +1,6 @@
 package com.shineidle.tripf.feed.service;
 
+import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.feed.dto.DaysRequestDto;
 import com.shineidle.tripf.feed.dto.FeedRequestDto;
 import com.shineidle.tripf.feed.dto.FeedResponseDto;
@@ -28,12 +29,12 @@ public interface FeedService {
     /**
      * 피드 삭제
      */
-    String deleteFeed(Long feedId);
+    PostMessageResponseDto deleteFeed(Long feedId);
 
     /**
      * 활동 삭제
      */
-    String deleteActivity(Long feedId, Long daysId, Long activityId);
+    PostMessageResponseDto deleteActivity(Long feedId, Long daysId, Long activityId);
 
     /**
      * 일정 추가

@@ -2,6 +2,9 @@ package com.shineidle.tripf.feed.service;
 
 import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.FeedErrorCode;
+import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
+import com.shineidle.tripf.common.message.enums.PostMessage;
+import com.shineidle.tripf.common.util.UserAuthorizationUtil;
 import com.shineidle.tripf.feed.dto.*;
 import com.shineidle.tripf.feed.entity.Activity;
 import com.shineidle.tripf.feed.entity.Days;
@@ -9,6 +12,7 @@ import com.shineidle.tripf.feed.entity.Feed;
 import com.shineidle.tripf.feed.repository.ActivityRepository;
 import com.shineidle.tripf.feed.repository.DaysRepository;
 import com.shineidle.tripf.feed.repository.FeedRepository;
+import com.shineidle.tripf.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +34,9 @@ public class FeedServiceImpl implements FeedService {
      */
     @Override
     public FeedResponseDto createFeed(FeedRequestDto feedRequestDto) {
-        Feed feed = new Feed(feedRequestDto.getCity(), feedRequestDto.getStarted_at(), feedRequestDto.getEnded_at(), feedRequestDto.getTitle(), feedRequestDto.getContent(), feedRequestDto.getCost(), feedRequestDto.getTag());
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+
+        Feed feed = new Feed(new User(userId), feedRequestDto.getCity(), feedRequestDto.getStartedAt(), feedRequestDto.getEndedAt(), feedRequestDto.getTitle(), feedRequestDto.getContent(), feedRequestDto.getCost(), feedRequestDto.getTag());
         Feed saveFeed = feedRepository.save(feed);
 
         List<DaysResponseDto> daysResponseDto = feedRequestDto.getDays() != null
@@ -88,11 +94,12 @@ public class FeedServiceImpl implements FeedService {
      */
     @Override
     public FeedResponseDto updateFeed(Long feedId, FeedRequestDto feedRequestDto) {
-        Feed feed = CheckFeed(feedId);
+        checkUser(feedId);
+        Feed feed = checkFeed(feedId);
         feed.update(
                 feedRequestDto.getCity(),
-                feedRequestDto.getStarted_at(),
-                feedRequestDto.getEnded_at(),
+                feedRequestDto.getStartedAt(),
+                feedRequestDto.getEndedAt(),
                 feedRequestDto.getTitle(),
                 feedRequestDto.getContent(),
                 feedRequestDto.getCost(),
@@ -125,12 +132,12 @@ public class FeedServiceImpl implements FeedService {
     /**
      * 피드 상세조회
      *
-     * @param feedId
+     * @param feedId 피드 식별자
      * @return FeedResponseDto
      */
     @Override
     public FeedResponseDto findFeed(Long feedId) {
-        Feed feed = CheckFeed(feedId);
+        Feed feed = checkFeed(feedId);
 
         List<Days> daysList = daysRepository.findByFeed(feed);
 
@@ -158,14 +165,21 @@ public class FeedServiceImpl implements FeedService {
 
     // 피드 삭제
     @Override
-    public String deleteFeed(Long feedId) {
-        return "";
+    public PostMessageResponseDto deleteFeed(Long feedId) {
+        checkUser(feedId);
+        Feed feed = checkFeed(feedId);
+        if (feed.isDeleted()) {
+            throw new GlobalException(FeedErrorCode.FEED_ALREADY_DELETED);
+        }
+        feed.markAsDeleted();
+        feedRepository.save(feed);
+        return new PostMessageResponseDto(PostMessage.PEED_DELETED);
     }
 
     // 활동 삭제
     @Override
-    public String deleteActivity(Long feedId, Long daysId, Long activityId) {
-        return "";
+    public PostMessageResponseDto deleteActivity(Long feedId, Long daysId, Long activityId) {
+        return null;
     }
 
     /**
@@ -200,9 +214,22 @@ public class FeedServiceImpl implements FeedService {
      * @param feedId
      * @return
      */
-    public Feed CheckFeed(Long feedId) {
+    public Feed checkFeed(Long feedId) {
         return feedRepository.findById(feedId)
                 .orElseThrow(() -> new GlobalException(FeedErrorCode.FEED_NOT_FOUND));
     }
 
+    /**
+     * 작성자 검증 method
+     * 로그인한 유저와 작성자가 다를 경우 exception
+     * @param feedId
+     */
+    public void checkUser(Long feedId) {
+        Feed checkFeed = checkFeed(feedId);
+        Long checkUser = UserAuthorizationUtil.getLoginUserId();
+
+        if (!checkFeed.getUser().getId().equals(checkUser)) {
+            throw new GlobalException(FeedErrorCode.FEED_CANNOT_ACCESS);
+        }
+    }
 }
