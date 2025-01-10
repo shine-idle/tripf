@@ -36,53 +36,46 @@ public class FeedServiceImpl implements FeedService {
     public FeedResponseDto createFeed(FeedRequestDto feedRequestDto) {
         Long userId = UserAuthorizationUtil.getLoginUserId();
 
-        Feed feed = new Feed(new User(userId), feedRequestDto.getCity(), feedRequestDto.getStartedAt(), feedRequestDto.getEndedAt(), feedRequestDto.getTitle(), feedRequestDto.getContent(), feedRequestDto.getCost(), feedRequestDto.getTag());
-        Feed saveFeed = feedRepository.save(feed);
+        Feed feed = new Feed(
+                new User(userId),
+                feedRequestDto.getCity(),
+                feedRequestDto.getStartedAt(),
+                feedRequestDto.getEndedAt(),
+                feedRequestDto.getTitle(),
+                feedRequestDto.getContent(),
+                feedRequestDto.getCost(),
+                feedRequestDto.getTag()
+        );
+        Feed savedFeed = feedRepository.save(feed);
 
-        List<DaysResponseDto> daysResponseDto = feedRequestDto.getDays() != null
-                ? feedRequestDto.getDays()
-                .stream()
-                .map(daysRequestDto -> {
-                    Days days = new Days(
-                            saveFeed,
-                            daysRequestDto.getDate()
-                    );
-                    Days savedDays = daysRepository.save(days);
+        if (feedRequestDto.getDays() != null) {
+            feedRequestDto.getDays().forEach(daysRequestDto -> {
+                Days days = new Days(savedFeed, daysRequestDto.getDate());
 
-                    List<ActivityResponseDto> activityResponseDto = daysRequestDto.getActivity() != null
-                            ? daysRequestDto.getActivity()
-                            .stream()
-                            .map(activityRequestDto -> {
-                                Activity activity = new Activity(
-                                        savedDays,
-                                        activityRequestDto.getTitle(),
-                                        activityRequestDto.getStar(),
-                                        activityRequestDto.getMemo(),
-                                        activityRequestDto.getCity(),
-                                        activityRequestDto.getLatitude(),
-                                        activityRequestDto.getLongitude()
-                                );
-                                Activity savedActivity = activityRepository.save(activity);
-                                return new ActivityResponseDto(
-                                        savedActivity.getId(),
-                                        savedActivity.getTitle(),
-                                        savedActivity.getStar(),
-                                        savedActivity.getMemo(),
-                                        savedActivity.getCity(),
-                                        savedActivity.getLatitude(),
-                                        savedActivity.getLongitude()
-                                );
-                            }).toList()
-                            : List.of();
-                    return new DaysResponseDto(
-                            savedDays.getId(),
-                            savedDays.getDate(),
-                            activityResponseDto
-                    );
-                }).toList()
-                : List.of();
+                if (days.getDate().isBefore(savedFeed.getStartedAt().toLocalDate()) ||
+                        days.getDate().isAfter(savedFeed.getEndedAt().toLocalDate())) {
+                    throw new GlobalException(FeedErrorCode.DATE_INVALID);
+                }
 
-        return FeedResponseDto.toDto(saveFeed, daysResponseDto);
+                Days savedDays = daysRepository.save(days);
+
+                if (daysRequestDto.getActivity() != null) {
+                    daysRequestDto.getActivity().forEach(activityRequestDto -> {
+                        Activity activity = new Activity(
+                                savedDays,
+                                activityRequestDto.getTitle(),
+                                activityRequestDto.getStar(),
+                                activityRequestDto.getMemo(),
+                                activityRequestDto.getCity(),
+                                activityRequestDto.getLatitude(),
+                                activityRequestDto.getLongitude()
+                        );
+                        activityRepository.save(activity);
+                    });
+                }
+            });
+        }
+        return findFeed(savedFeed.getId());
     }
 
     /**
@@ -210,12 +203,38 @@ public class FeedServiceImpl implements FeedService {
     }
 
     /**
-     * 일정 추가
+     * 일정 및 활동 추가
      * 일정 추가 시 활동도 같이 추가
      */
     @Override
     public FeedResponseDto createDay(Long feedId, DaysRequestDto daysRequestDto) {
-        return null;
+        checkUser(feedId);
+        Feed feed = checkFeed(feedId);
+        Days days = new Days(feed, daysRequestDto.getDate());
+
+        if (days.getDate().isBefore(feed.getStartedAt().toLocalDate()) ||
+                days.getDate().isAfter(feed.getEndedAt().toLocalDate())) {
+            throw new GlobalException(FeedErrorCode.DATE_INVALID);
+        }
+
+        Days savedDays = daysRepository.save(days);
+
+        if (daysRequestDto.getActivity() != null) {
+            daysRequestDto.getActivity()
+                    .forEach(activityRequestDto -> {
+                Activity activity = new Activity(
+                        savedDays,
+                        activityRequestDto.getTitle(),
+                        activityRequestDto.getStar(),
+                        activityRequestDto.getMemo(),
+                        activityRequestDto.getCity(),
+                        activityRequestDto.getLatitude(),
+                        activityRequestDto.getLongitude()
+                );
+                activityRepository.save(activity);
+            });
+        }
+        return findFeed(feedId);
     }
 
     /**
@@ -293,4 +312,5 @@ public class FeedServiceImpl implements FeedService {
             throw new GlobalException(FeedErrorCode.FEED_CANNOT_ACCESS);
         }
     }
+
 }

@@ -1,10 +1,7 @@
 package com.shineidle.tripf.feed.service;
 
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
-import com.shineidle.tripf.feed.dto.DaysRequestDto;
-import com.shineidle.tripf.feed.dto.FeedRequestDto;
-import com.shineidle.tripf.feed.dto.FeedResponseDto;
-import com.shineidle.tripf.feed.dto.RegionResponseDto;
+import com.shineidle.tripf.feed.dto.*;
 import jakarta.validation.Valid;
 
 import java.util.List;
