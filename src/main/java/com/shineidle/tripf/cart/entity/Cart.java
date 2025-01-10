@@ -29,8 +29,10 @@ public class Cart extends BaseEntity {
 
     protected Cart() {}
 
-    public Cart(Long quantity) {
+    public Cart(Long quantity, User user, Product product) {
         this.quantity = quantity;
+        this.user = user;
+        this.product = product;
     }
 
     public void updateCart(CartCreateRequestDto cartCreateRequestDto) {
