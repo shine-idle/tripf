@@ -3,6 +3,7 @@ package com.shineidle.tripf.common.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,15 +22,25 @@ public class GlobalExceptionHandler {
         response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        String requestURI = request.getRequestURI();
+        String message = "로그인이 필요합니다.";
+        response.getWriter().write("{\"error\": \"Authentication required\", \"message\": \"" + message + "\"}");
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public void handleAccessDeniedException(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
         String message;
+        String requestURI = request.getRequestURI();
         if (requestURI.startsWith("/api/admin")) {
             message = "관리자 권한이 필요합니다.";
         } else {
-            message = "로그인이 필요합니다.";
+            message = "접근 권한이 없습니다.";
         }
 
-        response.getWriter().write("{\"error\": \"Authentication required\", \"message\": \"" + message + "\"}");
+        response.getWriter().write("{\"error\": \"Access denied\", \"message\": \"" + message + "\"}");
     }
 
     @ExceptionHandler(GlobalException.class)
