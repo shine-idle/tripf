@@ -12,6 +12,7 @@ import com.shineidle.tripf.feed.entity.Feed;
 import com.shineidle.tripf.feed.repository.ActivityRepository;
 import com.shineidle.tripf.feed.repository.DaysRepository;
 import com.shineidle.tripf.feed.repository.FeedRepository;
+import com.shineidle.tripf.geo.service.GeoService;
 import com.shineidle.tripf.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class FeedServiceImpl implements FeedService {
     private final FeedRepository feedRepository;
     private final DaysRepository daysRepository;
     private final ActivityRepository activityRepository;
+    private final GeoService geoService;
 
     /**
      * 피드 생성
@@ -37,8 +39,11 @@ public class FeedServiceImpl implements FeedService {
     public FeedResponseDto createFeed(FeedRequestDto feedRequestDto) {
         Long userId = UserAuthorizationUtil.getLoginUserId();
 
+        String country = geoService.getCountryByCity(feedRequestDto.getCity());
+
         Feed feed = new Feed(
                 new User(userId),
+                country,
                 feedRequestDto.getCity(),
                 feedRequestDto.getStartedAt(),
                 feedRequestDto.getEndedAt(),
@@ -94,7 +99,11 @@ public class FeedServiceImpl implements FeedService {
     public FeedResponseDto updateFeed(Long feedId, FeedRequestDto feedRequestDto) {
         checkUser(feedId);
         Feed feed = checkFeed(feedId);
+
+        String country = geoService.getCountryByCity(feedRequestDto.getCity());
+
         feed.update(
+                country,
                 feedRequestDto.getCity(),
                 feedRequestDto.getStartedAt(),
                 feedRequestDto.getEndedAt(),

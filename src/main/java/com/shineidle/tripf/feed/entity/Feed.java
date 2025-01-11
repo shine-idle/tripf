@@ -20,6 +20,8 @@ public class Feed extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    private String country;
+
     private String city;
 
     private LocalDateTime startedAt;
@@ -41,8 +43,9 @@ public class Feed extends BaseEntity {
      */
     public Feed() {}
 
-    public Feed(User user, String city, LocalDateTime startedAt, LocalDateTime endedAt, String title, String content, Long cost, String tag) {
+    public Feed(User user, String country, String city, LocalDateTime startedAt, LocalDateTime endedAt, String title, String content, Long cost, String tag) {
         this.user = user;
+        this.country = country;
         this.city = city;
         this.startedAt = startedAt;
         this.endedAt = endedAt;
@@ -66,7 +69,8 @@ public class Feed extends BaseEntity {
     /**
      * 서비스 메소드 - 외부에서 엔티티를 수정할 메소드를 정의합니다. (단일 책임을 가지도록 주의합니다.)
      */
-    public void update(String city, LocalDateTime startedAt, LocalDateTime endedAt, String title, String content, Long cost, String tag) {
+    public void update(String country, String city, LocalDateTime startedAt, LocalDateTime endedAt, String title, String content, Long cost, String tag) {
+        this.country = country;
         this.city = city;
         this.startedAt = startedAt;
         this.endedAt = endedAt;

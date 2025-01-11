@@ -14,7 +14,8 @@ public enum FeedErrorCode implements ExceptionType {
     FEED_CANNOT_ACCESS(HttpStatus.FORBIDDEN,"작성자만 접근이 가능합니다."),
     DATE_INVALID(HttpStatus.BAD_REQUEST, "일정 날짜는 피드의 시작 및 종료 날짜 범위 내에 있어야 합니다."),
     DATE_DUPLICATE(HttpStatus.CONFLICT, "동일한 일정이 이미 존재합니다."),
-    FEED_ALREADY_DELETED(HttpStatus.GONE, "피드가 이미 삭제되었습니다.");
+    FEED_ALREADY_DELETED(HttpStatus.GONE, "피드가 이미 삭제되었습니다."),
+    COUNTRY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 국가가 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
