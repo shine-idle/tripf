@@ -57,7 +57,7 @@ public interface FeedService {
     /**
      * 국가별 피드 조회
      */
-    List<RegionResponseDto> findRegion(String city);
+    List<RegionResponseDto> findRegion(String country);
 
 
 }

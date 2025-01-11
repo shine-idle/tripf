@@ -134,9 +134,9 @@ public class FeedController {
      */
     @GetMapping
     public ResponseEntity<List<RegionResponseDto>> findRegion(
-            @RequestParam(value = "region", required = false) String city
+            @RequestParam(value = "region", required = false) String country
     ) {
-        List<RegionResponseDto> regionResponseDto = feedService.findRegion(city);
+        List<RegionResponseDto> regionResponseDto = feedService.findRegion(country);
         return new ResponseEntity<>(regionResponseDto, HttpStatus.OK);
     }
 }

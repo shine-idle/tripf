@@ -15,10 +15,13 @@ import com.shineidle.tripf.feed.repository.FeedRepository;
 import com.shineidle.tripf.geo.service.GeoService;
 import com.shineidle.tripf.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ public class FeedServiceImpl implements FeedService {
     private final DaysRepository daysRepository;
     private final ActivityRepository activityRepository;
     private final GeoService geoService;
+    private final CacheManager cacheManager;
 
     /**
      * 피드 생성
@@ -238,8 +242,8 @@ public class FeedServiceImpl implements FeedService {
     /**
      * 활동 추가
      *
-     * @param feedId 피드 식별자
-     * @param daysId 일정 식별자
+     * @param feedId             피드 식별자
+     * @param daysId             일정 식별자
      * @param activityRequestDto 활동 요청 Dto
      * @return findFeed(feedId);
      */
@@ -288,8 +292,14 @@ public class FeedServiceImpl implements FeedService {
      * 국가별 피드 조회
      */
     @Override
-    public List<RegionResponseDto> findRegion(String city) {
-        return List.of();
+    @Cacheable(value = "regionCache", key = "'country:' + #country")
+    public List<RegionResponseDto> findRegion(String country) {
+
+        List<Feed> feeds = feedRepository.findByCountryAndDeletedAtIsNull(country);
+
+        return feeds.stream()
+                .map(RegionResponseDto::toDto)
+                .collect(Collectors.toList());
     }
 
     /**

@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface FeedRepository extends JpaRepository<Feed, Long> {
 
-    List<Feed> findByCountry(String country);
+    List<Feed> findByCountryAndDeletedAtIsNull(String country);
 
 }
