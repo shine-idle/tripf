@@ -11,12 +11,9 @@ import com.shineidle.tripf.common.util.UserAuthorizationUtil;
 import com.shineidle.tripf.product.entity.Product;
 import com.shineidle.tripf.product.repository.ProductRepository;
 import com.shineidle.tripf.user.entity.User;
-import com.shineidle.tripf.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -26,17 +23,14 @@ public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
-    private final UserRepository userRepository;
 
     @Override
     public CartCreateResponseDto createCart(Long productId, CartCreateRequestDto cartCreateRequestDto) {
 
-        Long userId = UserAuthorizationUtil.getLoginUserId();
-        User foundUser = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."));
-
+        User loginedUser = UserAuthorizationUtil.getLoginUser();
         Product foundProduct = findByIdOrElseThrow(productId);
 
-        Cart cart = new Cart(cartCreateRequestDto.getQuantity() , foundUser, foundProduct);
+        Cart cart = new Cart(cartCreateRequestDto.getQuantity() , loginedUser, foundProduct);
         Cart savedCart = cartRepository.save(cart);
 
         return CartCreateResponseDto.toDto(savedCart);
