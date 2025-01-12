@@ -7,13 +7,13 @@ import com.shineidle.tripf.product.dto.ProductResponseDto;
 import java.util.List;
 
 public interface ProductService {
-    ProductResponseDto create(ProductRequestDto dto);
+    ProductResponseDto createProduct(ProductRequestDto dto);
 
-    ProductResponseDto update(Long productId, ProductRequestDto dto);
+    ProductResponseDto updateProduct(Long productId, ProductRequestDto dto);
 
-    PostMessageResponseDto delete(Long productId);
+    PostMessageResponseDto deleteProduct(Long productId);
 
-    List<ProductResponseDto> find();
+    List<ProductResponseDto> findAllProduct();
 
-    ProductResponseDto find(Long productId);
+    ProductResponseDto findProduct(Long productId);
 }
