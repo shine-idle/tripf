@@ -30,7 +30,10 @@ public class WebConfig {
 
     private final AccessDeniedHandler accessDeniedHandler;
 
-    private static final String[] WHITE_LIST = {"/api/signup", "/api/login"};
+    private static final String[] WHITE_LIST = {
+            "/api/", "/api/signup", "/api/login",
+            "/api/products/**"
+    };
 
     /**
      * Security 필터
@@ -49,7 +52,7 @@ public class WebConfig {
                                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE,
                                         DispatcherType.ERROR).permitAll()
                                 // path 별로 접근이 가능한 권한 설정
-                                .requestMatchers("/api/admin/**").hasAuthority("AUTH_ADMIN") //AUTH_admin
+                                .requestMatchers("/api/admin/**").hasAuthority("AUTH_admin")
                                 .anyRequest().authenticated()
                 )
                 // Spring Security 예외에 대한 처리를 핸들러에 위임
@@ -70,6 +73,6 @@ public class WebConfig {
      */
     @Bean
     public RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl.fromHierarchy("AUTH_ADMIN > AUTH_NORMAL");
+        return RoleHierarchyImpl.fromHierarchy("AUTH_admin > AUTH_normal");
     }
 }
