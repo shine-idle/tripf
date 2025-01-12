@@ -31,7 +31,6 @@ public class FeedServiceImpl implements FeedService {
     private final DaysRepository daysRepository;
     private final ActivityRepository activityRepository;
     private final GeoService geoService;
-    private final CacheManager cacheManager;
 
     /**
      * 피드 생성
@@ -41,12 +40,12 @@ public class FeedServiceImpl implements FeedService {
      */
     @Override
     public FeedResponseDto createFeed(FeedRequestDto feedRequestDto) {
-        Long userId = UserAuthorizationUtil.getLoginUserId();
+        User userId = UserAuthorizationUtil.getLoginUser();
 
         String country = geoService.getCountryByCity(feedRequestDto.getCity());
 
         Feed feed = new Feed(
-                new User(userId),
+                userId,
                 country,
                 feedRequestDto.getCity(),
                 feedRequestDto.getStartedAt(),
