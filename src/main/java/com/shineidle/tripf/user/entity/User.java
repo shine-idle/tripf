@@ -5,12 +5,14 @@ import com.shineidle.tripf.user.type.UserAuth;
 import com.shineidle.tripf.user.type.UserStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Entity
 @Table(name = "`user`")
+@DynamicUpdate
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -34,9 +36,6 @@ public class User extends BaseEntity {
 
     private LocalDateTime deletedAt;
 
-    /**
-     * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
-     */
 
     public User(String email, String password, String name, UserAuth auth, String address) {
         this.email = email;
@@ -49,6 +48,10 @@ public class User extends BaseEntity {
     }
 
     protected User() {
+    }
+
+    public User(Long userId) {
+        this.id = userId;
     }
 
 
@@ -83,4 +86,7 @@ public class User extends BaseEntity {
     /**
      * 회원 탈퇴
      */
+    public void deactivate() {
+        this.status = UserStatus.DEACTIVATE;
+    }
 }

@@ -10,11 +10,28 @@ spring:
     username: ${DB_USER}
     url: jdbc:postgresql://${DB_HOST}:5432/tripf
     password: ${DB_PASSWORD}
+
   jpa:
     database: postgresql
     hibernate:
       ddl-auto: create
 
+    properties:
+      hibernate:
+        format_sql: 'true'
+        show_sql: 'true'
+
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 jwt:
   secret: ${JWT_SECRET}
   expiry-millis: 300000 # 토큰 만료시간 (밀리초)
+
+google:
+  api:
+    key: ${GOOGLE_API_KEY}

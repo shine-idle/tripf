@@ -19,10 +19,10 @@ public class FeedRequestDto {
     private final String city;
 
     @NotNull(message = "여행 시작일자는 비워둘 수 없습니다.")
-    private final LocalDateTime started_at;
+    private final LocalDateTime startedAt;
 
     @NotNull(message = "여행 종료일자는 비워둘 수 없습니다.")
-    private final LocalDateTime ended_at;
+    private final LocalDateTime endedAt;
 
     @NotBlank(message = "제목은 비워둘 수 없습니다.")
     @Size(max = 50, message = "제목은 50자 이내로 입력해야 합니다.")

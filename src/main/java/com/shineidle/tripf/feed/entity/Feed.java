@@ -16,17 +16,17 @@ public class Feed extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    // todo test를 위해 nullable = false 비활성화
     @ManyToOne(fetch = FetchType.LAZY)
-    //@JoinColumn(name = "user_id", nullable = false)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    private String country;
 
     private String city;
 
-    private LocalDateTime started_at;
+    private LocalDateTime startedAt;
 
-    private LocalDateTime ended_at;
+    private LocalDateTime endedAt;
 
     private String title;
 
@@ -36,30 +36,56 @@ public class Feed extends BaseEntity {
 
     private String tag;
 
-    private LocalDateTime deleted_at;
+    private LocalDateTime deletedAt;
 
+    /**
+     * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
+     */
     public Feed() {}
 
-    public Feed(String city, LocalDateTime started_at, LocalDateTime ended_at, String title, String content, Long cost, String tag) {
+    public Feed(User user, String country, String city, LocalDateTime startedAt, LocalDateTime endedAt, String title, String content, Long cost, String tag) {
+        this.user = user;
+        this.country = country;
         this.city = city;
-        this.started_at = started_at;
-        this.ended_at = ended_at;
+        this.startedAt = startedAt;
+        this.endedAt = endedAt;
         this.title = title;
         this.content = content;
         this.cost = cost;
         this.tag = tag;
-        this.deleted_at = LocalDateTime.now();
+        this.deletedAt = null;
     }
 
-    public Feed update(String city, LocalDateTime started_at, LocalDateTime ended_at, String title, String content, Long cost, String tag) {
+    /**
+     * 연관관계 - Foreign Key 값을 따로 컬럼으로 정의하지 않고 연관 관계로 정의합니다.
+     */
+
+
+    /**
+     * 연관관계 편의 메소드 - 반대쪽에는 연관관계 편의 메소드가 없도록 주의합니다.
+     */
+
+
+    /**
+     * 서비스 메소드 - 외부에서 엔티티를 수정할 메소드를 정의합니다. (단일 책임을 가지도록 주의합니다.)
+     */
+    public void update(String country, String city, LocalDateTime startedAt, LocalDateTime endedAt, String title, String content, Long cost, String tag) {
+        this.country = country;
         this.city = city;
-        this.started_at = started_at;
-        this.ended_at = ended_at;
+        this.startedAt = startedAt;
+        this.endedAt = endedAt;
         this.title = title;
         this.content = content;
         this.cost = cost;
         this.tag = tag;
-        this.deleted_at = LocalDateTime.now();
-        return this;
     }
+
+    public void markAsDeleted() {
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    public boolean isDeleted() {
+        return this.deletedAt != null;
+    }
+
 }
