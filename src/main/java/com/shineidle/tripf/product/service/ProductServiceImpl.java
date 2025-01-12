@@ -109,8 +109,8 @@ public class ProductServiceImpl implements ProductService {
         return new PostMessageResponseDto(PostMessage.PRODUCT_DISCONTINUED);
     }
 
-
-    private Product getProductById(Long productId) {
+    @Override
+    public Product getProductById(Long productId) {
         return productRepository.findById(productId).orElseThrow(() ->
                 new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
     }
