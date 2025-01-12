@@ -27,10 +27,10 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserResponseDto> find(
+    public ResponseEntity<UserResponseDto> findUser(
             @PathVariable Long userId
     ) {
-        return new ResponseEntity<>(userService.find(userId), HttpStatus.OK);
+        return new ResponseEntity<>(userService.findUser(userId), HttpStatus.OK);
     }
 
     @PatchMapping("/me")
@@ -48,9 +48,9 @@ public class UserController {
     }
 
     @PatchMapping("/deactivate")
-    public ResponseEntity<PostMessageResponseDto> delete(
+    public ResponseEntity<PostMessageResponseDto> deleteUser(
             @RequestBody UserRequestDto dto
     ) {
-        return new ResponseEntity<>(userService.delete(dto), HttpStatus.OK);
+        return new ResponseEntity<>(userService.deleteUser(dto), HttpStatus.OK);
     }
 }

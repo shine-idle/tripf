@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public PostMessageResponseDto create(UserRequestDto dto) {
+    public PostMessageResponseDto createUser(UserRequestDto dto) {
         boolean duplicated = userRepository.findByEmail(dto.getEmail()).isPresent();
         if (duplicated) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "중복된 이메일 입니다.");
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDto find(Long userId) {
+    public UserResponseDto findUser(Long userId) {
         User findUser = getUserById(userId);
         return UserResponseDto.toDto(findUser);
     }
@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PostMessageResponseDto delete(UserRequestDto dto) {
+    public PostMessageResponseDto deleteUser(UserRequestDto dto) {
         User user = UserAuthorizationUtil.getLoginUser();
         validatePassword(dto.getPassword(), user.getPassword());
 
