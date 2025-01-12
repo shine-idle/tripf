@@ -27,7 +27,7 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     @Transactional
-    public ProductResponseDto create(ProductRequestDto dto) {
+    public ProductResponseDto createProduct(ProductRequestDto dto) {
         Product product = new Product(
                 dto.getCategory(),
                 dto.getStatus(),
@@ -48,7 +48,7 @@ public class ProductServiceImpl implements ProductService {
      * @return {@link ProductResponseDto}
      */
     @Override
-    public List<ProductResponseDto> find() {
+    public List<ProductResponseDto> findAllProduct() {
         return productRepository.findAllExceptDiscontinuedProducts()
                 .stream()
                 .map(ProductResponseDto::toDto)
@@ -62,7 +62,7 @@ public class ProductServiceImpl implements ProductService {
      * @return {@link ProductResponseDto}
      */
     @Override
-    public ProductResponseDto find(Long productId) {
+    public ProductResponseDto findProduct(Long productId) {
         Product product = getProductById(productId);
 
         return ProductResponseDto.toDto(product);
@@ -78,7 +78,7 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     @Transactional
-    public ProductResponseDto update(Long productId, ProductRequestDto dto) {
+    public ProductResponseDto updateProduct(Long productId, ProductRequestDto dto) {
         Product product = getProductById(productId);
 
         // 기존의 상품과 이름이 중복되는지 체크
@@ -99,7 +99,7 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     @Transactional
-    public PostMessageResponseDto delete(Long productId) {
+    public PostMessageResponseDto deleteProduct(Long productId) {
         Product product = getProductById(productId);
 
         // 상품 삭제

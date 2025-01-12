@@ -24,7 +24,7 @@ public class ProductController {
      */
     @GetMapping
     public ResponseEntity<List<ProductResponseDto>> findAllProduct() {
-        return new ResponseEntity<>(productService.find(), HttpStatus.OK);
+        return new ResponseEntity<>(productService.findAllProduct(), HttpStatus.OK);
     }
 
     /**
@@ -36,6 +36,6 @@ public class ProductController {
     public ResponseEntity<ProductResponseDto> findProduct(
             @PathVariable Long productId
     ) {
-        return new ResponseEntity<>(productService.find(productId), HttpStatus.OK);
+        return new ResponseEntity<>(productService.findProduct(productId), HttpStatus.OK);
     }
 }

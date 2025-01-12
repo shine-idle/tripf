@@ -22,10 +22,10 @@ public class AdminProductController {
      * @return {@link ProductResponseDto}
      */
     @PostMapping
-    public ResponseEntity<ProductResponseDto> create(
+    public ResponseEntity<ProductResponseDto> createProduct(
             @RequestBody @Valid ProductRequestDto dto
     ) {
-        return new ResponseEntity<>(productService.create(dto), HttpStatus.CREATED);
+        return new ResponseEntity<>(productService.createProduct(dto), HttpStatus.CREATED);
     }
 
     /**
@@ -35,11 +35,11 @@ public class AdminProductController {
      * @return {@link ProductResponseDto}
      */
     @PatchMapping("/{productId}")
-    public ResponseEntity<ProductResponseDto> update(
+    public ResponseEntity<ProductResponseDto> updateProduct(
             @PathVariable Long productId,
             @RequestBody @Valid ProductRequestDto dto
     ) {
-        return new ResponseEntity<>(productService.update(productId, dto), HttpStatus.OK);
+        return new ResponseEntity<>(productService.updateProduct(productId, dto), HttpStatus.OK);
     }
 
     /**
@@ -48,9 +48,9 @@ public class AdminProductController {
      * @return 상품 삭제 문구
      */
     @DeleteMapping("/{productId}")
-    public ResponseEntity<PostMessageResponseDto> delete(
+    public ResponseEntity<PostMessageResponseDto> deleteProduct(
             @PathVariable Long productId
     ) {
-        return new ResponseEntity<>(productService.delete(productId), HttpStatus.OK);
+        return new ResponseEntity<>(productService.deleteProduct(productId), HttpStatus.OK);
     }
 }
