@@ -30,7 +30,10 @@ public class WebConfig {
 
     private final AccessDeniedHandler accessDeniedHandler;
 
-    private static final String[] WHITE_LIST = {"/api/signup", "/api/login"};
+    private static final String[] WHITE_LIST = {
+            "/api/", "/api/signup", "/api/login",
+            "/api/products/**"
+    };
 
     /**
      * Security 필터
