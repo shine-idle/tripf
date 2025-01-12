@@ -33,10 +33,10 @@ public class AccountController {
      * @return {@link PostMessageResponseDto} 회원가입 완료 문구
      */
     @PostMapping("/signup")
-    public ResponseEntity<PostMessageResponseDto> create(
+    public ResponseEntity<PostMessageResponseDto> signUp(
             @RequestBody UserRequestDto dto
     ) {
-        return new ResponseEntity<>(userService.create(dto), HttpStatus.CREATED);
+        return new ResponseEntity<>(userService.createUser(dto), HttpStatus.CREATED);
     }
 
     /**

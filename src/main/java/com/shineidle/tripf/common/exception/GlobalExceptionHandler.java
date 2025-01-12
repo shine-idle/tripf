@@ -1,5 +1,6 @@
 package com.shineidle.tripf.common.exception;
 
+import com.shineidle.tripf.common.exception.type.CommonErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class GlobalExceptionHandler {
         response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        String message = "로그인이 필요합니다.";
+        String message = CommonErrorCode.INVALID_USER.getMessage();
         response.getWriter().write("{\"error\": \"Authentication required\", \"message\": \"" + message + "\"}");
     }
 
@@ -35,9 +36,9 @@ public class GlobalExceptionHandler {
         String message;
         String requestURI = request.getRequestURI();
         if (requestURI.startsWith("/api/admin")) {
-            message = "관리자 권한이 필요합니다.";
+            message = CommonErrorCode.NEED_ADMIN_ACCESS.getMessage();
         } else {
-            message = "접근 권한이 없습니다.";
+            message = CommonErrorCode.ACCESS_DENIED.getMessage();
         }
 
         response.getWriter().write("{\"error\": \"Access denied\", \"message\": \"" + message + "\"}");
