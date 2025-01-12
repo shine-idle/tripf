@@ -56,14 +56,4 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.badRequest().body(fieldErrors);
     }
-
-//    @ExceptionHandler(ResponseStatusException.class)
-//    public ResponseEntity<Map<String, String>> handleResponseStatusException(ResponseStatusException e) {
-//
-//        Map<String, String> response = new HashMap<>();
-//        response.put("error code", e.getStatusCode().toString());
-//        response.put("message", e.getReason());
-//
-//        return new ResponseEntity<>(response, e.getStatusCode());
-//    }
 }

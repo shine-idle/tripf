@@ -59,7 +59,7 @@ public class CartServiceImpl implements CartService {
         Product foundProduct = findByIdOrElseThrow(productId);
 
         // 로그인한 유저 장바구니에서 특정 상품 찾기
-        Cart foundCart = findByUserIdAndProductId(userId, productId);
+        Cart foundCart = findByUserIdAndProductId(userId, foundProduct.getId());
 
         foundCart.updateCart(cartCreateRequestDto);
 
@@ -75,29 +75,16 @@ public class CartServiceImpl implements CartService {
 
         Product foundProduct = findByIdOrElseThrow(productId);
 
-        Cart foundCart = findByUserIdAndProductId(userId, productId);
+        Cart foundCart = findByUserIdAndProductId(userId, foundProduct.getId());
 
         cartRepository.delete(foundCart);
     }
-
-//    public Product findByIdOrElseThrow(Long productId) {
-//
-//        return productRepository.findById(productId)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 상품을 찾을 수 없습니다."));
-//    }
 
     public Product findByIdOrElseThrow(Long productId) {
 
         return productRepository.findById(productId)
                 .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
     }
-
-//    public Cart findByUserIdAndProductId(Long userId, Long productId) {
-//
-//        return cartRepository.findByUserIdAndProductId(userId, productId)
-//                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 유저와 상품을 찾을 수 없습니다."));
-//
-//    }
 
     public Cart findByUserIdAndProductId(Long userId, Long productId) {
 
