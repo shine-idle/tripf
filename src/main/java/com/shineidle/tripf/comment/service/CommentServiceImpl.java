@@ -6,17 +6,19 @@ import com.shineidle.tripf.comment.entity.Comment;
 import com.shineidle.tripf.comment.repository.CommentRepository;
 import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.CommentErrorCode;
+import com.shineidle.tripf.common.message.constants.NotificationMessage;
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.common.message.enums.PostMessage;
 import com.shineidle.tripf.common.util.UserAuthorizationUtil;
 import com.shineidle.tripf.feed.entity.Feed;
 import com.shineidle.tripf.feed.service.FeedService;
+import com.shineidle.tripf.notification.service.NotificationService;
+import com.shineidle.tripf.notification.type.NotifyType;
 import com.shineidle.tripf.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +27,7 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final FeedService feedService;
+    private final NotificationService notificationService;
 
     /**
      * 댓글 작성
@@ -44,6 +47,8 @@ public class CommentServiceImpl implements CommentService {
                 commentRequestDto.getComment()
         );
         Comment savecomment = commentRepository.save(comment);
+
+        createCommentNotification(feed.getUser(), user);
 
         return CommentResponseDto.toDto(savecomment);
     }
@@ -130,4 +135,8 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+    private void createCommentNotification(User targetUser, User actor) {
+        String context = String.format(NotificationMessage.NEW_COMMENT_NOTIFICATION, actor.getName());
+        notificationService.createNotification(targetUser, actor, NotifyType.NEW_COMMENT, context);
+    }
 }

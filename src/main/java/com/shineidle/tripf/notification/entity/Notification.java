@@ -1,5 +1,7 @@
 package com.shineidle.tripf.notification.entity;
 
+import com.shineidle.tripf.common.BaseEntity;
+import com.shineidle.tripf.notification.type.NotifyType;
 import com.shineidle.tripf.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,7 +9,7 @@ import lombok.Getter;
 @Entity
 @Getter
 @Table(name = "`notification`")
-public class Notification {
+public class Notification extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -17,5 +19,23 @@ public class Notification {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "actor_id")
+    private User actor;
+
+    @Enumerated(EnumType.STRING)
+    private NotifyType notifyType;
+
     private String notifyContext;
+
+    protected Notification() {}
+
+    public static Notification create(User user, User actor, NotifyType notifyType, String notifyContext) {
+        Notification notification = new Notification();
+        notification.user = user;
+        notification.actor = actor;
+        notification.notifyType = notifyType;
+        notification.notifyContext = notifyContext;
+        return notification;
+    }
 }
