@@ -53,6 +53,9 @@ dependencies {
     //JACKSON
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
+    //Mail
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
