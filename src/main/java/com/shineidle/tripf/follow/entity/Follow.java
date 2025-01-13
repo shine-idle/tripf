@@ -9,11 +9,11 @@ import lombok.Getter;
 @IdClass(FollowPk.class)
 @Table(name = "`follow`")
 public class Follow extends BaseEntity {
-    //팔로워 ID(나를 팔로워)
+    //팔로워 ID(나를 팔로우한 사람의 ID)
     @Id
     private Long followerId;
 
-    //팔로잉 ID(내가 팔로잉)
+    //팔로잉 ID(내가 팔로우한 사람의 ID)
     @Id
     private Long followingId;
 
