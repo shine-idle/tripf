@@ -40,7 +40,8 @@ public class NotificationServiceImpl implements NotificationService {
      * @param context 알림 내용
      */
     public void createNotification(User targetUser, User actor, NotifyType notifyType, String context) {
+
         Notification notification = Notification.create(targetUser, actor, notifyType, context);
-        notificationRepository.save(notification); // 저장
+        notificationRepository.save(notification);
     }
 }

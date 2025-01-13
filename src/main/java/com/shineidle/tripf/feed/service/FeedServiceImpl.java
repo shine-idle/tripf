@@ -15,7 +15,6 @@ import com.shineidle.tripf.feed.repository.FeedRepository;
 import com.shineidle.tripf.geo.service.GeoService;
 import com.shineidle.tripf.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
