@@ -32,7 +32,8 @@ public class WebConfig {
 
     private static final String[] WHITE_LIST = {
             "/api/", "/api/signup", "/api/login",
-            "/api/products/**"
+            "/api/products/**",
+            "/swagger-ui/**", "/v3/api-docs/**"
     };
 
     /**
