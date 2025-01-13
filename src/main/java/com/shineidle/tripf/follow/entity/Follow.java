@@ -1,31 +1,26 @@
 package com.shineidle.tripf.follow.entity;
 
 import com.shineidle.tripf.common.BaseEntity;
-import com.shineidle.tripf.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 
 @Getter
 @Entity
+@IdClass(FollowPk.class)
 @Table(name = "`follow`")
 public class Follow extends BaseEntity {
+    //팔로워 ID(나를 팔로워)
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "follow_id")
-    private Long id;
+    private Long followerId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "follower_id")
-    private User follower;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name ="followed_id")
-    private User followed;
+    //팔로잉 ID(내가 팔로잉)
+    @Id
+    private Long followingId;
 
     public Follow() {}
 
-    public Follow(User follower, User followed) {
-        this.follower = follower;
-        this.followed = followed;
+    public Follow(Long followerId, Long followingId) {
+        this.followerId = followerId;
+        this.followingId = followingId;
     }
 }
