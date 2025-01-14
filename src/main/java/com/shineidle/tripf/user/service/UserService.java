@@ -4,17 +4,17 @@ import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.user.dto.*;
 
 public interface UserService {
-    PostMessageResponseDto create(UserRequestDto dto);
+    PostMessageResponseDto createUser(UserRequestDto dto);
 
     JwtResponseDto login(UserRequestDto dto);
 
-    UserResponseDto find(Long userId);
+    UserResponseDto findUser(Long userId);
 
     PostMessageResponseDto updatePassword(PasswordUpdateRequestDto dto);
 
     PostMessageResponseDto updateName(UsernameUpdateRequestDto dto);
 
-    PostMessageResponseDto delete(UserRequestDto dto);
+    PostMessageResponseDto deleteUser(UserRequestDto dto);
 
     void verify(UserRequestDto dto);
 }

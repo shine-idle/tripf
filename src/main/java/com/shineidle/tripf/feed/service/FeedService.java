@@ -2,6 +2,7 @@ package com.shineidle.tripf.feed.service;
 
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.feed.dto.*;
+import com.shineidle.tripf.feed.entity.Feed;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -59,5 +60,8 @@ public interface FeedService {
      */
     List<RegionResponseDto> findRegion(String country);
 
-
+    /**
+     *피드 ID로 피드 확인
+     */
+    Feed checkFeed(Long feedId);
 }

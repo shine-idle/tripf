@@ -15,7 +15,6 @@ import com.shineidle.tripf.feed.repository.FeedRepository;
 import com.shineidle.tripf.geo.service.GeoService;
 import com.shineidle.tripf.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +30,6 @@ public class FeedServiceImpl implements FeedService {
     private final DaysRepository daysRepository;
     private final ActivityRepository activityRepository;
     private final GeoService geoService;
-    private final CacheManager cacheManager;
 
     /**
      * 피드 생성
@@ -41,12 +39,12 @@ public class FeedServiceImpl implements FeedService {
      */
     @Override
     public FeedResponseDto createFeed(FeedRequestDto feedRequestDto) {
-        Long userId = UserAuthorizationUtil.getLoginUserId();
+        User userId = UserAuthorizationUtil.getLoginUser();
 
         String country = geoService.getCountryByCity(feedRequestDto.getCity());
 
         Feed feed = new Feed(
-                new User(userId),
+                userId,
                 country,
                 feedRequestDto.getCity(),
                 feedRequestDto.getStartedAt(),
