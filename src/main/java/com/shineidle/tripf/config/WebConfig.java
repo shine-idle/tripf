@@ -43,9 +43,10 @@ public class WebConfig {
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
 
-    public static final String[] WHITE_LIST = {
-            "/", "/error", "/api/", "/api/signup", "/api/login", "/login",
-            "/api/products/**"
+    private static final String[] WHITE_LIST = {
+            "/", "/error", "/api/", "/api/signup", "/api/login", "/login"
+            "/api/products/**",
+            "/swagger-ui/**", "/v3/api-docs/**"
     };
 
     /**
