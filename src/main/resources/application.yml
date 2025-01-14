@@ -21,7 +21,13 @@ spring:
         format_sql: 'true'
         show_sql: 'true'
 
-  cache:
+  servlet:
+    multipart:
+      resolve-lazily: true
+      max-file-size: 8MB  # 파일 용량 제한
+      max-request-size: 128MB # 전체 최대 크기 용량 제한
+
+    cache:
     type: redis
   data:
     redis:
@@ -65,3 +71,15 @@ management:
   endpoint:
     health:
       show-details: always
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${S3_ACCESS_KEY}
+      secretKey: ${S3_SECRET_KEY}
+    s3:
+      bucketName: ${S3_BUCKET_NAME}
+    region:
+      static: ${S3_REGION}
+    stack:
+      auto: false
