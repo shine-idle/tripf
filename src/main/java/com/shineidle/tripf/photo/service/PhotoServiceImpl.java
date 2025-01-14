@@ -42,6 +42,9 @@ public class PhotoServiceImpl implements PhotoService {
     private final ProductPhotoRepository productPhotoRepository;
     private final S3Client s3Client;
 
+    private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "avif");
+    private static final long MAX_FILE_SIZE = 8 * 1024 * 1024; // 10MB (파일 크기 제한)
+
     @Value("${cloud.aws.s3.bucketName}")
     private String bucket;
 
@@ -58,14 +61,21 @@ public class PhotoServiceImpl implements PhotoService {
     @Transactional
     public PhotoCreateResponseDto uploadPhoto(Long domainId, PhotoCreateRequestDto photoCreateRequestDto, MultipartFile multipartFile, PhotoDomain domainType) throws IOException {
 
-        // S3에 파일 업로드
-        String storedFileName = generateUniqueFileName(multipartFile.getOriginalFilename());
+        String originalFileName = multipartFile.getOriginalFilename();
+        long fileSize = multipartFile.getSize();
+
+        // 사진 확장자 및 크기 검증
+        validateFileExtension(originalFileName);
+        validateFileSize(fileSize);
+
+        // S3에 사진 업로드
+        String storedFileName = generateUniqueFileName(originalFileName);
         uploadToS3(multipartFile, storedFileName);
 
         // S3 URL 생성
         String fileUrl = generateFileUrl(storedFileName);
 
-        // DB에 이미지 정보 저장
+        // DB에 사진 정보 저장
         Photo photo = saveImage(multipartFile, photoCreateRequestDto, fileUrl);
 
         // 도메인에 따라 관계 엔티티 저장
@@ -89,7 +99,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     /**
-     * 파일 정보를 Photo DB에 저장
+     * 사진 정보를 Photo DB에 저장
      *
      * @param multipartFile {@link MultipartFile}
      * @param photoCreateRequestDto {@link PhotoCreateRequestDto}
@@ -112,7 +122,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     /**
-     * 고유한 파일 이름 생성
+     * 고유한 사진 이름 생성
      *
      * @param originalFileName 원본 사진 이름
      * @return String
@@ -124,7 +134,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     /**
-     * S3에 파일 업로드
+     * S3에 사진 업로드
      *
      * @param multipartFile {@link MultipartFile}
      * @param storedFileName 저장 사진 이름
@@ -147,7 +157,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     /**
-     * S3 파일 URL 생성
+     * S3 사진 URL 생성
      *
      * @param storedFileName 저장 사진 이름
      * @return String
@@ -159,7 +169,30 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     /**
-     * 파일 확장자 추출
+     * 사진 확장자 검증
+     *
+     * @param originalFileName 원본 사진 이름
+     */
+    private void validateFileExtension(String originalFileName) {
+        String ext = getExtension(originalFileName);
+        if (!ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
+            throw new GlobalException(PhotoErrorCode.INVALID_FILE_EXTENSION);
+        }
+    }
+
+    /**
+     * 사진 크기 검증
+     *
+     * @param size 사진 크기
+     */
+    private void validateFileSize(long size) {
+        if (size > MAX_FILE_SIZE) {
+            throw new GlobalException(PhotoErrorCode.INVALID_FILE_SIZE);
+        }
+    }
+
+    /**
+     * 사진 확장자 추출
      *
      * @param originalFileName 원본 사진 이름
      * @return String
@@ -237,6 +270,13 @@ public class PhotoServiceImpl implements PhotoService {
     @Override
     @Transactional
     public PhotoCreateResponseDto updatePhoto(Long domainId, Long photoId, PhotoCreateRequestDto photoCreateRequestDto, MultipartFile multipartFile, PhotoDomain domainType) {
+
+        String originalFileName = multipartFile.getOriginalFilename();
+        long fileSize = multipartFile.getSize();
+
+        // 사진 확장자 및 크기 검증
+        validateFileExtension(originalFileName);
+        validateFileSize(fileSize);
 
         Photo photo = findByPhotoId(photoId);
 
