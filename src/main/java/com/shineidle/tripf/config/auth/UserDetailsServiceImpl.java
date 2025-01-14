@@ -15,15 +15,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
     /**
-     * 입력받은 이메일에 해당하는 유저의 정보를 찾아 리턴
+     * 입력받은 이메일에 해당하는 유저의 정보를 찾아 리턴 (카카오의 경의 providerId)
      * @param username username
      * @return {@link UserDetailsImpl}
      * @throws UsernameNotFoundException 이메일에 해당하는 유저를 찾지 못한 경우 예외 발생
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = this.userRepository.findByEmail(username).orElseThrow(() ->
-                new UsernameNotFoundException("User not found"));
+        User user = this.userRepository.findByEmail(username)
+                .orElseGet(() -> this.userRepository.findByProviderId(username)
+                        .orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다.")));
+
         return new UserDetailsImpl(user);
     }
 }
