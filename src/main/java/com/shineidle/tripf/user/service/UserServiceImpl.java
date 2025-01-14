@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 토큰 생성
-        String accessToken = jwtProvider.generateToken(authentication);
+        String accessToken = jwtProvider.generateToken(authentication, false);
         log.info("토큰: {}", accessToken);
         log.info("로그인 유저의 Id: {}", UserAuthorizationUtil.getLoginUserId());
         log.info(UserAuthorizationUtil.getLoginUserEmail());

@@ -12,4 +12,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return {@link User}
      */
     Optional<User> findByEmail(String email);
+
+    /**
+     * ProviderId로 유저 찾기 (소셜로그인)
+     * @param id providerId
+     * @return {@link User
+     */
+    Optional<User> findByProviderId(String id);
 }

@@ -1,6 +1,10 @@
 package com.shineidle.tripf.config;
 
 import com.shineidle.tripf.config.filter.JwtAuthFilter;
+import com.shineidle.tripf.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.shineidle.tripf.oauth2.handler.OAuth2AuthenticationFailureHandler;
+import com.shineidle.tripf.oauth2.handler.OAuth2AuthenticationSuccessHandler;
+import com.shineidle.tripf.oauth2.service.CustomOAuth2UserService;
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -30,20 +34,33 @@ public class WebConfig {
 
     private final AccessDeniedHandler accessDeniedHandler;
 
-    private static final String[] WHITE_LIST = {
-            "/api/", "/api/signup", "/api/login",
+    private final CustomOAuth2UserService customOAuth2UserService;
+
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+
+    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+
+
+    public static final String[] WHITE_LIST = {
+            "/", "/error", "/api/", "/api/signup", "/api/login", "/login",
             "/api/products/**"
     };
 
     /**
      * Security 필터
+     *
      * @param http {@link HttpSecurity}
      * @return {@link SecurityFilterChain} 필터 체인
      */
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(AbstractHttpConfigurer::disable)
+                .headers(HeadersConfigurer -> HeadersConfigurer.frameOptions(org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig::disable)) // H2 DB
                 .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(WHITE_LIST).permitAll()
                                 // static 리소스 경로
@@ -62,6 +79,12 @@ public class WebConfig {
                 // HttpSession을 사용하지 않도록 설정
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
+                .oauth2Login(configure ->
+                        configure.authorizationEndpoint(config -> config.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
+                                .userInfoEndpoint(config -> config.userService(customOAuth2UserService))
+                                .successHandler(oAuth2AuthenticationSuccessHandler)
+                                .failureHandler(oAuth2AuthenticationFailureHandler)
+                )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -69,6 +92,7 @@ public class WebConfig {
 
     /**
      * 권한 계층 설정
+     *
      * @return {@link RoleHierarchy}
      */
     @Bean
