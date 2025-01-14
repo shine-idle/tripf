@@ -14,9 +14,11 @@ public class UserResponseDto {
     private final Long id;
     private final String email;
     private final String name;
-    private final String address;
+    private final String provider;
+    private final String providerId;
     private final UserStatus status;
     private final UserAuth auth;
+    private final String address;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
     private final LocalDateTime deletedAt;
@@ -26,9 +28,11 @@ public class UserResponseDto {
                 user.getId(),
                 user.getEmail(),
                 user.getName(),
-                user.getAddress(),
+                user.getProvider(),
+                user.getProviderId(),
                 user.getStatus(),
                 user.getAuth(),
+                user.getAddress(),
                 user.getCreatedAt(),
                 user.getModifiedAt(),
                 user.getDeletedAt()
