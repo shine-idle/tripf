@@ -42,7 +42,7 @@ public class ActivityPhotoController {
     public ResponseEntity<PhotoCreateResponseDto> uploadPhotoToActivity(
             @PathVariable Long activityId,
             @ModelAttribute PhotoCreateRequestDto photoCreateRequestDto,
-            @RequestParam MultipartFile file
+            @RequestParam(value = "file",required = false) MultipartFile file
     ) throws IOException {
         PhotoCreateResponseDto responseDto = photoService.uploadPhoto(activityId, photoCreateRequestDto, file, PhotoDomain.ACTIVITY);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);

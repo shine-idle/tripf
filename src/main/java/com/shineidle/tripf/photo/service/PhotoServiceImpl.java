@@ -61,15 +61,11 @@ public class PhotoServiceImpl implements PhotoService {
     @Transactional
     public PhotoCreateResponseDto uploadPhoto(Long domainId, PhotoCreateRequestDto photoCreateRequestDto, MultipartFile multipartFile, PhotoDomain domainType) throws IOException {
 
-        String originalFileName = multipartFile.getOriginalFilename();
-        long fileSize = multipartFile.getSize();
-
-        // 사진 확장자 및 크기 검증
-        validateFileExtension(originalFileName);
-        validateFileSize(fileSize);
+        // 사진 유효성 검사
+        validateMultipartFile(multipartFile);
 
         // S3에 사진 업로드
-        String storedFileName = generateUniqueFileName(originalFileName);
+        String storedFileName = generateUniqueFileName(multipartFile.getOriginalFilename());
         uploadToS3(multipartFile, storedFileName);
 
         // S3 URL 생성
@@ -169,24 +165,30 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     /**
-     * 사진 확장자 검증
+     * 사진 유효성 검증
      *
-     * @param originalFileName 원본 사진 이름
+     * @param multipartFile {@link MultipartFile}
      */
-    private void validateFileExtension(String originalFileName) {
+    private void validateMultipartFile(MultipartFile multipartFile) {
+
+        // 사진 존재 여부 검증
+        if (multipartFile == null) {
+            throw new GlobalException(PhotoErrorCode.PHOTO_EMPTY);
+        }
+        if (multipartFile.isEmpty()) {
+            throw new GlobalException(PhotoErrorCode.PHOTO_EMPTY);
+        }
+
+        // 사진 확장자 검증
+        String originalFileName = multipartFile.getOriginalFilename();
         String ext = getExtension(originalFileName);
         if (!ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
             throw new GlobalException(PhotoErrorCode.INVALID_FILE_EXTENSION);
         }
-    }
 
-    /**
-     * 사진 크기 검증
-     *
-     * @param size 사진 크기
-     */
-    private void validateFileSize(long size) {
-        if (size > MAX_FILE_SIZE) {
+        // 사진 크기 검증
+        long fileSize = multipartFile.getSize();
+        if (fileSize > MAX_FILE_SIZE) {
             throw new GlobalException(PhotoErrorCode.INVALID_FILE_SIZE);
         }
     }
@@ -271,12 +273,8 @@ public class PhotoServiceImpl implements PhotoService {
     @Transactional
     public PhotoCreateResponseDto updatePhoto(Long domainId, Long photoId, PhotoCreateRequestDto photoCreateRequestDto, MultipartFile multipartFile, PhotoDomain domainType) {
 
-        String originalFileName = multipartFile.getOriginalFilename();
-        long fileSize = multipartFile.getSize();
-
-        // 사진 확장자 및 크기 검증
-        validateFileExtension(originalFileName);
-        validateFileSize(fileSize);
+        // 사진 유효성 검사
+        validateMultipartFile(multipartFile);
 
         Photo photo = findByPhotoId(photoId);
 
