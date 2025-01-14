@@ -1,12 +1,16 @@
 package com.shineidle.tripf.product.entity;
 
 import com.shineidle.tripf.common.BaseEntity;
+import com.shineidle.tripf.photo.entity.ProductPhoto;
 import com.shineidle.tripf.product.ProductCategory;
 import com.shineidle.tripf.product.ProductStatus;
 import com.shineidle.tripf.product.dto.ProductRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicUpdate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -32,6 +36,9 @@ public class Product extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductPhoto> productPhotos = new ArrayList<>();
 
     public Product(ProductCategory category, ProductStatus status, String name, Long price, String description, Long stock) {
         this.category = category;

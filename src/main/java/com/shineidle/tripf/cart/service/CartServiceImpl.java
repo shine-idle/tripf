@@ -24,6 +24,13 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
 
+    /**
+     * 장바구니 생성
+     *
+     * @param productId 상품Id
+     * @param cartCreateRequestDto {@link CartCreateRequestDto}
+     * @return {@link CartCreateResponseDto} 생성된 장바구니 응답값
+     */
     @Override
     public CartCreateResponseDto createCart(Long productId, CartCreateRequestDto cartCreateRequestDto) {
 
@@ -36,6 +43,11 @@ public class CartServiceImpl implements CartService {
         return CartCreateResponseDto.toDto(savedCart);
     }
 
+    /**
+     * 장바구니 조회
+     *
+     * @return {@link CartCreateResponseDto} 조회된 장바구니 응답값
+     */
     @Override
     public List<CartCreateResponseDto> findCart() {
 
@@ -46,6 +58,12 @@ public class CartServiceImpl implements CartService {
         return carts.stream().map(CartCreateResponseDto::toDto).toList();
     }
 
+    /**
+     *
+     * @param productId 상품Id
+     * @param cartCreateRequestDto {@link CartCreateRequestDto}
+     * @return {@link CartCreateResponseDto} 수정된 장바구니 응답값
+     */
     @Override
     public CartCreateResponseDto updateCart(Long productId, CartCreateRequestDto cartCreateRequestDto) {
 
@@ -62,6 +80,11 @@ public class CartServiceImpl implements CartService {
         return CartCreateResponseDto.toDto(foundCart);
     }
 
+    /**
+     * 장바구니 삭제
+     *
+     * @param productId 상품Id
+     */
     @Override
     public void deleteCart(Long productId) {
 
@@ -74,12 +97,24 @@ public class CartServiceImpl implements CartService {
         cartRepository.delete(foundCart);
     }
 
+    /**
+     * 상품Id로 상품 조회
+     *
+     * @param productId 상품Id
+     * @return Product {@link Product}
+     */
     public Product findByIdOrElseThrow(Long productId) {
 
         return productRepository.findById(productId)
                 .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
     }
 
+    /**
+     * 유저Id와 상품Id에 해당하는 장바구니 조회
+     * @param userId
+     * @param productId
+     * @return Cart {@link Cart}
+     */
     public Cart findByUserIdAndProductId(Long userId, Long productId) {
 
         return cartRepository.findByUserIdAndProductId(userId, productId)

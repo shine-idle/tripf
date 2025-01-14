@@ -1,11 +1,14 @@
 package com.shineidle.tripf.feed.entity;
 
 import com.shineidle.tripf.common.BaseEntity;
-import com.shineidle.tripf.feed.dto.ActivityResponseDto;
+import com.shineidle.tripf.photo.entity.ActivityPhoto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -32,6 +35,9 @@ public class Activity extends BaseEntity {
     private Double latitude;
 
     private Double longitude;
+
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ActivityPhoto> activityPhotos = new ArrayList<>();
 
     public Activity() {}
 
