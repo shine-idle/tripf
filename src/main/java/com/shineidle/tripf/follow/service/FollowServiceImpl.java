@@ -57,9 +57,9 @@ public class FollowServiceImpl implements FollowService {
     @Override
     public List<FollowResponseDto> findFollowers() {
         User loginUser = UserAuthorizationUtil.getLoginUser();
-        Long followingrId = loginUser.getId();
+        Long followingId = loginUser.getId();
 
-        List<Follow> followers = followRepository.findByFollowingId(followingrId);
+        List<Follow> followers = followRepository.findByFollowingId(followingId);
 
         return followers.stream()
                 .map(f -> new FollowResponseDto(f.getFollowerId()))
