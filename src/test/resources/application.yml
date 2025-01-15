@@ -1,0 +1,55 @@
+server:
+  error:
+    include-message: always
+
+spring:
+  profiles:
+    active: local
+    include: test
+  datasource:
+    url: jdbc:h2:mem:~/test
+    username: root
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    generate-ddl: 'false'
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: 'true'
+        format_sql: 'true'
+    database: h2
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: 'true'
+    hibernate:
+      ddl-auto: create
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: mail.tripf@gmail.com
+    password: test
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    default-encoding: UTF-8
+
+jwt:
+  secret: test
+  expiry-millis: 300000 # 토큰 만료시간 (밀리초)
+
+google:
+  api:
+    key: test
