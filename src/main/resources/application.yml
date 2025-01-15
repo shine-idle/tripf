@@ -77,12 +77,13 @@ spring:
       max-file-size: 8MB  # 파일 용량 제한
       max-request-size: 128MB # 전체 최대 크기 용량 제한
 
-    cache:
+  cache:
     type: redis
   data:
     redis:
-      host: localhost
+      host: ${REDIS_HOST}
       port: 6379
+      password: ${REDIS_PASSWORD}
 
   mail:
     host: smtp.gmail.com
@@ -105,7 +106,7 @@ jwt:
 google:
   api:
     key: ${GOOGLE_API_KEY}
-    
+
 springdoc:
   api-docs:
     enabled: true
