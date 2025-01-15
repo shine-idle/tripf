@@ -39,6 +39,9 @@ public class Photo extends BaseEntity {
     @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ActivityPhoto> activityPhotos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductPhoto> productPhotos = new ArrayList<>();
+
     protected Photo() {}
 
     public Photo(String originalFileName, String storedFileName, String description, String url, Long size, String ext) {
