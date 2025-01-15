@@ -302,21 +302,6 @@ public class PhotoServiceImpl implements PhotoService {
         // 도메인 관계 검증
         validateRelation(domainId, photoId, domainType);
 
-        // 도메인에 따라 관계 엔티티 삭제
-        switch (domainType) {
-            case ACTIVITY -> {
-                ActivityPhoto activityPhoto = activityPhotoRepository.findByActivityIdAndPhotoId(domainId, photoId)
-                        .orElseThrow(() -> new GlobalException(PhotoErrorCode.RELATION_INVALID));
-                activityPhotoRepository.delete(activityPhoto);
-            }
-            case PRODUCT -> {
-                ProductPhoto productPhoto = productPhotoRepository.findByProductIdAndPhotoId(domainId, photoId)
-                        .orElseThrow(() -> new GlobalException(PhotoErrorCode.RELATION_INVALID));
-                productPhotoRepository.delete(productPhoto);
-            }
-            default -> throw new GlobalException(PhotoErrorCode.DOMAIN_NOT_FOUND);
-        }
-
         // 사진 엔티티 삭제
         photoRepository.delete(photo);
 
