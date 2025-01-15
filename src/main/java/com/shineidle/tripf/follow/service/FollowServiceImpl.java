@@ -9,13 +9,11 @@ import com.shineidle.tripf.follow.entity.FollowPk;
 import com.shineidle.tripf.follow.repository.FollowRepository;
 import com.shineidle.tripf.user.entity.User;
 import com.shineidle.tripf.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -119,6 +117,5 @@ public class FollowServiceImpl implements FollowService {
             throw new GlobalException(FollowErrorCode.FOLLOW_RELATION_NOT_FOUND);
         }
     }
-
 }
 

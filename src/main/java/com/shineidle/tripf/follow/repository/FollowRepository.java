@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface FollowRepository extends JpaRepository<Follow, FollowPk> {
@@ -18,9 +17,7 @@ public interface FollowRepository extends JpaRepository<Follow, FollowPk> {
 
     //팔로우 취소
     void deleteById(FollowPk followPk);
-    //void deleteByFollowingIdAndFollowerId(Long followingId, Long followerId);
 
     //이미 팔로우 했는지 확인
     boolean existsById(FollowPk followPk);
-    //boolean existsByFollowingIdAndFollowerId(Long followingId, Long followerId);
 }

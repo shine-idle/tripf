@@ -1,7 +1,6 @@
 package com.shineidle.tripf.follow.service;
 
 import com.shineidle.tripf.follow.dto.FollowResponseDto;
-import com.shineidle.tripf.follow.entity.Follow;
 
 import java.util.List;
 
@@ -15,9 +14,9 @@ public interface FollowService {
     //팔로잉 조회
     List<FollowResponseDto> findFollowings();
 
-    //팔로우 삭제
+    //팔로잉 삭제
     void deleteFollowByFollowingId(Long followingId);
 
+    //팔로워 삭제
     void deleteFollowByFollowerId(Long followerId);
-
 }

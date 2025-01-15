@@ -1,17 +1,13 @@
 package com.shineidle.tripf.follow.controller;
 
-import com.shineidle.tripf.common.util.UserAuthorizationUtil;
 import com.shineidle.tripf.follow.dto.FollowResponseDto;
-import com.shineidle.tripf.follow.entity.Follow;
 import com.shineidle.tripf.follow.service.FollowService;
-import com.shineidle.tripf.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
