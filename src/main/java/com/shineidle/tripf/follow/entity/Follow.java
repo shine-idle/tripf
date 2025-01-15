@@ -1,7 +1,10 @@
 package com.shineidle.tripf.follow.entity;
 
 import com.shineidle.tripf.common.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Table;
 import lombok.Getter;
 
 @Getter

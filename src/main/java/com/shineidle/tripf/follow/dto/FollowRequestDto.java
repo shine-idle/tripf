@@ -6,4 +6,5 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class FollowRequestDto {
+    private final Long followingId;
 }
