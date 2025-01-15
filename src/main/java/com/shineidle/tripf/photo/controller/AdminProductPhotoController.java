@@ -9,15 +9,7 @@ import com.shineidle.tripf.photo.type.PhotoDomain;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -37,7 +29,7 @@ public class AdminProductPhotoController {
      * @param file {@link MultipartFile}
      * @return {@link PhotoCreateResponseDto} 생성된 사진 응답값
      */
-    @PostMapping
+    @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<PhotoCreateResponseDto> uploadPhotoToProduct(
             @PathVariable Long productId,
             @ModelAttribute PhotoCreateRequestDto photoCreateRequestDto,
@@ -58,7 +50,11 @@ public class AdminProductPhotoController {
      * @param file {@link MultipartFile}
      * @return {@link PhotoCreateResponseDto} 수정된 사진 응답값
      */
-    @PatchMapping("/{photoId}")
+    @RequestMapping(
+            value = "/{photoId}",
+            method = RequestMethod.PATCH,
+            consumes = "multipart/form-data"
+    )
     public ResponseEntity<PhotoCreateResponseDto> updateProductPhoto(
             @PathVariable Long productId,
             @PathVariable Long photoId,
