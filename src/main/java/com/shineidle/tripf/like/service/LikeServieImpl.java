@@ -23,7 +23,7 @@ public class LikeServieImpl implements LikeServie{
     private final UserService userService;
 
     /**
-     * 좋이요
+     * 좋아요
      * @param feedId 좋이요를 누를 피드 Id
      */
     @Override
