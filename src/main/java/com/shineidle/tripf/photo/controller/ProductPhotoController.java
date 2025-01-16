@@ -3,6 +3,7 @@ package com.shineidle.tripf.photo.controller;
 import com.shineidle.tripf.photo.dto.PhotoResponseDto;
 import com.shineidle.tripf.photo.service.PhotoService;
 import com.shineidle.tripf.photo.type.PhotoDomain;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class ProductPhotoController {
      * @param photoId 사진 식별자
      * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
+    @Operation(summary = "상품 사진 단건 조회")
     @GetMapping("/{photoId}")
     public ResponseEntity<PhotoResponseDto> findProductPhoto(
             @PathVariable Long productId,
@@ -43,6 +45,7 @@ public class ProductPhotoController {
      * @param productId 상품 식별자
      * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
+    @Operation(summary = "상품 사진 다건 조회")
     @GetMapping()
     public ResponseEntity<List<PhotoResponseDto>> findAllProductPhoto(
             @PathVariable Long productId
