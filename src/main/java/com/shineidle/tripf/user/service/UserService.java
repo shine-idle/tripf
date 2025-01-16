@@ -17,4 +17,8 @@ public interface UserService {
     PostMessageResponseDto deleteUser(UserRequestDto dto);
 
     void verify(UserRequestDto dto);
+
+    JwtResponseDto updateToken(String refreshToken);
+
+    void deleteRefreshToken();
 }

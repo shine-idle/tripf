@@ -14,10 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
@@ -29,6 +26,7 @@ public class AccountController {
 
     /**
      * 회원가입
+     *
      * @param dto {@link UserRequestDto}
      * @return {@link PostMessageResponseDto} 회원가입 완료 문구
      */
@@ -41,6 +39,7 @@ public class AccountController {
 
     /**
      * 로그인
+     *
      * @param dto {@link UserRequestDto}
      * @return {@link JwtResponseDto} 토큰 정보
      */
@@ -53,14 +52,16 @@ public class AccountController {
 
     /**
      * 로그아웃
-     * @param request {@link HttpServletRequest}
-     * @param response {@link HttpServletResponse}
+     *
+     * @param request        {@link HttpServletRequest}
+     * @param response       {@link HttpServletResponse}
      * @param authentication {@link Authentication}
      * @return {@link PostMessageResponseDto} 로그아웃 완료 문구
      */
     @PostMapping("/logout")
     public ResponseEntity<PostMessageResponseDto> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
+            userService.deleteRefreshToken();
             new SecurityContextLogoutHandler().logout(request, response, authentication);
 
             log.info("인증 객체의 삭제 확인: {}", SecurityContextHolder.getContext().getAuthentication() == null);
@@ -68,5 +69,21 @@ public class AccountController {
         }
 
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "잘못된 접근입니다.");
+    }
+
+    /**
+     * 토큰 갱신 (재로그인)
+     * @param refreshTokenHeader 리프레시 토큰 정보가 담긴 Authorization 헤더
+     * @return 새로 발급된 accessToken, refreshToken
+     * @apiNote Refresh Token Rotation 방식
+     * @see <a href="https://g-db.tistory.com/entry/Spring-Security-%EC%8A%A4%ED%94%84%EB%A7%81-%EB%B6%80%ED%8A%B8-Access-Token%EC%97%90%EC%84%9C-Refresh-Token%EC%B6%94%EA%B0%80%ED%95%98%EC%97%AC-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0">
+     */
+    @PostMapping("/refresh-token")
+    public ResponseEntity<JwtResponseDto> refreshToken(
+            @RequestHeader("Authorization") String refreshTokenHeader
+    ) {
+        String refreshToken = refreshTokenHeader.replace("Bearer ", "");
+
+        return new ResponseEntity<>(userService.updateToken(refreshToken), HttpStatus.OK);
     }
 }

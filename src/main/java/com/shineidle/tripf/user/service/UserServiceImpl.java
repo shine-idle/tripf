@@ -6,8 +6,10 @@ import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.common.message.enums.PostMessage;
 import com.shineidle.tripf.common.util.AuthenticationScheme;
 import com.shineidle.tripf.common.util.JwtProvider;
+import com.shineidle.tripf.common.util.TokenType;
 import com.shineidle.tripf.common.util.UserAuthorizationUtil;
 import com.shineidle.tripf.user.dto.*;
+import com.shineidle.tripf.user.entity.RefreshToken;
 import com.shineidle.tripf.user.entity.User;
 import com.shineidle.tripf.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
 
     /**
      * 유저 생성
@@ -43,7 +46,8 @@ public class UserServiceImpl implements UserService {
             throw new GlobalException(UserErrorCode.EMAIL_DUPLICATED);
         }
 
-        User user = new User(dto.getEmail(),
+        User user = new User(
+                dto.getEmail(),
                 passwordEncoder.encode(dto.getPassword()),
                 dto.getName(),
                 dto.getAuth(),
@@ -60,6 +64,7 @@ public class UserServiceImpl implements UserService {
      * @param dto {@link UserRequestDto} </br>
      * email(이메일,String), password(비밀번호, String)
      * @return {@link JwtResponseDto}
+     * @apiNote 최초 로그인 시 엑세스토큰과 리프레시토큰을 발급
      */
     @Override
     public JwtResponseDto login(UserRequestDto dto) {
@@ -77,13 +82,36 @@ public class UserServiceImpl implements UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 토큰 생성
-        String accessToken = jwtProvider.generateToken(authentication, false);
-        log.info("토큰: {}", accessToken);
-        log.info("로그인 유저의 Id: {}", UserAuthorizationUtil.getLoginUserId());
-        log.info(UserAuthorizationUtil.getLoginUserEmail());
-        log.info(UserAuthorizationUtil.getLoginUserAuthority().toString());
+        String accessToken = jwtProvider.generateToken(authentication, false, TokenType.ACCESS);
+        RefreshToken refreshToken = refreshTokenService.generateToken(user.getId(), authentication, false);
 
-        return new JwtResponseDto(AuthenticationScheme.BEARER.getName(), accessToken);
+        log.info("일반 로그인 accessToken: {}", accessToken);
+        log.info("일반 로그인 refreshToken: {}", refreshToken.getToken());
+        log.info("로그인 유저의 Id: {}", UserAuthorizationUtil.getLoginUserId());
+        log.info("로그인 유저의 Email: {}", UserAuthorizationUtil.getLoginUserEmail());
+        log.info("로그인 유저의 권한: {}", UserAuthorizationUtil.getLoginUserAuthority().toString());
+
+        return new JwtResponseDto(AuthenticationScheme.BEARER.getName(), accessToken, refreshToken.getToken());
+    }
+
+    /**
+     * 토큰 갱신(재로그인)
+     * @param refreshToken {@link RefreshToken}
+     * @return {@link JwtResponseDto} 갱신된 토큰 정보
+     */
+    @Override
+    public JwtResponseDto updateToken(String refreshToken) {
+        RefreshToken validRefreshToken = refreshTokenService.findByToken(refreshToken).orElseThrow(() ->
+                new GlobalException(UserErrorCode.TOKEN_NOT_FOUND));
+
+        // 유효한 토큰인지 확인
+        refreshTokenService.verifyExpiration(validRefreshToken);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String accessToken = jwtProvider.generateToken(authentication, false, TokenType.ACCESS);
+        RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(validRefreshToken, authentication);
+
+        return new JwtResponseDto(AuthenticationScheme.BEARER.getName(), accessToken, newRefreshToken.getToken());
     }
 
     /**
@@ -111,7 +139,7 @@ public class UserServiceImpl implements UserService {
         user.updatePassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
 
-        // logout
+        refreshTokenService.deleteToken(user.getId());
 
         return new PostMessageResponseDto(PostMessage.PASSWORD_UPDATED);
     }
@@ -145,16 +173,24 @@ public class UserServiceImpl implements UserService {
         user.deactivate();
         userRepository.save(user);
 
-        // logout
+        // 리프레시 토큰 삭제
+        refreshTokenService.deleteToken(user.getId());
 
         return new PostMessageResponseDto(PostMessage.USER_DEACTIVATED);
     }
 
+    /**
+     * 비밀번호 확인
+     * @param dto {@link UserRequestDto} password
+     */
     @Override
     public void verify(UserRequestDto dto) {
         validatePassword(dto.getPassword(), UserAuthorizationUtil.getLoginUserPassword());
     }
 
+    public void deleteRefreshToken() {
+        refreshTokenService.deleteToken(UserAuthorizationUtil.getLoginUserId());
+    }
 
     private User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() ->
