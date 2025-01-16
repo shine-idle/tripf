@@ -34,14 +34,16 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * 알림 생성 메서드
+     *
      * @param targetUser 알림을 받을 사용자 (대상)
-     * @param actor 알림을 발생시킨 사용자 (발생자)
+     * @param actor      알림을 발생시킨 사용자 (발생자)
      * @param notifyType 알림 유형
-     * @param context 알림 내용
+     * @param context    알림 내용
+     * @param feedId
      */
-    public void createNotification(User targetUser, User actor, NotifyType notifyType, String context) {
+    public void createNotification(User targetUser, User actor, NotifyType notifyType, String context, Long feedId) {
 
-        Notification notification = Notification.create(targetUser, actor, notifyType, context);
+        Notification notification = Notification.create(targetUser, actor, notifyType, context, feedId);
         notificationRepository.save(notification);
     }
 }
