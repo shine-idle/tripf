@@ -19,12 +19,15 @@ public class NotificationResponseDto {
 
     private final LocalDateTime createAt;
 
+    private final Long feedId;
+
     public static NotificationResponseDto toDto(Notification notification) {
         return new NotificationResponseDto(
                 notification.getActor().getName(),
                 notification.getNotifyContext(),
                 notification.getNotifyType(),
-                notification.getCreatedAt()
+                notification.getCreatedAt(),
+                notification.getFeedId()
         );
     }
 }

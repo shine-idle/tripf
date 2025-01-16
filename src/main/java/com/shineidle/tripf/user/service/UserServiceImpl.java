@@ -192,7 +192,7 @@ public class UserServiceImpl implements UserService {
         refreshTokenService.deleteToken(UserAuthorizationUtil.getLoginUserId());
     }
 
-    private User getUserById(Long id) {
+    public User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() ->
                 new GlobalException(UserErrorCode.USER_NOT_FOUND));
     }
