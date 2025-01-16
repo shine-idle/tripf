@@ -21,7 +21,8 @@ public class MailController {
      * @return 성공 메시지
      */
     @GetMapping("/send")
-    public ResponseEntity<String> sendTestMail(@RequestParam String email) {
+    public ResponseEntity<String> sendTestMail(
+            @RequestParam String email) {
         String subject = "테스트 메일";
         String text = "이것은 테스트 메일입니다. SMTP 설정이 성공적으로 완료되었습니다.";
 

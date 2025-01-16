@@ -22,6 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -201,5 +203,14 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new GlobalException(UserErrorCode.PASSWORD_MISMATCH);
         }
+    }
+
+    /**
+     * 활성상태의 유저 Email 반환
+     * @return getActiveUserEmails
+     */
+    @Override
+    public List<String> getActiveUserEmails() {
+        return userRepository.findAllActiveEmails();
     }
 }
