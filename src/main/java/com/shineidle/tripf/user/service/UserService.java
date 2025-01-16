@@ -2,6 +2,7 @@ package com.shineidle.tripf.user.service;
 
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.user.dto.*;
+import com.shineidle.tripf.user.entity.User;
 
 public interface UserService {
     PostMessageResponseDto createUser(UserRequestDto dto);
@@ -17,4 +18,7 @@ public interface UserService {
     PostMessageResponseDto deleteUser(UserRequestDto dto);
 
     void verify(UserRequestDto dto);
+
+    User getUserById(Long id);
+
 }
