@@ -1,8 +1,6 @@
 package com.shineidle.tripf.user.dto;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @Getter
@@ -17,4 +15,9 @@ public class JwtResponseDto {
      * access token
      */
     private final String accessToken;
+
+    /**
+     * refresh token
+     */
+    private final String refreshToken;
 }

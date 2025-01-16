@@ -19,6 +19,9 @@ public interface UserService {
 
     void verify(UserRequestDto dto);
 
-    User getUserById(Long id);
+    JwtResponseDto updateToken(String refreshToken);
 
+    void deleteRefreshToken();
+
+    User getUserById(Long id);
 }
