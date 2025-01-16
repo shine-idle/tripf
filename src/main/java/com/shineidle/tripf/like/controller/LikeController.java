@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/likes")
+@RequestMapping("/api/feeds/{feedId}/likes")
 public class LikeController {
     private final LikeServie likeServie;
 
     //좋아요
-    @PostMapping("/{feedId}")
+    @PostMapping
     public ResponseEntity<String> createLike(
             @PathVariable Long feedId
     ) {
@@ -22,7 +22,7 @@ public class LikeController {
     }
 
     //좋아요 취소
-    @DeleteMapping("/{feedId}")
+    @DeleteMapping
     public ResponseEntity<String> deleteLike(
             @PathVariable Long feedId
     ) {
