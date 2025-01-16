@@ -48,7 +48,7 @@ public class CommentServiceImpl implements CommentService {
         );
         Comment savecomment = commentRepository.save(comment);
 
-        createCommentNotification(feed.getUser(), user);
+        createCommentNotification(feed.getUser(), user, feedId);
 
         return CommentResponseDto.toDto(savecomment);
     }
@@ -65,9 +65,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = checkComment(feedId, commentId);
         checkUser(feedId, commentId);
 
-        comment.update(
-                commentRequestDto.getComment()
-        );
+        comment.update(commentRequestDto.getComment());
 
         commentRepository.save(comment);
 
@@ -135,8 +133,13 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
-    private void createCommentNotification(User targetUser, User actor) {
+    /**
+     * 댓글을 달 경우 알림 발생
+     * @param targetUser 알림 수신자 (알림 조회자)
+     * @param actor 알림 발생자
+     */
+    private void createCommentNotification(User targetUser, User actor, Long feedId) {
         String context = String.format(NotificationMessage.NEW_COMMENT_NOTIFICATION, actor.getName());
-        notificationService.createNotification(targetUser, actor, NotifyType.NEW_COMMENT, context);
+        notificationService.createNotification(targetUser, actor, NotifyType.NEW_COMMENT, context, feedId);
     }
 }

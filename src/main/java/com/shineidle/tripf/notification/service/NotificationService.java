@@ -14,7 +14,7 @@ public interface NotificationService {
     List<NotificationResponseDto> findNotification(Long userId);
 
     /**
-     * 알림 생성
+     * 피드, 댓글, 좋아요 알림 생성
      */
-    void createNotification(User targetUser, User actor, NotifyType notifyType, String context);
+    void createNotification(User targetUser, User actor, NotifyType notifyType, String context, Long feedId);
 }
