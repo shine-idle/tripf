@@ -13,12 +13,12 @@ import lombok.Getter;
 public class Like extends BaseEntity {
     @Id
     @ManyToOne(targetEntity = Feed.class ,fetch = FetchType.LAZY)
-    @JoinColumn(name = "feedId")
+    @JoinColumn(name = "feed_id")
     private Feed feed;
 
     @Id
     @ManyToOne(targetEntity = User.class ,fetch = FetchType.LAZY)
-    @JoinColumn(name = "userID")
+    @JoinColumn(name = "user_id")
     private User user;
 
     public Like() {}
