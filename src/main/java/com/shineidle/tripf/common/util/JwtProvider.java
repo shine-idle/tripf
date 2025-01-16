@@ -10,10 +10,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -29,24 +31,40 @@ public class JwtProvider {
     private String secret;
 
     /**
-     * 토큰 만료시간(milli seconds)
+     * 엑세스토큰 만료시간(milli seconds)
      */
     @Getter
-    @Value("${jwt.expiry-millis}")
-    private Long expiryMillis;
+    @Value("${jwt.expiry.access}")
+    private Long accessExpiryMillis;
+
+    /**
+     * 리프레시토큰 만료시간(milli seconds)
+     */
+    @Getter
+    @Value("${jwt.expiry.refresh}")
+    private Long refreshExpiryMillis;
 
     private final UserRepository userRepository;
 
     /**
      * 토큰 생성 후 리턴 </br>
-     * 입력받은 {@link Authentication}에서 추출한 {@code username}으로 {@link #generateTokenBy(String)} 이용한다.
+     * 입력받은 {@link Authentication}에서 추출한 {@code username}으로 토큰 생성
      * @param authentication 인증 완료된 후 세부 정보
      * @return 토큰
      * @throws EntityNotFoundException 입력받은 이메일에 해당하는 사용자를 찾지 못했을 경우
      */
-    public String generateToken(Authentication authentication) throws EntityNotFoundException {
+    public String generateToken(Authentication authentication, boolean isSocialLogin, TokenType tokenType) throws EntityNotFoundException {
         String username = authentication.getName();
-        return this.generateTokenBy(username);
+        String token;
+
+        if (isSocialLogin) {
+            log.info(authentication.getAuthorities().toString());
+            token = generateTokenForSocialLogin(username, authentication.getAuthorities(), tokenType);
+        } else {
+            token = generateTokenForNormalLogin(username, tokenType);
+        }
+
+        return token;
     }
 
     /**
@@ -79,22 +97,43 @@ public class JwtProvider {
     }
 
     /**
-     * 이메일을 이용해 토큰을 생성 (HS256 알고리즘 이용)
+     * (일반 로그인) 이메일을 이용해 토큰을 생성 (HS256 알고리즘 이용)
      * @param email 이메일
      * @return 생성된 토큰
      * @throws EntityNotFoundException 입력받은 이메일에 해당하는 유저를 찾지 못한 경우 예외 발생
      */
-    private String generateTokenBy(String email) throws EntityNotFoundException {
-        User user = this.userRepository.findByEmail(email).orElseThrow(() ->
+    private String generateTokenForNormalLogin(String email, TokenType tokenType) throws EntityNotFoundException {
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
                 new EntityNotFoundException("유저를 찾을 수 없습니다."));
+
+        return createToken(email, user.getAuth().toString(), tokenType);
+    }
+
+    /**
+     * (소셜 로그인) 이메일을 이용해 토큰을 생성 (HS256 알고리즘 이용)
+     * @param email 이메일
+     * @return 생성된 토큰
+     */
+    private String generateTokenForSocialLogin(String email, Collection<? extends GrantedAuthority> authorities, TokenType tokenType) {
+        String auth = authorities.stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElse("AUTH_guest");
+
+        log.info("JwtProvider auth: {}", auth);
+        return createToken(email, auth, tokenType);
+    }
+
+    private String createToken(String email, String auth, TokenType tokenType) {
         Date currentDate = new Date();
-        Date expireDate = new Date(currentDate.getTime() + this.expiryMillis);
+        Date expireDate = new Date(tokenType.equals(TokenType.ACCESS) ?
+                currentDate.getTime() + this.accessExpiryMillis : currentDate.getTime() + this.refreshExpiryMillis);
 
         return Jwts.builder()
                 .subject(email)
                 .issuedAt(currentDate)
                 .expiration(expireDate)
-                .claim("auth", "AUTH_" + user.getAuth())
+                .claim("auth", auth)
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
                 .compact();
     }

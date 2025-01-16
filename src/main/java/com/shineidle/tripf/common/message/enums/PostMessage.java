@@ -12,6 +12,7 @@ public enum PostMessage {
     ACTIVITY_DELETED("활동이 삭제되었습니다."),
     COMMENT_DELETED("댓글이 삭제되었습니다."),
     PRODUCT_DELETED("상품이 삭제되었습니다."),
+    PHOTO_DELETED("사진이 삭제되었습니다."),
     PRODUCT_DISCONTINUED("상품을 단종처리 하였습니다."),
     SIGNUP_SUCCESS("회원 가입이 완료되었습니다! 이제 모든 서비스를 마음껏 이용해 보세요."),
     LOGOUT_SUCCESS("로그아웃 처리 되었습니다."),
