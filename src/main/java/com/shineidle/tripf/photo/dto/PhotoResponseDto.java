@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @RequiredArgsConstructor
-public class PhotoCreateResponseDto {
+public class PhotoResponseDto {
 
     private final Long id;
 
@@ -26,8 +26,8 @@ public class PhotoCreateResponseDto {
 
     private final LocalDateTime modifiedAt;
 
-    public static PhotoCreateResponseDto toDto(Photo photo) {
-        return new PhotoCreateResponseDto(
+    public static PhotoResponseDto toDto(Photo photo) {
+        return new PhotoResponseDto(
                 photo.getId(),
                 photo.getOriginalFileName(),
                 photo.getDescription(),

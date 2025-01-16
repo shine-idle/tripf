@@ -11,6 +11,13 @@ public class MailServiceImpl implements MailService{
 
     private final JavaMailSender mailSender;
 
+    /**
+     * 테스트 메일 발송
+     *
+     * @param to 수신자 메일 주소
+     * @param subject 메일 제목
+     * @param text 메일 내용
+     */
     @Override
     public void sendSimpleMail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();

@@ -1,10 +1,11 @@
 package com.shineidle.tripf.cart.controller;
 
-import com.shineidle.tripf.cart.dto.CartCreateRequestDto;
-import com.shineidle.tripf.cart.dto.CartCreateResponseDto;
+import com.shineidle.tripf.cart.dto.CartRequestDto;
+import com.shineidle.tripf.cart.dto.CartResponseDto;
 import com.shineidle.tripf.cart.service.CartService;
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.common.message.enums.PostMessage;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -24,17 +25,18 @@ public class CartController {
     /**
      * 장바구니 상품 생성
      *
-     * @param productId
-     * @param cartCreateRequestDto {@link CartCreateRequestDto}
-     * @return {@link CartCreateResponseDto} 생성된 장바구니 응답값
+     * @param productId 상품 식별자
+     * @param cartRequestDto {@link CartRequestDto} 장바구니 요청 Dto
+     * @return {@link CartResponseDto} 장바구니 응답 Dto
      */
+    @Operation(summary = "장바구니 상품 생성")
     @PostMapping("/products/{productId}")
-    public ResponseEntity<CartCreateResponseDto> createCart(
+    public ResponseEntity<CartResponseDto> createCart(
             @PathVariable Long productId,
-            @Valid @RequestBody CartCreateRequestDto cartCreateRequestDto
+            @Valid @RequestBody CartRequestDto cartRequestDto
     ) {
 
-        CartCreateResponseDto responseDto = cartService.createCart(productId, cartCreateRequestDto);
+        CartResponseDto responseDto = cartService.createCart(productId, cartRequestDto);
 
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
@@ -42,12 +44,13 @@ public class CartController {
     /**
      * 장바구니 조회
      *
-     * @return {@link CartCreateResponseDto} 조회된 장바구니 응답값
+     * @return {@link CartResponseDto} 장바구니 응답 Dto
      */
+    @Operation(summary = "장바구니 조회")
     @GetMapping
-    public ResponseEntity<List<CartCreateResponseDto>> findCart() {
+    public ResponseEntity<List<CartResponseDto>> findCart() {
 
-        List<CartCreateResponseDto> responseDtos = cartService.findCart();
+        List<CartResponseDto> responseDtos = cartService.findCart();
 
         return new ResponseEntity<>(responseDtos, HttpStatus.OK);
     }
@@ -55,17 +58,18 @@ public class CartController {
     /**
      * 장바구니 상품 수량 수정
      *
-     * @param productId
-     * @param cartCreateRequestDto {@link CartCreateRequestDto}
-     * @return {@link CartCreateResponseDto} 수정된 장바구니 응답값
+     * @param productId 상품 식별자
+     * @param cartRequestDto {@link CartRequestDto} 장바구니 요청 Dto
+     * @return {@link CartResponseDto} 장바구니 응답 Dto
      */
+    @Operation(summary = "장바구니 상품 수량 수정")
     @PatchMapping("/products/{productId}")
-    public ResponseEntity<CartCreateResponseDto> updateCart(
+    public ResponseEntity<CartResponseDto> updateCart(
             @PathVariable Long productId,
-            @Valid @RequestBody CartCreateRequestDto cartCreateRequestDto
+            @Valid @RequestBody CartRequestDto cartRequestDto
     ) {
 
-        CartCreateResponseDto responseDto = cartService.updateCart(productId, cartCreateRequestDto);
+        CartResponseDto responseDto = cartService.updateCart(productId, cartRequestDto);
 
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
@@ -73,9 +77,10 @@ public class CartController {
     /**
      * 장바구니 상품 삭제
      *
-     * @param productId
-     * @return {@link PostMessageResponseDto} 삭제 완료 메세지 응답값
+     * @param productId 상품 식별자
+     * @return {@link PostMessageResponseDto} 삭제 완료 문구
      */
+    @Operation(summary = "장바구니 상품 삭제")
     @DeleteMapping("/products/{productId}")
     public ResponseEntity<PostMessageResponseDto> deleteCart(
             @PathVariable Long productId

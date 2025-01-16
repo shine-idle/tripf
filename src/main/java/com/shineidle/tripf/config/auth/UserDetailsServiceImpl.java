@@ -16,7 +16,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     /**
      * 입력받은 이메일에 해당하는 유저의 정보를 찾아 리턴 (카카오의 경의 providerId)
-     * @param username username
+     *
+     * @param username 유저 이름
      * @return {@link UserDetailsImpl}
      * @throws UsernameNotFoundException 이메일에 해당하는 유저를 찾지 못한 경우 예외 발생
      */

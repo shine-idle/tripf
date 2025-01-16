@@ -25,8 +25,9 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 주문 생성
-     * @param dto
-     * @return OrderResponseDto
+     *
+     * @param dto {@link OrderRequestDto} 주문 요청 Dto
+     * @return {@link OrderResponseDto} 주문 응답 Dto
      */
     @Override
     public OrderResponseDto createOrder(OrderRequestDto dto) {
@@ -44,8 +45,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * 주문조회(다건)
-     * @return List<OrderResponseDto>
+     * 주문 조회(다건)
+     *
+     * @return {@link OrderResponseDto} 주문 응답 Dto
      */
     @Override
     public List<OrderResponseDto> findAllOrder() {
@@ -63,15 +65,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * 주문조회(단건)
-     * @param id 주문 ID
-     * @return OrderResponseDto
+     * 주문 조회(단건)
+     *
+     * @param orderId 주문 ID
+     * @return {@link OrderResponseDto} 주문 응답 Dto
      */
     @Override
-    public OrderResponseDto findOrder(Long id) {
+    public OrderResponseDto findOrder(Long orderId) {
         User user = UserAuthorizationUtil.getLoginUser();
 
-        Optional<Order> order = orderRepository.findByIdAndUserId(id, user.getId());
+        Optional<Order> order = orderRepository.findByIdAndUserId(orderId, user.getId());
         return order.map(OrderResponseDto::toDto)
                 .orElseThrow(() -> new GlobalException(OrderErrorCode.ORDER_NOT_FOUND));
     }

@@ -25,7 +25,8 @@ public class FollowServiceImpl implements FollowService {
 
     /**
      * 팔로잉 추가
-     * @param followingId 내가 팔로잉 할 사람의 Id
+     *
+     * @param followingId 팔로잉 식별자(내가 팔로우 할 사람의 식별자)
      */
     @Override
     public void createFollow(Long followingId) {
@@ -52,7 +53,8 @@ public class FollowServiceImpl implements FollowService {
 
     /**
      * 팔로워 조회(나를 팔로우한 사람들)
-     * @return List<FollowResponseDto> 팔로워들 리스트
+     *
+     * @return {@link FollowResponseDto} 팔로우 응답 Dto
      */
     @Override
     public List<FollowResponseDto> findFollowers() {
@@ -68,7 +70,8 @@ public class FollowServiceImpl implements FollowService {
 
     /**
      * 팔로잉 조회(내가 팔로우한 사람들)
-     * @return List<FollowResponseDto> 팔로잉 한 사람들 리스트
+     *
+     * @return {@link FollowResponseDto} 팔로우 응답 Dto
      */
     @Override
     public List<FollowResponseDto> findFollowings() {
@@ -83,8 +86,9 @@ public class FollowServiceImpl implements FollowService {
     }
 
     /**
-     *팔로잉 취소
-     * @param followingId 내가 팔로잉한 사람의 Id
+     * 팔로잉 취소
+     *
+     * @param followingId  팔로잉 식별자(내가 팔로우한 사람의 식별자)
      */
     @Override
     @Transactional
@@ -102,7 +106,8 @@ public class FollowServiceImpl implements FollowService {
 
     /**
      * 팔로우 취소
-     * @param followerId 나를팔로우 한 사람의 Id
+     *
+     * @param followerId 팔로워 식별자(나를 팔로우한 사람의 식별자)
      */
     @Override
     @Transactional

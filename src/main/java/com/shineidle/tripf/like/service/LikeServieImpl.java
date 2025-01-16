@@ -28,7 +28,8 @@ public class LikeServieImpl implements LikeServie{
 
     /**
      * 좋아요
-     * @param feedId 좋이요를 누를 피드 Id
+     *
+     * @param feedId 피드 식별자(좋아요를 누를 피드 식별자)
      */
     @Override
      public void createLike(Long feedId) {
@@ -51,7 +52,8 @@ public class LikeServieImpl implements LikeServie{
 
     /**
      * 좋아요 취소
-     * @param feedId 좋아요를 취소할 피드 Id
+     *
+     * @param feedId 피드 식별자(좋아요를 취소할 피드 식별자)
      */
      @Override
      public void deleteLike(Long feedId) {
@@ -64,13 +66,12 @@ public class LikeServieImpl implements LikeServie{
             throw new GlobalException(LikeErrorCode.LIKED_YET);
          }
 
-         loginUser = userService.getUserById(loginUser.getId());
-
          likeRepository.deleteById(likePk);
      }
 
     /**
      * 피드에 좋아요를 남길 경우 알림
+     *
      * @param targetUser 알림 수신자 (피드 소유자)
      * @param actor 알림 발생자 (좋아요 누른 사람)
      * @param feedId 피드 식별자

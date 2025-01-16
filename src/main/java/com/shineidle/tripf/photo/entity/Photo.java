@@ -16,11 +16,15 @@ public class Photo extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    // 원본 사진 이름
+    /**
+     * 원본 사진 이름
+     */
     @Column(nullable = false, length = 50)
     private String originalFileName;
 
-    // 저장 사진 이름
+    /**
+     * 저장 사진 이름
+     */
     @Column(nullable = false, length = 50)
     private String storedFileName;
 

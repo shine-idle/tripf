@@ -18,8 +18,9 @@ public class AdminProductController {
 
     /**
      * 상품 생성
-     * @param dto {@link ProductRequestDto}
-     * @return {@link ProductResponseDto}
+     *
+     * @param dto {@link ProductRequestDto} 상품 요청 Dto
+     * @return {@link ProductResponseDto} 상품 응답 Dto
      */
     @PostMapping
     public ResponseEntity<ProductResponseDto> createProduct(
@@ -30,9 +31,10 @@ public class AdminProductController {
 
     /**
      * 상품 수정
-     * @param productId 상품Id
-     * @param dto {@link ProductRequestDto}
-     * @return {@link ProductResponseDto}
+     *
+     * @param productId 상품 식별자
+     * @param dto {@link ProductRequestDto} 상품 요청 Dto
+     * @return {@link ProductResponseDto} 상품 응답 Dto
      */
     @PatchMapping("/{productId}")
     public ResponseEntity<ProductResponseDto> updateProduct(
@@ -44,8 +46,9 @@ public class AdminProductController {
 
     /**
      * 상품 삭제
-     * @param productId 상품Id
-     * @return 상품 삭제 문구
+     *
+     * @param productId 상품 식별자
+     * @return {@link PostMessageResponseDto} 상품 삭제 문구
      */
     @DeleteMapping("/{productId}")
     public ResponseEntity<PostMessageResponseDto> deleteProduct(
