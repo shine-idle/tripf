@@ -82,11 +82,22 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return refreshTokenRepository.findByToken(token);
     }
 
+    public Optional<RefreshToken> findByUserId(Long userId) {
+        return refreshTokenRepository.findByUserId(userId);
+    }
+
     @Override
     @Transactional
     public void deleteToken(Long userId) {
         RefreshToken token = refreshTokenRepository.findByUserId(userId).orElseThrow(() ->
                 new GlobalException(UserErrorCode.TOKEN_NOT_FOUND));
         refreshTokenRepository.delete(token);
+    }
+
+    @Override
+    @Transactional
+    public void deleteTokenAndUser(RefreshToken refreshToken) {
+        refreshTokenRepository.delete(refreshToken);
+        userRepository.delete(refreshToken.getUser());
     }
 }

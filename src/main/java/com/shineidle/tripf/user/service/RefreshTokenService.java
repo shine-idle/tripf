@@ -14,5 +14,9 @@ public interface RefreshTokenService {
 
     Optional<RefreshToken> findByToken(String refreshToken);
 
+    Optional<RefreshToken> findByUserId(Long userId);
+
     void deleteToken(Long userId);
+
+    void deleteTokenAndUser(RefreshToken refreshToken);
 }
