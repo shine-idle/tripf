@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     /**
      * 이메일로 유저 찾기
+     *
      * @param email 유저 이메일
      * @return {@link User}
      */
@@ -15,8 +16,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
      * ProviderId로 유저 찾기 (소셜로그인)
+     *
      * @param id providerId
-     * @return {@link User
+     * @return {@link User}
      */
     Optional<User> findByProviderId(String id);
 }

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @RequiredArgsConstructor
-public class CartCreateResponseDto {
+public class CartResponseDto {
 
     private final Long cartId;
     private final Long userId;
@@ -17,8 +17,8 @@ public class CartCreateResponseDto {
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
-    public static CartCreateResponseDto toDto(Cart cart) {
-        return new CartCreateResponseDto(
+    public static CartResponseDto toDto(Cart cart) {
+        return new CartResponseDto(
                 cart.getId(),
                 cart.getUser().getId(),
                 cart.getProduct().getId(),

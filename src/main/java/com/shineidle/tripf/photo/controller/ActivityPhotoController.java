@@ -2,8 +2,8 @@ package com.shineidle.tripf.photo.controller;
 
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.common.message.enums.PostMessage;
-import com.shineidle.tripf.photo.dto.PhotoCreateRequestDto;
-import com.shineidle.tripf.photo.dto.PhotoCreateResponseDto;
+import com.shineidle.tripf.photo.dto.PhotoRequestDto;
+import com.shineidle.tripf.photo.dto.PhotoResponseDto;
 import com.shineidle.tripf.photo.service.PhotoService;
 import com.shineidle.tripf.photo.type.PhotoDomain;
 import lombok.RequiredArgsConstructor;
@@ -25,34 +25,34 @@ public class ActivityPhotoController {
     /**
      * 활동 사진 업로드
      *
-     * @param activityId 활동Id
-     * @param photoCreateRequestDto {@link PhotoCreateRequestDto}
-     * @param file {@link MultipartFile}
-     * @return {@link PhotoCreateResponseDto} 생성된 사진 응답값
+     * @param activityId 활동 식별자
+     * @param photoRequestDto {@link PhotoRequestDto} 사진 요청 Dto
+     * @param file {@link MultipartFile} 첨부할 사진
+     * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<PhotoCreateResponseDto> uploadPhotoToActivity(
+    public ResponseEntity<PhotoResponseDto> uploadPhotoToActivity(
             @PathVariable Long activityId,
-            @ModelAttribute PhotoCreateRequestDto photoCreateRequestDto,
+            @ModelAttribute PhotoRequestDto photoRequestDto,
             @RequestParam(value = "file",required = false) MultipartFile file
     ) throws IOException {
-        PhotoCreateResponseDto responseDto = photoService.uploadPhoto(activityId, photoCreateRequestDto, file, PhotoDomain.ACTIVITY);
+        PhotoResponseDto responseDto = photoService.uploadPhoto(activityId, photoRequestDto, file, PhotoDomain.ACTIVITY);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
     /**
      * 활동 사진 단건 조회
      *
-     * @param activityId 활동Id
-     * @param photoId 사진Id
-     * @return {@link PhotoCreateResponseDto} 조회된 사진 응답값
+     * @param activityId 활동 식별자
+     * @param photoId 사진 식별자
+     * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @GetMapping("/{photoId}")
-    public ResponseEntity<PhotoCreateResponseDto> findActivityPhoto(
+    public ResponseEntity<PhotoResponseDto> findActivityPhoto(
             @PathVariable Long activityId,
             @PathVariable Long photoId
     ) {
-        PhotoCreateResponseDto responseDto = photoService.findPhoto(activityId, photoId, PhotoDomain.ACTIVITY);
+        PhotoResponseDto responseDto = photoService.findPhoto(activityId, photoId, PhotoDomain.ACTIVITY);
 
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
@@ -60,14 +60,14 @@ public class ActivityPhotoController {
     /**
      * 활동 사진 다건 조회
      *
-     * @param activityId 활동Id
-     * @return {@link PhotoCreateResponseDto} 조회된 사진 응답값
+     * @param activityId 활동 식별
+     * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @GetMapping()
-    public ResponseEntity<List<PhotoCreateResponseDto>> findAllActivityPhoto(
+    public ResponseEntity<List<PhotoResponseDto>> findAllActivityPhoto(
             @PathVariable Long activityId
     ) {
-        List<PhotoCreateResponseDto> responseDtos = photoService.findAllPhoto(activityId, PhotoDomain.ACTIVITY);
+        List<PhotoResponseDto> responseDtos = photoService.findAllPhoto(activityId, PhotoDomain.ACTIVITY);
 
         return new ResponseEntity<>(responseDtos, HttpStatus.OK);
     }
@@ -76,32 +76,32 @@ public class ActivityPhotoController {
     /**
      * 활동 사진 수정
      *
-     * @param activityId 활동Id
-     * @param photoId 사진Id
-     * @param photoCreateRequestDto {@link PhotoCreateRequestDto}
-     * @param file {@link MultipartFile}
-     * @return {@link PhotoCreateResponseDto} 수정된 사진 응답값
+     * @param activityId 활동 식별자
+     * @param photoId 사진 식별자
+     * @param photoRequestDto {@link PhotoRequestDto}
+     * @param file {@link MultipartFile} 첨부할 사진
+     * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @RequestMapping(
             value = "/{photoId}",
             method = RequestMethod.PATCH,
             consumes = "multipart/form-data"
     )
-    public ResponseEntity<PhotoCreateResponseDto> updateActivityPhoto(
+    public ResponseEntity<PhotoResponseDto> updateActivityPhoto(
             @PathVariable Long activityId,
             @PathVariable Long photoId,
-            @ModelAttribute PhotoCreateRequestDto photoCreateRequestDto,
+            @ModelAttribute PhotoRequestDto photoRequestDto,
             @RequestParam MultipartFile file
     ) {
-        PhotoCreateResponseDto responseDto = photoService.updatePhoto(activityId, photoId, photoCreateRequestDto, file, PhotoDomain.ACTIVITY);
+        PhotoResponseDto responseDto = photoService.updatePhoto(activityId, photoId, photoRequestDto, file, PhotoDomain.ACTIVITY);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     /**
      * 활동 사진 삭제
      *
-     * @param activityId 활동Id
-     * @param photoId 사진Id
+     * @param activityId 활동 식별자
+     * @param photoId 사진 식별자
      * @return {@link PostMessageResponseDto} 사진 삭제 문구
      */
     @DeleteMapping("/{photoId}")

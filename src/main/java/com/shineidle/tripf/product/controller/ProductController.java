@@ -20,7 +20,8 @@ public class ProductController {
 
     /**
      * 상품 조회(다건)
-     * @return {@link ProductResponseDto}
+     *
+     * @return {@link ProductResponseDto} 상품 응답 Dto
      */
     @GetMapping
     public ResponseEntity<List<ProductResponseDto>> findAllProduct() {
@@ -29,8 +30,9 @@ public class ProductController {
 
     /**
      * 상품 조회(단건)
-     * @param productId 상품Id
-     * @return {@link ProductResponseDto}
+     *
+     * @param productId 상품 식별자
+     * @return {@link ProductResponseDto} 상품 응답 Dto
      */
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponseDto> findProduct(

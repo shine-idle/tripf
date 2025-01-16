@@ -8,6 +8,7 @@ import com.shineidle.tripf.oauth2.user.OAuth2UserUnlinkManager;
 import com.shineidle.tripf.oauth2.util.CookieUtils;
 import com.shineidle.tripf.user.entity.RefreshToken;
 import com.shineidle.tripf.user.service.RefreshTokenService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +26,13 @@ public class OAuth2UnlinkController {
 
     /**
      * 소셜 연동해제 (탈퇴)
+     *
      * @param provider {@link OAuth2Provider}
      * @param authorizationHeader Authorization 헤더
      * @param request {@link HttpServletRequest}
      * @param response {@link HttpServletResponse}
      */
+    @Operation(summary = "소셜 연동해제 (탈퇴)")
     @PostMapping("/{provider}")
     public ResponseEntity<Void> unlink(
             @PathVariable("provider") OAuth2Provider provider,

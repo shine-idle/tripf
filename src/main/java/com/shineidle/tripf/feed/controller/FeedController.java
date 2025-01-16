@@ -3,6 +3,7 @@ package com.shineidle.tripf.feed.controller;
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.feed.dto.*;
 import com.shineidle.tripf.feed.service.FeedService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,11 @@ public class FeedController {
     /**
      * 피드 작성
      * 피드 작성 시 피드, 일정, 활동 모두 작성
+     *
+     * @param feedRequestDto {@link FeedRequestDto} 피드 요청 Dto
+     * @return {@link FeedResponseDto} 피드 응답 Dto
      */
+    @Operation(summary = "피드 작성")
     @PostMapping
     public ResponseEntity<FeedResponseDto> createFeed(
             @Valid @RequestBody FeedRequestDto feedRequestDto
@@ -32,7 +37,12 @@ public class FeedController {
 
     /**
      * 피드 수정
+     *
+     * @param feedId 피드 식별자
+     * @param feedRequestDto {@link FeedRequestDto} 피드 요청 Dto
+     * @return {@link FeedResponseDto} 피드 응답 Dto
      */
+    @Operation(summary = "피드 수정")
     @PutMapping("/{feedId}")
     public ResponseEntity<FeedResponseDto> updateFeed(
             @PathVariable Long feedId,
@@ -43,8 +53,12 @@ public class FeedController {
     }
 
     /**
-    * 피드 상세 조회
-    */
+     * 피드 상세 조회
+     *
+     * @param feedId 피드 식별자
+     * @return {@link FeedResponseDto} 피드 응답 Dto
+     */
+    @Operation(summary = "피드 상세 조회")
     @GetMapping("/{feedId}")
     public ResponseEntity<FeedResponseDto> findFeed(
             @PathVariable Long feedId
@@ -55,7 +69,11 @@ public class FeedController {
 
     /**
      * 피드 삭제
+     *
+     * @param feedId 피드 식별자
+     * @return {@link PostMessageResponseDto} 피드 삭제 문구
      */
+    @Operation(summary = "피드 삭제")
     @DeleteMapping("/{feedId}")
     public ResponseEntity<PostMessageResponseDto> deleteFeed(
             @PathVariable Long feedId
@@ -66,7 +84,12 @@ public class FeedController {
 
     /**
      * 일정 삭제
+     *
+     * @param feedId 피드 식별자
+     * @param daysId 일정 식별자
+     * @return {@link PostMessageResponseDto} 일정 삭제 문구
      */
+    @Operation(summary = "일정 삭제")
     @DeleteMapping("/{feedId}/days/{daysId}")
     public ResponseEntity<PostMessageResponseDto> deleteDays(
             @PathVariable Long feedId,
@@ -78,7 +101,13 @@ public class FeedController {
 
     /**
      * 활동 삭제
+     *
+     * @param feedId 피드 식별자
+     * @param daysId 일정 식별자
+     * @param activityId 활동 식별자
+     * @return {@link PostMessageResponseDto} 활동 삭제 문구
      */
+    @Operation(summary = "활동 삭제")
     @DeleteMapping("/{feedId}/days/{daysId}/activities/{activityId}")
     public ResponseEntity<PostMessageResponseDto> deleteActivity(
             @PathVariable Long feedId,
@@ -92,7 +121,12 @@ public class FeedController {
     /**
      * 일정 추가
      * 일정 추가 시 활동도 같이 추가
+     *
+     * @param feedId 피드 식별자
+     * @param daysRequestDto {@link DaysRequestDto} 일정 요청 Dto
+     * @return {@link FeedResponseDto} 피드 응답 Dto
      */
+    @Operation(summary = "일정 추가")
     @PostMapping("/{feedId}/days")
     public ResponseEntity<FeedResponseDto> createDay(
             @PathVariable Long feedId,
@@ -104,7 +138,13 @@ public class FeedController {
 
     /**
      * 활동 추가
+     *
+     * @param feedId 피드 식별자
+     * @param daysId 일정 식별자
+     * @param activityRequestDto {@link ActivityRequestDto} 활동 요청 Dto
+     * @return {@link FeedResponseDto} 피드 응답 Dto
      */
+    @Operation(summary = "활동 추가")
     @PostMapping("/{feedId}/days/{daysId}/activities")
     public ResponseEntity<FeedResponseDto> createActivity(
             @PathVariable Long feedId,
@@ -117,7 +157,14 @@ public class FeedController {
 
     /**
      * 활동 수정
+     *
+     * @param feedId 피드 식별자
+     * @param daysId 일정 식별자
+     * @param activityId 활동 식별자
+     * @param activityRequestDto {@link ActivityRequestDto} 활동 요청 Dto
+     * @return {@link FeedResponseDto} 피드 응답 Dto
      */
+    @Operation(summary = "피드 작성")
     @PutMapping("/{feedId}/days/{daysId}/activities/{activityId}")
     public ResponseEntity<FeedResponseDto> updateActivity(
             @PathVariable Long feedId,
@@ -131,7 +178,11 @@ public class FeedController {
 
     /**
      * 국가별 피드 조회
+     *
+     * @param country 국가명
+     * @return {@link RegionResponseDto} 지역 응답 Dto
      */
+    @Operation(summary = "국가별 피드 조회")
     @GetMapping
     public ResponseEntity<List<RegionResponseDto>> findRegion(
             @RequestParam(value = "region", required = false) String country

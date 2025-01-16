@@ -2,8 +2,8 @@ package com.shineidle.tripf.photo.controller;
 
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.common.message.enums.PostMessage;
-import com.shineidle.tripf.photo.dto.PhotoCreateRequestDto;
-import com.shineidle.tripf.photo.dto.PhotoCreateResponseDto;
+import com.shineidle.tripf.photo.dto.PhotoRequestDto;
+import com.shineidle.tripf.photo.dto.PhotoResponseDto;
 import com.shineidle.tripf.photo.service.PhotoService;
 import com.shineidle.tripf.photo.type.PhotoDomain;
 import lombok.RequiredArgsConstructor;
@@ -24,19 +24,19 @@ public class AdminProductPhotoController {
     /**
      * 상품 사진 업로드
      *
-     * @param productId 상품Id
-     * @param photoCreateRequestDto {@link PhotoCreateRequestDto}
-     * @param file {@link MultipartFile}
-     * @return {@link PhotoCreateResponseDto} 생성된 사진 응답값
+     * @param productId 상품 식별자
+     * @param photoRequestDto {@link PhotoRequestDto} 사진 요청 Dto
+     * @param file {@link MultipartFile} 첨부할 사진
+     * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<PhotoCreateResponseDto> uploadPhotoToProduct(
+    public ResponseEntity<PhotoResponseDto> uploadPhotoToProduct(
             @PathVariable Long productId,
-            @ModelAttribute PhotoCreateRequestDto photoCreateRequestDto,
+            @ModelAttribute PhotoRequestDto photoRequestDto,
             @RequestPart MultipartFile file
     ) throws IOException {
 
-        PhotoCreateResponseDto responseDto = photoService.uploadPhoto(productId, photoCreateRequestDto, file, PhotoDomain.PRODUCT);
+        PhotoResponseDto responseDto = photoService.uploadPhoto(productId, photoRequestDto, file, PhotoDomain.PRODUCT);
 
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
@@ -44,24 +44,24 @@ public class AdminProductPhotoController {
     /**
      * 상품 사진 수정
      *
-     * @param productId 상품Id
-     * @param photoId 사진Id
-     * @param photoCreateRequestDto {@link PhotoCreateRequestDto}
-     * @param file {@link MultipartFile}
-     * @return {@link PhotoCreateResponseDto} 수정된 사진 응답값
+     * @param productId 상품 식별자
+     * @param photoId 사진 식별자
+     * @param photoRequestDto {@link PhotoRequestDto} 사진 요청 Dto
+     * @param file {@link MultipartFile} 첨부할 사진
+     * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @RequestMapping(
             value = "/{photoId}",
             method = RequestMethod.PATCH,
             consumes = "multipart/form-data"
     )
-    public ResponseEntity<PhotoCreateResponseDto> updateProductPhoto(
+    public ResponseEntity<PhotoResponseDto> updateProductPhoto(
             @PathVariable Long productId,
             @PathVariable Long photoId,
-            @ModelAttribute PhotoCreateRequestDto photoCreateRequestDto,
+            @ModelAttribute PhotoRequestDto photoRequestDto,
             @RequestParam MultipartFile file
     ) {
-        PhotoCreateResponseDto responseDto = photoService.updatePhoto(productId, photoId, photoCreateRequestDto, file, PhotoDomain.PRODUCT);
+        PhotoResponseDto responseDto = photoService.updatePhoto(productId, photoId, photoRequestDto, file, PhotoDomain.PRODUCT);
 
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
@@ -70,8 +70,8 @@ public class AdminProductPhotoController {
     /**
      * 상품 사진 삭제
      *
-     * @param productId 상품Id
-     * @param photoId 사진Id
+     * @param productId 상품 식별자
+     * @param photoId 사진 식별자
      * @return {@link PostMessageResponseDto} 사진 삭제 문구
      */
     @DeleteMapping("/{photoId}")

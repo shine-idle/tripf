@@ -22,6 +22,7 @@ public class SecurityConfig {
 
     /**
      * 인증 관리자 (AuthenticationManager)
+     *
      * @param config {@link AuthenticationConfiguration}
      * @return 설정이 추가된 AuthenticationManager
      */
@@ -32,6 +33,7 @@ public class SecurityConfig {
 
     /**
      * 인증 공급자 (AuthenticationProvider)
+     *
      * @return {@link AuthenticationProvider}
      */
     @Bean

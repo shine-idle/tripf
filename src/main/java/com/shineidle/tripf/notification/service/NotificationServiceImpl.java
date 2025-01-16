@@ -18,9 +18,10 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
 
     /**
-     * 알림 조회
+     * 알림 목록 조회
+     *
      * @param userId 유저 식별자
-     * @return NotificationResponseDto
+     * @return NotificationResponseDto {@link NotificationResponseDto} 알림 응답 Dto
      */
     @Override
     public List<NotificationResponseDto> findNotification(Long userId) {
@@ -33,13 +34,13 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * 알림 생성 메서드
+     * 알림 생성
      *
      * @param targetUser 알림을 받을 사용자 (대상)
-     * @param actor      알림을 발생시킨 사용자 (발생자)
+     * @param actor 알림을 발생시킨 사용자 (발생자)
      * @param notifyType 알림 유형
-     * @param context    알림 내용
-     * @param feedId
+     * @param context 알림 내용
+     * @param feedId 피드 식별자
      */
     public void createNotification(User targetUser, User actor, NotifyType notifyType, String context, Long feedId) {
 
