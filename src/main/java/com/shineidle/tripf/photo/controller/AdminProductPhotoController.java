@@ -6,6 +6,7 @@ import com.shineidle.tripf.photo.dto.PhotoRequestDto;
 import com.shineidle.tripf.photo.dto.PhotoResponseDto;
 import com.shineidle.tripf.photo.service.PhotoService;
 import com.shineidle.tripf.photo.type.PhotoDomain;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ public class AdminProductPhotoController {
      * @param file {@link MultipartFile} 첨부할 사진
      * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
+    @Operation(summary = "상품 사진 업로드")
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<PhotoResponseDto> uploadPhotoToProduct(
             @PathVariable Long productId,
@@ -50,6 +52,7 @@ public class AdminProductPhotoController {
      * @param file {@link MultipartFile} 첨부할 사진
      * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
+    @Operation(summary = "상품 사진 수정")
     @RequestMapping(
             value = "/{photoId}",
             method = RequestMethod.PATCH,
@@ -74,6 +77,7 @@ public class AdminProductPhotoController {
      * @param photoId 사진 식별자
      * @return {@link PostMessageResponseDto} 사진 삭제 문구
      */
+    @Operation(summary = "상품 사진 삭제")
     @DeleteMapping("/{photoId}")
     public ResponseEntity<PostMessageResponseDto> deleteProductPhoto(
             @PathVariable Long productId,
