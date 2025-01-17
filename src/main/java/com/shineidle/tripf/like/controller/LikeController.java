@@ -1,6 +1,5 @@
 package com.shineidle.tripf.like.controller;
 
-import com.shineidle.tripf.like.service.LikeServie;
 import io.swagger.v3.oas.annotations.Operation;
 import com.shineidle.tripf.like.service.LikeService;
 import lombok.RequiredArgsConstructor;

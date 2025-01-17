@@ -36,7 +36,7 @@ public class MailServiceImpl implements MailService{
 //        for (String email : recipientEmails) {
 //            sendSimpleMail(
 //                    email,
-//                    "오늘의 상위 5개 피드",
+//                    "Tripf 오늘의 상위 5개 피드",
 //                    feedContent .toString()
 //            );
 //        }

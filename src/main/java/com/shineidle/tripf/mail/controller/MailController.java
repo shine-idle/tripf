@@ -17,7 +17,17 @@ public class MailController {
     private final MailService mailService;
 
     /**
-     * 테스트 메일 발송 API
+     * 상위 피드 이메일 발송 테스트
+     */
+    @Operation(summary = "상위 피드 이메일 발송 테스트")
+    @GetMapping("/sendTopFeedsMail")
+    public ResponseEntity<String> sendTopFeedsMail() {
+        mailService.sendTopFeedsMail();
+        return ResponseEntity.ok("상위 피드 이메일이 발송되었습니다.");
+    }
+
+    /**
+     * simple 테스트 메일 발송 API
      *
      * @param email 수신자 이메일
      * @return 성공 메시지
