@@ -12,6 +12,7 @@ import com.shineidle.tripf.user.dto.*;
 import com.shineidle.tripf.user.entity.RefreshToken;
 import com.shineidle.tripf.user.entity.User;
 import com.shineidle.tripf.user.repository.UserRepository;
+import com.shineidle.tripf.user.type.UserStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -44,8 +46,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public PostMessageResponseDto createUser(UserRequestDto dto) {
-        boolean duplicated = userRepository.findByEmail(dto.getEmail()).isPresent();
-        if (duplicated) {
+        Optional<User> existUser = userRepository.findByEmail(dto.getEmail());
+
+        if (existUser.isPresent() && existUser.get().getStatus().equals(UserStatus.DEACTIVATE)) {
+            throw new GlobalException(UserErrorCode.USER_DEACTIVATED);
+        }
+
+        if (existUser.isPresent()) {
             throw new GlobalException(UserErrorCode.EMAIL_DUPLICATED);
         }
 
@@ -74,6 +81,11 @@ public class UserServiceImpl implements UserService {
     public JwtResponseDto login(UserRequestDto dto) {
         User user = userRepository.findByEmail(dto.getEmail()).orElseThrow(() ->
                 new GlobalException(UserErrorCode.USER_NOT_FOUND));
+
+        // 탈퇴된 회원에 대한 예외처리
+        if (user.getStatus().equals(UserStatus.DEACTIVATE)) {
+            throw new GlobalException(UserErrorCode.USER_DEACTIVATED);
+        }
 
         validatePassword(dto.getPassword(), user.getPassword());
 
