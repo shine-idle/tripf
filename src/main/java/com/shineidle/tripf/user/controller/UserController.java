@@ -83,7 +83,7 @@ public class UserController {
      * @return {@link PostMessageResponseDto} 탈퇴완료 문구
      */
     @Operation(summary = "회원탈퇴")
-    @PatchMapping("/deactivate")
+    @DeleteMapping("/deactivate")
     public ResponseEntity<PostMessageResponseDto> deleteUser(
             @RequestBody UserRequestDto dto
     ) {
