@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class CartCreateRequestDto {
+public class CartRequestDto {
 
     @NotNull(message = "상품 수량을 입력해주세요.")
     private final Long quantity;

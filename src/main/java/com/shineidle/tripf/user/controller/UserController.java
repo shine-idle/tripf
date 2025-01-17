@@ -6,6 +6,7 @@ import com.shineidle.tripf.user.dto.UserRequestDto;
 import com.shineidle.tripf.user.dto.UserResponseDto;
 import com.shineidle.tripf.user.dto.UsernameUpdateRequestDto;
 import com.shineidle.tripf.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +21,11 @@ public class UserController {
 
     /**
      * 권한 체크(비밀번호 체크)
-     * @param dto {@link UserRequestDto}
+     *
+     * @param dto {@link UserRequestDto} 유저 요청 Dto
      * @return 프로필 페이지로 리다이렉트
      */
+    @Operation(summary = "권한 체크(비밀번호 체크)")
     @PostMapping("/verify-authority")
     public ResponseEntity<Void> verify(
             @RequestBody UserRequestDto dto
@@ -33,9 +36,11 @@ public class UserController {
 
     /**
      * 유저 조회
-     * @param userId 유저Id
-     * @return {@link UserResponseDto}
+     *
+     * @param userId 유저 식별자
+     * @return {@link UserResponseDto} 유저 응답 Dto
      */
+    @Operation(summary = "유저 조회")
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDto> findUser(
             @PathVariable Long userId
@@ -45,9 +50,11 @@ public class UserController {
 
     /**
      * 패스워드 수정
-     * @param dto {@link PasswordUpdateRequestDto}
-     * @return {@link PostMessageResponseDto} 수정완료 문구
+     *
+     * @param dto {@link PasswordUpdateRequestDto} 패스워드 수정 요청 Dto
+     * @return {@link PostMessageResponseDto} 수정 완료 문구
      */
+    @Operation(summary = "패스워드 수정")
     @PatchMapping("/me")
     public ResponseEntity<PostMessageResponseDto> updatePassword(
             @RequestBody PasswordUpdateRequestDto dto
@@ -56,10 +63,12 @@ public class UserController {
     }
 
     /**
-     * 이름 수정
-     * @param dto {@link UsernameUpdateRequestDto}
+     * 유저 이름 수정
+     *
+     * @param dto {@link UsernameUpdateRequestDto} 유저 이름 수정 요청 Dto
      * @return {@link PostMessageResponseDto} 수정완료 문구
      */
+    @Operation(summary = "유저이름 수정")
     @PutMapping("/me")
     public ResponseEntity<PostMessageResponseDto> updateName(
             @RequestBody UsernameUpdateRequestDto dto
@@ -69,9 +78,11 @@ public class UserController {
 
     /**
      * 회원 탈퇴
-     * @param dto {@link UserRequestDto}
+     *
+     * @param dto {@link UserRequestDto} 유저 요청 Dto
      * @return {@link PostMessageResponseDto} 탈퇴완료 문구
      */
+    @Operation(summary = "회원탈퇴")
     @PatchMapping("/deactivate")
     public ResponseEntity<PostMessageResponseDto> deleteUser(
             @RequestBody UserRequestDto dto

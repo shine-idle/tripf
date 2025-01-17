@@ -1,6 +1,6 @@
 package com.shineidle.tripf.photo.controller;
 
-import com.shineidle.tripf.photo.dto.PhotoCreateResponseDto;
+import com.shineidle.tripf.photo.dto.PhotoResponseDto;
 import com.shineidle.tripf.photo.service.PhotoService;
 import com.shineidle.tripf.photo.type.PhotoDomain;
 import lombok.RequiredArgsConstructor;
@@ -23,16 +23,16 @@ public class ProductPhotoController {
     /**
      * 상품 사진 단건 조회
      *
-     * @param productId
-     * @param photoId
-     * @return {@link PhotoCreateResponseDto} 조회된 사진 응답값
+     * @param productId 상품 식별자
+     * @param photoId 사진 식별자
+     * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @GetMapping("/{photoId}")
-    public ResponseEntity<PhotoCreateResponseDto> findProductPhoto(
+    public ResponseEntity<PhotoResponseDto> findProductPhoto(
             @PathVariable Long productId,
             @PathVariable Long photoId
     ) {
-        PhotoCreateResponseDto responseDto = photoService.findPhoto(productId, photoId, PhotoDomain.PRODUCT);
+        PhotoResponseDto responseDto = photoService.findPhoto(productId, photoId, PhotoDomain.PRODUCT);
 
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
@@ -40,14 +40,14 @@ public class ProductPhotoController {
     /**
      * 상품 사진 다건 조회
      *
-     * @param productId
-     * @return {@link PhotoCreateResponseDto} 조회된 사진 응답값
+     * @param productId 상품 식별자
+     * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @GetMapping()
-    public ResponseEntity<List<PhotoCreateResponseDto>> findAllProductPhoto(
+    public ResponseEntity<List<PhotoResponseDto>> findAllProductPhoto(
             @PathVariable Long productId
     ) {
-        List<PhotoCreateResponseDto> responseDtos = photoService.findAllPhoto(productId, PhotoDomain.PRODUCT);
+        List<PhotoResponseDto> responseDtos = photoService.findAllPhoto(productId, PhotoDomain.PRODUCT);
 
         return new ResponseEntity<>(responseDtos, HttpStatus.OK);
     }

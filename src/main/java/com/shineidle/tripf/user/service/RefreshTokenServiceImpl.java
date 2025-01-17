@@ -27,9 +27,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     /**
      * 리프레시 토큰 생성
      *
-     * @param userId         유저Id
-     * @param authentication {@link Authentication}
-     * @param isSocialLogin  소셜로그인 = true or 일반로그인 = false
+     * @param userId 유저 식별자
+     * @param authentication {@link Authentication} 인증 객체
+     * @param isSocialLogin  소셜로그인 = true 또는 일반로그인 = false
      * @return {@link RefreshToken}
      */
     @Override
@@ -51,7 +51,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
      * 리프레시 토큰 유효성 확인
      *
      * @param refreshToken {@link RefreshToken}
-     * @return {@link RefreshToken
+     * @return {@link RefreshToken}
      */
     @Override
     @Transactional
@@ -66,7 +66,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
      * 리프레시 토큰 갱신
      *
      * @param validRefreshToken {@link RefreshToken}
-     * @param authentication    {@link Authentication}}
+     * @param authentication {@link Authentication}}
      * @return {@link RefreshToken} 새 리프레시 토큰
      * @apiNote 기존의 리프레시 토큰을 삭제하고 새 리프레시 토큰을 저장
      */
@@ -78,15 +78,47 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return generateToken(validRefreshToken.getUser().getId(), authentication, isSocialLogin);
     }
 
+    /**
+     * 토큰으로 리프레시 토큰 조회
+     *
+     * @param token 조회할 리프레시 토큰
+     * @return {@link RefreshToken}
+     */
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
     }
 
+    /**
+     * 유저 식별자로 리프레시 토큰 조회
+     * @param userId 유저 식별자
+     * @return {@link RefreshToken}
+     */
+    public Optional<RefreshToken> findByUserId(Long userId) {
+        return refreshTokenRepository.findByUserId(userId);
+    }
+
+    /**
+     * 리프레시 토큰 삭제
+     *
+     * @param userId 유저 식별자
+     */
     @Override
     @Transactional
     public void deleteToken(Long userId) {
         RefreshToken token = refreshTokenRepository.findByUserId(userId).orElseThrow(() ->
                 new GlobalException(UserErrorCode.TOKEN_NOT_FOUND));
         refreshTokenRepository.delete(token);
+    }
+
+    /**
+     * 토큰과 유저 정보 삭제
+     *
+     * @param refreshToken {@link RefreshToken}
+     */
+    @Override
+    @Transactional
+    public void deleteTokenAndUser(RefreshToken refreshToken) {
+        refreshTokenRepository.delete(refreshToken);
+        userRepository.delete(refreshToken.getUser());
     }
 }

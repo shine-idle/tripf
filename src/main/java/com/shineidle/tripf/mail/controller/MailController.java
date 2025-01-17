@@ -1,6 +1,7 @@
 package com.shineidle.tripf.mail.controller;
 
 import com.shineidle.tripf.mail.service.MailService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +18,11 @@ public class MailController {
 
     /**
      * 테스트 메일 발송 API
+     *
      * @param email 수신자 이메일
      * @return 성공 메시지
      */
+    @Operation(summary = "테스트 메일 발송")
     @GetMapping("/send")
     public ResponseEntity<String> sendTestMail(
             @RequestParam String email) {

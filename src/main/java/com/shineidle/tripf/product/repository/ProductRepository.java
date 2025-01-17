@@ -9,6 +9,7 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     /**
      * 단종된 상품을 제외한 모든 상품 리턴
+     *
      * @return 상품 리스트
      */
     @Query("select pr from Product pr where pr.status != 'DISCONTINUED'")
