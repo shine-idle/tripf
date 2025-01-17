@@ -338,4 +338,16 @@ public class PhotoServiceImpl implements PhotoService {
             throw new GlobalException(PhotoErrorCode.RELATION_INVALID);
         }
     }
+
+    /**
+     * 특정 활동 id에 대한 이미지 url 가져오기
+     *
+     * @param activityId 활동 식별자
+     * @return domainType {@link PhotoDomain}
+     */
+    public List<String> getActivityPhotoUrls(Long activityId) {
+        return activityPhotoRepository.findAllByActivityId(activityId).stream()
+                .map(activityPhoto -> activityPhoto.getPhoto().getUrl())
+                .toList();
+    }
 }

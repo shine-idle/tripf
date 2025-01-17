@@ -22,7 +22,8 @@ public interface LikeRepository extends JpaRepository<Like, LikePk> {
     void deleteById(LikePk likePk);
 
     // 좋아요 상위 5개
-    @Query("SELECT new com.shineidle.tripf.like.dto.FeedLikeDto(l.feed.id, f.title, COUNT(l)) " +
+    @Query("SELECT new com.shineidle.tripf.like.dto.FeedLikeDto(" +
+            "l.feed.id, f.title, COUNT(l)) " +
             "FROM Like l " +
             "JOIN l.feed f " +
             "GROUP BY l.feed.id, f.title " +

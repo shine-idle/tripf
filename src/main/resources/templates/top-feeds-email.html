@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tripf 인기 피드</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
+<div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; overflow: hidden;">
+    <!-- Header -->
+    <div style="background-color: #1b2b42; text-align: center; color: #ffffff; padding: 20px;">
+        <h1 style="margin: 0; font-size: 72px; font-weight: bold;">Tripf 인기 피드</h1>
+        <img src="cid:backgroundImage" alt="캠핑 이미지" style="max-width: 100%; height: auto;">
+    </div>
+
+    <!-- Feed Items -->
+    <div style="width: 100%; padding: 20px; font-family: Arial, sans-serif; background-color: #f9f9f9; box-sizing: border-box;">
+        <h1 style="text-align: center; color: #333;">Tripf 인기 피드</h1>
+
+        <!-- 상단 피드 (2개) -->
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; margin-bottom: 20px; box-sizing: border-box;">
+            <div th:if="${feeds.size() > 0}" style="flex: 1; min-width: 45%; max-width: 48%; border: 1px solid #ddd; border-radius: 10px; background-color: #fff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); overflow: hidden; box-sizing: border-box;">
+                <img th:src="${feeds[0].representativeImageUrl ?: 'cid:defaultImage'}"
+                     style="width: 100%; height: 150px; object-fit: cover;" alt="피드 이미지">
+                <p style="margin: 10px; font-size: 14px; color: #555;" th:text="${feeds[0].title}">기본 타이틀</p>
+            </div>
+            <div th:if="${feeds.size() > 1}" style="flex: 1; min-width: 45%; max-width: 48%; border: 1px solid #ddd; border-radius: 10px; background-color: #fff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); overflow: hidden; box-sizing: border-box;">
+                <img th:src="${feeds[1].representativeImageUrl ?: 'cid:defaultImage'}"
+                     style="width: 100%; height: 150px; object-fit: cover;" alt="피드 이미지">
+                <p style="margin: 10px; font-size: 14px; color: #555;" th:text="${feeds[1].title}">기본 타이틀</p>
+            </div>
+        </div>
+
+        <!-- 하단 피드 (3개) -->
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; box-sizing: border-box;">
+            <div th:if="${feeds.size() > 2}" style="flex: 1; min-width: 30%; max-width: 32%; border: 1px solid #ddd; border-radius: 10px; background-color: #fff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); overflow: hidden; box-sizing: border-box;">
+                <img th:src="${feeds[2].representativeImageUrl ?: 'cid:defaultImage'}"
+                     style="width: 100%; height: 150px; object-fit: cover;" alt="피드 이미지">
+                <p style="margin: 10px; font-size: 14px; color: #555;" th:text="${feeds[2].title}">기본 타이틀</p>
+            </div>
+            <div th:if="${feeds.size() > 3}" style="flex: 1; min-width: 30%; max-width: 32%; border: 1px solid #ddd; border-radius: 10px; background-color: #fff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); overflow: hidden; box-sizing: border-box;">
+                <img th:src="${feeds[3].representativeImageUrl ?: 'cid:defaultImage'}"
+                     style="width: 100%; height: 150px; object-fit: cover;" alt="피드 이미지">
+                <p style="margin: 10px; font-size: 14px; color: #555;" th:text="${feeds[3].title}">기본 타이틀</p>
+            </div>
+            <div th:if="${feeds.size() > 4}" style="flex: 1; min-width: 30%; max-width: 32%; border: 1px solid #ddd; border-radius: 10px; background-color: #fff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); overflow: hidden; box-sizing: border-box;">
+                <img th:src="${feeds[4].representativeImageUrl ?: 'cid:defaultImage'}"
+                     style="width: 100%; height: 150px; object-fit: cover;" alt="피드 이미지">
+                <p style="margin: 10px; font-size: 14px; color: #555;" th:text="${feeds[4].title}">기본 타이틀</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="background-color: #1b2b42; text-align: center; padding: 20px; color: #ffffff;">
+        <p style="margin: 0; font-size: 12px;">&copy; 2025 Tripf. All rights reserved.</p>
+        <div style="margin-top: 10px;">
+            <a href="https://facebook.com/" target="_blank">
+                <img src="cid:facebookImage" alt="Facebook" style="width: 32px; margin: 0 5px;">
+            </a>
+            <a href="https://twitter.com/" target="_blank">
+                <img src="cid:twitterImage" alt="Twitter" style="width: 32px; margin: 0 5px;">
+            </a>
+            <a href="https://instagram.com/" target="_blank">
+                <img src="cid:InstaImage" alt="Instagram" style="width: 32px; margin: 0 5px;">
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

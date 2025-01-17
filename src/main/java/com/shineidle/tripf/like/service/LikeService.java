@@ -12,5 +12,5 @@ public interface LikeService {
     void deleteLike(Long feedId);
 
     //좋아요 상위 5개 피드
-    public List<FeedLikeDto> getTop5LikedFeeds();
+    public List<FeedLikeDto> getTop5LikedFeedsWithImages();
 }
