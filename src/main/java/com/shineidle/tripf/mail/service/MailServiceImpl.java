@@ -63,7 +63,7 @@ public class MailServiceImpl implements MailService{
 
             // 이미지 추가 (인라인으로 첨부)
             helper.addInline("backgroundImage", new ClassPathResource("static/images/image-1.png"));
-            helper.addInline("baseImage", new ClassPathResource("static/images/image-3.png"));
+            helper.addInline("defaultImage", new ClassPathResource("static/images/image-3.png"));
             helper.addInline("facebookImage", new ClassPathResource("static/images/image-6.png"));
             helper.addInline("twitterImage", new ClassPathResource("static/images/image-7.png"));
             helper.addInline("LinkedInImage", new ClassPathResource("static/images/image-8.png"));

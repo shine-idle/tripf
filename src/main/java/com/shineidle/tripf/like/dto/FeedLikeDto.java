@@ -30,7 +30,7 @@ public class FeedLikeDto {
         if (photoUrls != null && !photoUrls.isEmpty()) {
             return photoUrls.get(0);
         }
-        return "cid:baseImage"; // 기본 이미지를 제공
+        return "cid:defaultImage"; // 기본 이미지를 제공
     }
 
 }
