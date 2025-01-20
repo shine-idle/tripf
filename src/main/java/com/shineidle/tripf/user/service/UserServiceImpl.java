@@ -4,10 +4,7 @@ import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.UserErrorCode;
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.common.message.enums.PostMessage;
-import com.shineidle.tripf.common.util.AuthenticationScheme;
-import com.shineidle.tripf.common.util.JwtProvider;
-import com.shineidle.tripf.common.util.TokenType;
-import com.shineidle.tripf.common.util.UserAuthorizationUtil;
+import com.shineidle.tripf.common.util.*;
 import com.shineidle.tripf.user.dto.*;
 import com.shineidle.tripf.user.entity.RefreshToken;
 import com.shineidle.tripf.user.entity.User;
@@ -23,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +33,7 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final RefreshTokenService refreshTokenService;
+    private final RedisUtils redisUtils;
 
     /**
      * 유저 생성
@@ -94,7 +93,6 @@ public class UserServiceImpl implements UserService {
                         dto.getEmail(),
                         dto.getPassword())
         );
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 토큰 생성
@@ -139,8 +137,12 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserResponseDto findUser(Long userId) {
-        User findUser = getUserById(userId);
-        return UserResponseDto.toDto(findUser);
+        User user = (User) redisUtils.getFromRedis("USER:" + userId.toString());
+        if (user == null) {
+            user = getUserById(userId);
+            redisUtils.saveToRedis("USER:" + user.getId().toString(), user, Duration.ofMinutes(1));
+        }
+        return UserResponseDto.toDto(user);
     }
 
     /**
@@ -233,4 +235,5 @@ public class UserServiceImpl implements UserService {
     public List<String> getActiveUserEmails() {
         return userRepository.findAllActiveEmails();
     }
+
 }
