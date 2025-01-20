@@ -332,6 +332,26 @@ public class FeedServiceImpl implements FeedService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public HomeResponseDto findHomeData() {
+
+        List<RegionResponseDto> korea = feedRepository.findByCountry("대한민국")
+                .stream()
+                .map(RegionResponseDto::toDto)
+                .toList();
+
+        List<RegionResponseDto> global = feedRepository.findByCountryNot("대한민국")
+                .stream()
+                .map(RegionResponseDto::toDto)
+                .toList();
+
+        List<FollowResponseDto> followers = followService.findFollowers();
+        List<FollowResponseDto> followings = followService.findFollowings();
+
+        return new HomeResponseDto(korea, global, followers, followings);
+    }
+
+
     /**
      * repository Service method
      */

@@ -64,4 +64,9 @@ public interface FeedService {
      *피드 ID로 피드 확인
      */
     Feed checkFeed(Long feedId);
+
+    /**
+     * 홈페이지
+     */
+    HomeResponseDto findHomeData();
 }
