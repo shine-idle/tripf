@@ -14,6 +14,7 @@ import com.shineidle.tripf.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class CartServiceImpl implements CartService {
      * @return {@link CartResponseDto} 장바구니 응답 Dto
      */
     @Override
+    @Transactional
     public CartResponseDto createCart(Long productId, CartRequestDto cartRequestDto) {
 
         User loginedUser = UserAuthorizationUtil.getLoginUser();
@@ -49,6 +51,7 @@ public class CartServiceImpl implements CartService {
      * @return {@link CartResponseDto} 장바구니 응답 Dto
      */
     @Override
+    @Transactional
     public List<CartResponseDto> findCart() {
 
         Long userId = UserAuthorizationUtil.getLoginUserId();
@@ -59,12 +62,14 @@ public class CartServiceImpl implements CartService {
     }
 
     /**
+     * 장바구니 수정
      *
      * @param productId 상품 식별자
      * @param cartRequestDto {@link CartRequestDto} 장바구니 요청 Dto
      * @return {@link CartResponseDto} 장바구니 응답 Dto
      */
     @Override
+    @Transactional
     public CartResponseDto updateCart(Long productId, CartRequestDto cartRequestDto) {
 
         Long userId = UserAuthorizationUtil.getLoginUserId();
@@ -86,6 +91,7 @@ public class CartServiceImpl implements CartService {
      * @param productId 상품 식별자
      */
     @Override
+    @Transactional
     public void deleteCart(Long productId) {
 
         Long userId = UserAuthorizationUtil.getLoginUserId();
@@ -111,6 +117,7 @@ public class CartServiceImpl implements CartService {
 
     /**
      * 유저Id와 상품Id에 해당하는 장바구니 조회
+     *
      * @param userId 유저 식별자
      * @param productId 상품 식별자
      * @return Cart {@link Cart}
