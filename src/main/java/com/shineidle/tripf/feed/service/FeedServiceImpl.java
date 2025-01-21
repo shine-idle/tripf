@@ -2,6 +2,7 @@ package com.shineidle.tripf.feed.service;
 
 import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.FeedErrorCode;
+import com.shineidle.tripf.common.message.constants.NotificationMessage;
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.common.message.enums.PostMessage;
 import com.shineidle.tripf.common.util.UserAuthorizationUtil;
@@ -12,11 +13,17 @@ import com.shineidle.tripf.feed.entity.Feed;
 import com.shineidle.tripf.feed.repository.ActivityRepository;
 import com.shineidle.tripf.feed.repository.DaysRepository;
 import com.shineidle.tripf.feed.repository.FeedRepository;
+import com.shineidle.tripf.follow.dto.FollowResponseDto;
+import com.shineidle.tripf.follow.service.FollowService;
 import com.shineidle.tripf.geo.service.GeoService;
+import com.shineidle.tripf.notification.service.NotificationService;
+import com.shineidle.tripf.notification.type.NotifyType;
 import com.shineidle.tripf.user.entity.User;
+import com.shineidle.tripf.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,14 +37,18 @@ public class FeedServiceImpl implements FeedService {
     private final DaysRepository daysRepository;
     private final ActivityRepository activityRepository;
     private final GeoService geoService;
+    private final FollowService followService;
+    private final UserService userService;
+    private final NotificationService notificationService;
 
     /**
      * 피드 생성
      *
-     * @param feedRequestDto 피드 요청 Dto
-     * @return feedResponseDto 피드 응답 Dto
+     * @param feedRequestDto {@link FeedRequestDto} 피드 요청 Dto
+     * @return {@link FeedResponseDto} 피드 응답 Dto
      */
     @Override
+    @Transactional
     public FeedResponseDto createFeed(FeedRequestDto feedRequestDto) {
         User userId = UserAuthorizationUtil.getLoginUser();
 
@@ -87,17 +98,21 @@ public class FeedServiceImpl implements FeedService {
                 }
             });
         }
+
+        followerNewPostNotification(userId, feed.getId());
+
         return findFeed(savedFeed.getId());
     }
 
     /**
      * 피드 수정
      *
-     * @param feedId         피드 ID
-     * @param feedRequestDto 피드 요청 DTO
-     * @return feedResponseDto 수정된 피드 응답 DTO
+     * @param feedId 피드 식별자
+     * @param feedRequestDto {@link FeedRequestDto} 피드 요청 DTO
+     * @return {@link FeedResponseDto} 피드 응답 DTO
      */
     @Override
+    @Transactional
     public FeedResponseDto updateFeed(Long feedId, FeedRequestDto feedRequestDto) {
         checkUser(feedId);
         Feed feed = checkFeed(feedId);
@@ -122,7 +137,7 @@ public class FeedServiceImpl implements FeedService {
      * 피드 상세조회
      *
      * @param feedId 피드 식별자
-     * @return FeedResponseDto
+     * @return {@link FeedResponseDto} 피드 응답 Dto
      */
     @Override
     public FeedResponseDto findFeed(Long feedId) {
@@ -156,7 +171,7 @@ public class FeedServiceImpl implements FeedService {
      * 피드 삭제
      *
      * @param feedId 피드 식별자
-     * @return PostMessageResponseDto(PostMessage.PEED_DELETED)
+     * @return {@link PostMessageResponseDto} 피드 삭제 문구
      */
     @Override
     public PostMessageResponseDto deleteFeed(Long feedId) {
@@ -172,9 +187,10 @@ public class FeedServiceImpl implements FeedService {
      *
      * @param feedId 피드 식별자
      * @param daysId 일정 식별자
-     * @return new PostMessageResponseDto(PostMessage.DAYS_DELETED);
+     * @return {@link PostMessageResponseDto} 일정 삭제 문구
      */
     @Override
+    @Transactional
     public PostMessageResponseDto deleteDays(Long feedId, Long daysId) {
         checkUser(feedId);
         checkDays(feedId, daysId);
@@ -185,12 +201,13 @@ public class FeedServiceImpl implements FeedService {
     /**
      * 활동 삭제
      *
-     * @param feedId     피드 식별자
-     * @param daysId     일정 식별자
+     * @param feedId 피드 식별자
+     * @param daysId 일정 식별자
      * @param activityId 활동 식별자
-     * @return PostMessageResponseDto(PostMessage.ACTIVITY_DELETED);
+     * @return {@link PostMessageResponseDto} 활동 삭제 문구
      */
     @Override
+    @Transactional
     public PostMessageResponseDto deleteActivity(Long feedId, Long daysId, Long activityId) {
         checkUser(feedId);
         checkActivity(feedId, daysId, activityId);
@@ -201,8 +218,13 @@ public class FeedServiceImpl implements FeedService {
     /**
      * 일정 및 활동 추가
      * 일정 추가 시 활동도 같이 추가
+     *
+     * @param feedId 피드 식별자
+     * @param daysRequestDto {@link DaysRequestDto} 일정 요청 Dto
+     * @return {@link FeedResponseDto} 일정 응답 Dto
      */
     @Override
+    @Transactional
     public FeedResponseDto createDay(Long feedId, DaysRequestDto daysRequestDto) {
         checkUser(feedId);
         Feed feed = checkFeed(feedId);
@@ -240,12 +262,13 @@ public class FeedServiceImpl implements FeedService {
     /**
      * 활동 추가
      *
-     * @param feedId             피드 식별자
-     * @param daysId             일정 식별자
-     * @param activityRequestDto 활동 요청 Dto
-     * @return findFeed(feedId);
+     * @param feedId 피드 식별자
+     * @param daysId 일정 식별자
+     * @param activityRequestDto {@link ActivityRequestDto} 활동 요청 Dto
+     * @return {@link FeedResponseDto} 활동 응답 Dto
      */
     @Override
+    @Transactional
     public FeedResponseDto createActivity(Long feedId, Long daysId, ActivityRequestDto activityRequestDto) {
         checkUser(feedId);
         Days days = checkDays(feedId, daysId);
@@ -266,8 +289,15 @@ public class FeedServiceImpl implements FeedService {
 
     /**
      * 활동 수정
+     *
+     * @param feedId 피드 식별자
+     * @param daysId 일정 식별자
+     * @param activityId 활동 식별자
+     * @param activityRequestDto {@link ActivityRequestDto} 활동 요청 Dto
+     * @return {@link FeedResponseDto} 활동 응답 Dto
      */
     @Override
+    @Transactional
     public FeedResponseDto updateActivity(Long feedId, Long daysId, Long activityId, ActivityRequestDto activityRequestDto) {
         checkUser(feedId);
         Activity activity = checkActivity(feedId, daysId, activityId);
@@ -285,9 +315,11 @@ public class FeedServiceImpl implements FeedService {
         return findFeed(feedId);
     }
 
-
     /**
      * 국가별 피드 조회
+     *
+     * @param country 국가명
+     * @return {@link RegionResponseDto} 지역 응답 Dto
      */
     @Override
     @Cacheable(value = "regionCache", key = "'country:' + #country")
@@ -300,6 +332,26 @@ public class FeedServiceImpl implements FeedService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public HomeResponseDto findHomeData() {
+
+        List<RegionResponseDto> korea = feedRepository.findByCountry("대한민국")
+                .stream()
+                .map(RegionResponseDto::toDto)
+                .toList();
+
+        List<RegionResponseDto> global = feedRepository.findByCountryNot("대한민국")
+                .stream()
+                .map(RegionResponseDto::toDto)
+                .toList();
+
+        List<FollowResponseDto> followers = followService.findFollowers();
+        List<FollowResponseDto> followings = followService.findFollowings();
+
+        return new HomeResponseDto(korea, global, followers, followings);
+    }
+
+
     /**
      * repository Service method
      */
@@ -308,7 +360,7 @@ public class FeedServiceImpl implements FeedService {
      * 피드 Id로 피드 확인
      *
      * @param feedId 피드 식별자
-     * @return feed
+     * @return {@link Feed}
      */
     public Feed checkFeed(Long feedId) {
         Feed feed = feedRepository.findById(feedId)
@@ -326,7 +378,7 @@ public class FeedServiceImpl implements FeedService {
      *
      * @param feedId 피드 식별자
      * @param daysId 일정 식별자
-     * @return days
+     * @return {@link Days}
      */
     public Days checkDays(Long feedId, Long daysId) {
         return daysRepository.findByIdWithFeed(feedId, daysId)
@@ -336,10 +388,10 @@ public class FeedServiceImpl implements FeedService {
     /**
      * 피드 및 일정 및 피드 Id로 활동 확인
      *
-     * @param feedId     피드 식별자
-     * @param daysId     일정 식별자
+     * @param feedId 피드 식별자
+     * @param daysId 일정 식별자
      * @param activityId 활동 식별자
-     * @return Activity
+     * @return {@link Activity}
      */
     public Activity checkActivity(Long feedId, Long daysId, Long activityId) {
         return activityRepository.findByIdWithFeedAndDays(feedId, daysId, activityId)
@@ -350,7 +402,7 @@ public class FeedServiceImpl implements FeedService {
      * 작성자 검증 method
      * 로그인한 유저와 작성자가 다를 경우 exception
      *
-     * @param feedId
+     * @param feedId 피드 식별자
      */
     public void checkUser(Long feedId) {
         Feed checkFeed = checkFeed(feedId);
@@ -361,4 +413,17 @@ public class FeedServiceImpl implements FeedService {
         }
     }
 
+    /**
+     * 팔로우 한사람이 새로운 게시글을 작성할 경우 알림
+     * @param actor 알림 발생자
+     * @param feedId 알림 발생 피드
+     */
+    private void followerNewPostNotification(User actor, Long feedId) {
+        List<FollowResponseDto> followers = followService.findFollowers();
+        for (FollowResponseDto follower : followers) {
+            User targetUser = userService.getUserById(follower.getUserId());
+            String context = String.format(NotificationMessage.FOLLOW_FEED_NOTIFICATION, actor.getName());
+            notificationService.createNotification(targetUser, actor, NotifyType.NEW_FEED, context,feedId);
+        }
+    }
 }

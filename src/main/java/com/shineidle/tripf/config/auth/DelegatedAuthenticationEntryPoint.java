@@ -13,6 +13,7 @@ import java.io.IOException;
 
 @Component
 public class DelegatedAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
     /**
      * 스프링 시큐리티 예외를 처리하기 위한 resolver
      */

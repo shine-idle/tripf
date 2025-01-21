@@ -32,9 +32,9 @@ public class CommentServiceImpl implements CommentService {
     /**
      * 댓글 작성
      *
-     * @param feedId            피드 식별자
-     * @param commentRequestDto 댓글 요청 DTO
-     * @return CommentResponseDto.toDto
+     * @param feedId 피드 식별자
+     * @param commentRequestDto {@link CommentRequestDto} 댓글 요청 Dto
+     * @return {@link CommentResponseDto} 댓글 응답 Dto
      */
     @Override
     public CommentResponseDto createComment(Long feedId, CommentRequestDto commentRequestDto) {
@@ -48,7 +48,7 @@ public class CommentServiceImpl implements CommentService {
         );
         Comment savecomment = commentRepository.save(comment);
 
-        createCommentNotification(feed.getUser(), user);
+        createCommentNotification(feed.getUser(), user, feedId);
 
         return CommentResponseDto.toDto(savecomment);
     }
@@ -57,23 +57,27 @@ public class CommentServiceImpl implements CommentService {
      * 댓글 수정
      * @param feedId 피드 식별자
      * @param commentId 댓글 식별자
-     * @param commentRequestDto 댓글 요청 DTo
-     * @return CommentResponseDto.toDto
+     * @param commentRequestDto {@link CommentRequestDto} 댓글 요청 Dto
+     * @return {@link CommentResponseDto} 댓글 응답 Dto
      */
     @Override
     public CommentResponseDto updateComment(Long feedId, Long commentId, CommentRequestDto commentRequestDto) {
         Comment comment = checkComment(feedId, commentId);
         checkUser(feedId, commentId);
 
-        comment.update(
-                commentRequestDto.getComment()
-        );
+        comment.update(commentRequestDto.getComment());
 
         commentRepository.save(comment);
 
         return CommentResponseDto.toDto(comment);
     }
 
+    /**
+     * 댓글 다건 조회
+     *
+     * @param feedId 피드 식별자
+     * @return {@link CommentResponseDto} 댓글 응답 Dto
+     */
     @Override
     public List<CommentResponseDto> findAllComment(Long feedId) {
 
@@ -84,6 +88,13 @@ public class CommentServiceImpl implements CommentService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 댓글 삭제
+     *
+     * @param feedId 피드 식별자
+     * @param commentId 댓글 식별자
+     * @return {@link PostMessageResponseDto} 댓글 삭제 문구
+     */
     @Override
     public PostMessageResponseDto deleteComment(Long feedId, Long commentId) {
         checkUser(feedId, commentId);
@@ -100,7 +111,7 @@ public class CommentServiceImpl implements CommentService {
      * 피드 Id로 피드 확인
      *
      * @param feedId 피드 식별자
-     * @return feed
+     * @return {@link Feed}
      */
     public Feed checkFeed(Long feedId) {
         return feedService.checkFeed(feedId);
@@ -111,7 +122,7 @@ public class CommentServiceImpl implements CommentService {
      *
      * @param feedId    피드 식별자
      * @param commentId 댓글 식별자
-     * @return comment
+     * @return {@link Comment}
      */
     public Comment checkComment(Long feedId, Long commentId) {
         Comment comment = commentRepository.findByIdAndFeedId(commentId, feedId)
@@ -135,8 +146,14 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
-    private void createCommentNotification(User targetUser, User actor) {
+    /**
+     * 댓글을 달 경우 알림 발생
+     *
+     * @param targetUser 알림 수신자 (알림 조회자)
+     * @param actor 알림 발생자
+     */
+    private void createCommentNotification(User targetUser, User actor, Long feedId) {
         String context = String.format(NotificationMessage.NEW_COMMENT_NOTIFICATION, actor.getName());
-        notificationService.createNotification(targetUser, actor, NotifyType.NEW_COMMENT, context);
+        notificationService.createNotification(targetUser, actor, NotifyType.NEW_COMMENT, context, feedId);
     }
 }

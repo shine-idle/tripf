@@ -2,6 +2,7 @@ package com.shineidle.tripf.product.controller;
 
 import com.shineidle.tripf.product.dto.ProductResponseDto;
 import com.shineidle.tripf.product.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,10 @@ public class ProductController {
 
     /**
      * 상품 조회(다건)
-     * @return {@link ProductResponseDto}
+     *
+     * @return {@link ProductResponseDto} 상품 응답 Dto
      */
+    @Operation(summary = "상품 조회(다건)")
     @GetMapping
     public ResponseEntity<List<ProductResponseDto>> findAllProduct() {
         return new ResponseEntity<>(productService.findAllProduct(), HttpStatus.OK);
@@ -29,9 +32,11 @@ public class ProductController {
 
     /**
      * 상품 조회(단건)
-     * @param productId 상품Id
-     * @return {@link ProductResponseDto}
+     *
+     * @param productId 상품 식별자
+     * @return {@link ProductResponseDto} 상품 응답 Dto
      */
+    @Operation(summary = "상품 조회(단건)")
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponseDto> findProduct(
             @PathVariable Long productId

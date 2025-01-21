@@ -1,93 +1,66 @@
 package com.shineidle.tripf.oauth2.handler;
 
 import com.shineidle.tripf.common.util.JwtProvider;
+import com.shineidle.tripf.common.util.TokenType;
 import com.shineidle.tripf.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.shineidle.tripf.oauth2.service.OAuth2UserPrincipal;
 import com.shineidle.tripf.oauth2.user.OAuth2Provider;
-import com.shineidle.tripf.oauth2.user.OAuth2UserUnlinkManager;
 import com.shineidle.tripf.oauth2.util.CookieUtils;
-import jakarta.servlet.http.Cookie;
+import com.shineidle.tripf.user.entity.RefreshToken;
+import com.shineidle.tripf.user.entity.User;
+import com.shineidle.tripf.user.repository.UserRepository;
+import com.shineidle.tripf.user.service.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.util.Optional;
-
-import static com.shineidle.tripf.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.MODE_PARAM_COOKIE_NAME;
-import static com.shineidle.tripf.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+    public static final String REDIRECT_URL = "/";
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
-    private final OAuth2UserUnlinkManager oAuth2UserUnlinkManager;
+    private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-        String token = jwtProvider.generateToken(authentication, true);
-        log.info("Social Login JWT: {}", token);
-        response.addHeader("Authorization", "Bearer " + token);
-        httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
-        getRedirectStrategy().sendRedirect(request, response, "/");
+        OAuth2UserPrincipal oAuth2UserPrincipal = getOAuth2UserPrincipal(authentication);
+
+        User user = oAuth2UserPrincipal.getUserInfo().getProvider().equals(OAuth2Provider.KAKAO) ?
+                userRepository.findByProviderId(oAuth2UserPrincipal.getUserInfo().getId()).orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND)) :
+                userRepository.findByEmail(oAuth2UserPrincipal.getName()).orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        String accessToken = jwtProvider.generateToken(authentication, true, TokenType.ACCESS);
+        RefreshToken refreshToken = refreshTokenService.generateToken(user.getId(), authentication, true);
+
+        // 쿠키에 사용
+        addRefreshTokenToCookie(request, response, refreshToken);
+
+        //Path 뒤에 accessToken 붙이기
+        String targetUrl = getTargetUrl(accessToken);
+
+        clearAuthenticationAttributes(request, response);
+
+        // 리다이렉트
+        getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
-    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
-                .map(Cookie::getValue);
-
-        String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
-
-        String mode = CookieUtils.getCookie(request, MODE_PARAM_COOKIE_NAME)
-                .map(Cookie::getValue)
-                .orElse("");
-
-        OAuth2UserPrincipal principal = getOAuth2UserPrincipal(authentication);
-
-        if (principal == null) {
-            return UriComponentsBuilder.fromUriString(targetUrl)
-                    .queryParam("error", "Login failed")
-                    .build().toUriString();
-        }
-
-        if ("login".equalsIgnoreCase(mode)) {
-            // TODO: DB 저장
-            // TODO: accessToken, refreshToken 발급
-            // TODO: refreshToken DB 저장
-            log.info("email={}, name={}, nickname={}, accessToken={}", principal.getUserInfo().getEmail(),
-                    principal.getUserInfo().getName(),
-                    principal.getUserInfo().getNickname(),
-                    principal.getUserInfo().getAccessToken()
-            );
-
-            String accessToken = jwtProvider.generateToken(authentication, true);
-            String refreshToken = "test_refresh_token";
-
-            return UriComponentsBuilder.fromUriString(targetUrl)
-                    .queryParam("access_token", accessToken)
-                    .queryParam("refresh_token", refreshToken)
-                    .build().toUriString();
-        } else if ("unlink".equalsIgnoreCase(mode)) {
-            String accessToken = principal.getUserInfo().getAccessToken();
-            OAuth2Provider provider = principal.getUserInfo().getProvider();
-
-            // TODO: DB 삭제
-            // TODO: refreshToken 삭제
-            oAuth2UserUnlinkManager.unlink(provider, accessToken);
-
-            return UriComponentsBuilder.fromUriString(targetUrl)
-                    .build().toUriString();
-        }
-
-        return UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("error", "Login failed")
+    protected String getTargetUrl(String accessToken) {
+        return UriComponentsBuilder.fromUriString(REDIRECT_URL)
+                .queryParam("accessToken", accessToken)
                 .build().toUriString();
     }
 
@@ -99,6 +72,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         return null;
+    }
+
+    private void addRefreshTokenToCookie(HttpServletRequest request, HttpServletResponse response, RefreshToken refreshToken) {
+        int cookieMaxAge = jwtProvider.getRefreshExpiryMillis().intValue();
+        CookieUtils.deleteCookie(request, response, "refresh_token");
+        CookieUtils.addCookie(response, "refresh_token", refreshToken.getToken(), cookieMaxAge);
     }
 
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {

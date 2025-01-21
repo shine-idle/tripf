@@ -48,6 +48,7 @@ public class ProductServiceImpl implements ProductService {
      * @return {@link ProductResponseDto}
      */
     @Override
+    @Transactional
     public List<ProductResponseDto> findAllProduct() {
         return productRepository.findAllExceptDiscontinuedProducts()
                 .stream()

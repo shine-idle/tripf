@@ -31,11 +31,18 @@ public class JwtProvider {
     private String secret;
 
     /**
-     * 토큰 만료시간(milli seconds)
+     * 엑세스토큰 만료시간(milli seconds)
      */
     @Getter
-    @Value("${jwt.expiry-millis}")
-    private Long expiryMillis;
+    @Value("${jwt.expiry.access}")
+    private Long accessExpiryMillis;
+
+    /**
+     * 리프레시토큰 만료시간(milli seconds)
+     */
+    @Getter
+    @Value("${jwt.expiry.refresh}")
+    private Long refreshExpiryMillis;
 
     private final UserRepository userRepository;
 
@@ -46,15 +53,15 @@ public class JwtProvider {
      * @return 토큰
      * @throws EntityNotFoundException 입력받은 이메일에 해당하는 사용자를 찾지 못했을 경우
      */
-    public String generateToken(Authentication authentication, boolean isSocialLogin) throws EntityNotFoundException {
+    public String generateToken(Authentication authentication, boolean isSocialLogin, TokenType tokenType) throws EntityNotFoundException {
         String username = authentication.getName();
         String token;
 
         if (isSocialLogin) {
             log.info(authentication.getAuthorities().toString());
-            token = generateTokenForSocialLogin(username, authentication.getAuthorities());
+            token = generateTokenForSocialLogin(username, authentication.getAuthorities(), tokenType);
         } else {
-            token = generateTokenForNormalLogin(username);
+            token = generateTokenForNormalLogin(username, tokenType);
         }
 
         return token;
@@ -95,11 +102,11 @@ public class JwtProvider {
      * @return 생성된 토큰
      * @throws EntityNotFoundException 입력받은 이메일에 해당하는 유저를 찾지 못한 경우 예외 발생
      */
-    private String generateTokenForNormalLogin(String email) throws EntityNotFoundException {
+    private String generateTokenForNormalLogin(String email, TokenType tokenType) throws EntityNotFoundException {
         User user = userRepository.findByEmail(email).orElseThrow(() ->
                 new EntityNotFoundException("유저를 찾을 수 없습니다."));
 
-        return createToken(email, user.getAuth().toString());
+        return createToken(email, user.getAuth().toString(), tokenType);
     }
 
     /**
@@ -107,19 +114,20 @@ public class JwtProvider {
      * @param email 이메일
      * @return 생성된 토큰
      */
-    private String generateTokenForSocialLogin(String email, Collection<? extends GrantedAuthority> authorities) {
+    private String generateTokenForSocialLogin(String email, Collection<? extends GrantedAuthority> authorities, TokenType tokenType) {
         String auth = authorities.stream()
                 .findFirst()
                 .map(GrantedAuthority::getAuthority)
                 .orElse("AUTH_guest");
 
         log.info("JwtProvider auth: {}", auth);
-        return createToken(email, auth);
+        return createToken(email, auth, tokenType);
     }
 
-    private String createToken(String email, String auth) {
+    private String createToken(String email, String auth, TokenType tokenType) {
         Date currentDate = new Date();
-        Date expireDate = new Date(currentDate.getTime() + this.expiryMillis);
+        Date expireDate = new Date(tokenType.equals(TokenType.ACCESS) ?
+                currentDate.getTime() + this.accessExpiryMillis : currentDate.getTime() + this.refreshExpiryMillis);
 
         return Jwts.builder()
                 .subject(email)

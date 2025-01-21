@@ -20,6 +20,14 @@ public class GeoServiceImpl implements GeoService {
     @Value("${google.api.key}")
     private String apiKey;
 
+    /**
+     * 도시가 속하는 국가 정보 조회
+     * Google Maps Geocoding API를 사용하여 도시 이름을 검색 및 해당 도시의 국가명을 반환
+     * 결과는 캐시되어 동일한 도시 이름에 대한 반복된 요청 시 성능이 향상
+     *
+     * @param city 도시명
+     * @return 도시가 속한 국가명
+     */
     @Override
     @Cacheable(value = "locationCache", key = "'city:' + #city")
     public String getCountryByCity(String city) {

@@ -19,7 +19,8 @@ public class UserDetailsImpl implements UserDetails {
     private final User user;
 
     /**
-     * 권한 리스트를 리턴
+     * 권한 리스트를 반환
+     *
      * @return {@code Collection<? extends GrantedAuthority>}
      */
     @Override

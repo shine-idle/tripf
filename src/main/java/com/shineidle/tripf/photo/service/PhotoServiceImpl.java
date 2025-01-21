@@ -6,8 +6,8 @@ import com.shineidle.tripf.common.exception.type.PhotoErrorCode;
 import com.shineidle.tripf.common.exception.type.ProductErrorCode;
 import com.shineidle.tripf.feed.entity.Activity;
 import com.shineidle.tripf.feed.repository.ActivityRepository;
-import com.shineidle.tripf.photo.dto.PhotoCreateRequestDto;
-import com.shineidle.tripf.photo.dto.PhotoCreateResponseDto;
+import com.shineidle.tripf.photo.dto.PhotoRequestDto;
+import com.shineidle.tripf.photo.dto.PhotoResponseDto;
 import com.shineidle.tripf.photo.entity.ActivityPhoto;
 import com.shineidle.tripf.photo.entity.Photo;
 import com.shineidle.tripf.photo.entity.ProductPhoto;
@@ -43,7 +43,7 @@ public class PhotoServiceImpl implements PhotoService {
     private final S3Client s3Client;
 
     private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "avif");
-    private static final long MAX_FILE_SIZE = 8 * 1024 * 1024; // 10MB (파일 크기 제한)
+    private static final long MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB (파일 크기 제한)
 
     @Value("${cloud.aws.s3.bucketName}")
     private String bucket;
@@ -51,15 +51,15 @@ public class PhotoServiceImpl implements PhotoService {
     /**
      * 사진 업로드
      *
-     * @param domainId 상품Id 또는 활동Id
-     * @param photoCreateRequestDto {@link PhotoCreateRequestDto}
-     * @param multipartFile {@link MultipartFile}
-     * @param domainType {@link PhotoDomain}
-     * @return {@link PhotoCreateResponseDto} 생성된 사진 응답값
+     * @param domainId 상품 식별자 또는 활동 식별자
+     * @param photoRequestDto {@link PhotoRequestDto} 사진 요청 Dto
+     * @param multipartFile {@link MultipartFile} 첨부할 사진
+     * @param domainType {@link PhotoDomain} 상품 또는 활동
+     * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @Override
     @Transactional
-    public PhotoCreateResponseDto uploadPhoto(Long domainId, PhotoCreateRequestDto photoCreateRequestDto, MultipartFile multipartFile, PhotoDomain domainType) throws IOException {
+    public PhotoResponseDto uploadPhoto(Long domainId, PhotoRequestDto photoRequestDto, MultipartFile multipartFile, PhotoDomain domainType) throws IOException {
 
         // 사진 유효성 검사
         validateMultipartFile(multipartFile);
@@ -72,7 +72,7 @@ public class PhotoServiceImpl implements PhotoService {
         String fileUrl = generateFileUrl(storedFileName);
 
         // DB에 사진 정보 저장
-        Photo photo = saveImage(multipartFile, photoCreateRequestDto, fileUrl);
+        Photo photo = saveImage(multipartFile, photoRequestDto, fileUrl);
 
         // 도메인에 따라 관계 엔티티 저장
         switch (domainType) {
@@ -91,18 +91,18 @@ public class PhotoServiceImpl implements PhotoService {
             default -> throw new GlobalException(PhotoErrorCode.DOMAIN_NOT_FOUND);
         }
 
-        return new PhotoCreateResponseDto(domainId, photo.getOriginalFileName(), photo.getDescription(), fileUrl, photo.getSize(), photo.getExt(), photo.getCreatedAt(), photo.getModifiedAt());
+        return new PhotoResponseDto(domainId, photo.getOriginalFileName(), photo.getDescription(), fileUrl, photo.getSize(), photo.getExt(), photo.getCreatedAt(), photo.getModifiedAt());
     }
 
     /**
      * 사진 정보를 Photo DB에 저장
      *
-     * @param multipartFile {@link MultipartFile}
-     * @param photoCreateRequestDto {@link PhotoCreateRequestDto}
+     * @param multipartFile {@link MultipartFile} 첨부할 사진
+     * @param photoRequestDto {@link PhotoRequestDto} 사진 요청 Dto
      * @param fileUrl 사진 경로
      * @return {@link Photo}
      */
-    private Photo saveImage(MultipartFile multipartFile, PhotoCreateRequestDto photoCreateRequestDto, String fileUrl) {
+    private Photo saveImage(MultipartFile multipartFile, PhotoRequestDto photoRequestDto, String fileUrl) {
 
         // 원본 사진 이름
         String originalFileName = multipartFile.getOriginalFilename();
@@ -113,7 +113,7 @@ public class PhotoServiceImpl implements PhotoService {
         String ext = getExtension(originalFileName);
         Long size = multipartFile.getSize();
 
-        Photo photo = new Photo(multipartFile.getOriginalFilename(), storedFileName, photoCreateRequestDto.getDescription(), fileUrl, size, ext);
+        Photo photo = new Photo(multipartFile.getOriginalFilename(), storedFileName, photoRequestDto.getDescription(), fileUrl, size, ext);
         return photoRepository.save(photo);
     }
 
@@ -132,7 +132,7 @@ public class PhotoServiceImpl implements PhotoService {
     /**
      * S3에 사진 업로드
      *
-     * @param multipartFile {@link MultipartFile}
+     * @param multipartFile {@link MultipartFile} 첨부한 사진
      * @param storedFileName 저장 사진 이름
      */
     private void uploadToS3(MultipartFile multipartFile, String storedFileName) throws IOException {
@@ -167,7 +167,7 @@ public class PhotoServiceImpl implements PhotoService {
     /**
      * 사진 유효성 검증
      *
-     * @param multipartFile {@link MultipartFile}
+     * @param multipartFile {@link MultipartFile} 첨부한 사진
      */
     private void validateMultipartFile(MultipartFile multipartFile) {
 
@@ -207,13 +207,13 @@ public class PhotoServiceImpl implements PhotoService {
     /**
      * 사진 단건 조회
      *
-     * @param domainId 상품Id 또는 활동Id
-     * @param photoId 사진Id
-     * @param domainType {@link PhotoDomain}
-     * @return {@link PhotoCreateResponseDto} 조회된 사진 응답값
+     * @param domainId 상품 식별자 또는 활동 식별자
+     * @param photoId 사진 식별자
+     * @param domainType {@link PhotoDomain} 상품 또는 활동
+     * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @Override
-    public PhotoCreateResponseDto findPhoto(Long domainId, Long photoId, PhotoDomain domainType) {
+    public PhotoResponseDto findPhoto(Long domainId, Long photoId, PhotoDomain domainType) {
 
         findByPhotoId(photoId);
 
@@ -229,18 +229,18 @@ public class PhotoServiceImpl implements PhotoService {
             default -> throw new GlobalException(PhotoErrorCode.DOMAIN_NOT_FOUND);
         };
 
-        return PhotoCreateResponseDto.toDto(photo);
+        return PhotoResponseDto.toDto(photo);
     }
 
     /**
      * 사진 다건 조회
      *
-     * @param domainId 상품Id 또는 활동Id
-     * @param domainType {@link PhotoDomain}
-     * @return {@link PhotoCreateResponseDto} 조회된 사진 응답값
+     * @param domainId 상품 식별자 또는 활동 식별자
+     * @param domainType {@link PhotoDomain} 상품 또는 활동
+     * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @Override
-    public List<PhotoCreateResponseDto> findAllPhoto(Long domainId, PhotoDomain domainType) {
+    public List<PhotoResponseDto> findAllPhoto(Long domainId, PhotoDomain domainType) {
 
         // 연관된 사진 조회
         List<Photo> photos = switch (domainType) {
@@ -255,23 +255,23 @@ public class PhotoServiceImpl implements PhotoService {
             default -> throw new GlobalException(PhotoErrorCode.DOMAIN_NOT_FOUND);
         };
 
-        return photos.stream().map(PhotoCreateResponseDto::toDto).toList();
+        return photos.stream().map(PhotoResponseDto::toDto).toList();
     }
 
 
     /**
      * 사진 수정
      *
-     * @param domainId 상품Id 또는 활동Id
-     * @param photoId 사진Id
-     * @param photoCreateRequestDto {@link PhotoCreateRequestDto}
-     * @param multipartFile {@link MultipartFile}
-     * @param domainType {@link PhotoDomain}
-     * @return {@link PhotoCreateResponseDto} 수정된 사진 응답값
+     * @param domainId 상품 식별자 또는 활동 식별자
+     * @param photoId 사진 식별자
+     * @param photoRequestDto {@link PhotoRequestDto} 사진 요청 Dto
+     * @param multipartFile {@link MultipartFile} 첨부할 사진
+     * @param domainType {@link PhotoDomain} 상품 또는 활동
+     * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @Override
     @Transactional
-    public PhotoCreateResponseDto updatePhoto(Long domainId, Long photoId, PhotoCreateRequestDto photoCreateRequestDto, MultipartFile multipartFile, PhotoDomain domainType) {
+    public PhotoResponseDto updatePhoto(Long domainId, Long photoId, PhotoRequestDto photoRequestDto, MultipartFile multipartFile, PhotoDomain domainType) {
 
         // 사진 유효성 검사
         validateMultipartFile(multipartFile);
@@ -281,17 +281,17 @@ public class PhotoServiceImpl implements PhotoService {
         // 도메인 관계 검증
         validateRelation(domainId, photoId, domainType);
 
-        photo.update(photoCreateRequestDto.getDescription(), multipartFile.getOriginalFilename());
+        photo.update(photoRequestDto.getDescription(), multipartFile.getOriginalFilename());
         Photo updatedPhoto = photoRepository.save(photo);
-        return PhotoCreateResponseDto.toDto(updatedPhoto);
+        return PhotoResponseDto.toDto(updatedPhoto);
     }
 
     /**
      * 사진 삭제
      *
-     * @param domainId 상품Id 또는 활동Id
-     * @param photoId 사진Id
-     * @param domainType {@link PhotoDomain}
+     * @param domainId 상품 식별자 또는 활동 식별자
+     * @param photoId 사진 식별자
+     * @param domainType {@link PhotoDomain} 상품 또는 활동
      */
     @Override
     @Transactional
@@ -310,7 +310,7 @@ public class PhotoServiceImpl implements PhotoService {
     /**
      * 사진Id에 해당하는 사진 반환
      *
-     * @param photoId 사진Id
+     * @param photoId 사진 식별자
      * @return Photo {@link Photo}
      */
     private Photo findByPhotoId(Long photoId) {
@@ -322,9 +322,9 @@ public class PhotoServiceImpl implements PhotoService {
     /**
      * 도메인 관계 검증
      *
-     * @param domainId 상품Id 또는 활동Id
-     * @param photoId 사진Id
-     * @param domainType {@link PhotoDomain}
+     * @param domainId 상품 식별자 또는 활동 식별자
+     * @param photoId 사진 식별자
+     * @param domainType {@link PhotoDomain} 상품 또는 활동
      */
     private void validateRelation(Long domainId, Long photoId, PhotoDomain domainType) {
 
@@ -337,5 +337,17 @@ public class PhotoServiceImpl implements PhotoService {
         if (!isRelated) {
             throw new GlobalException(PhotoErrorCode.RELATION_INVALID);
         }
+    }
+
+    /**
+     * 특정 활동 id에 대한 이미지 url 가져오기
+     *
+     * @param activityId 활동 식별자
+     * @return domainType {@link PhotoDomain}
+     */
+    public List<String> getActivityPhotoUrls(Long activityId) {
+        return activityPhotoRepository.findAllByActivityId(activityId).stream()
+                .map(activityPhoto -> activityPhoto.getPhoto().getUrl())
+                .toList();
     }
 }

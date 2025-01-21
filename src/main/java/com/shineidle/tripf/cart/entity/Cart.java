@@ -1,6 +1,6 @@
 package com.shineidle.tripf.cart.entity;
 
-import com.shineidle.tripf.cart.dto.CartCreateRequestDto;
+import com.shineidle.tripf.cart.dto.CartRequestDto;
 import com.shineidle.tripf.common.BaseEntity;
 import com.shineidle.tripf.product.entity.Product;
 import com.shineidle.tripf.user.entity.User;
@@ -35,7 +35,7 @@ public class Cart extends BaseEntity {
         this.product = product;
     }
 
-    public void updateCart(CartCreateRequestDto cartCreateRequestDto) {
-        this.quantity = cartCreateRequestDto.getQuantity();
+    public void updateCart(CartRequestDto cartRequestDto) {
+        this.quantity = cartRequestDto.getQuantity();
     }
 }

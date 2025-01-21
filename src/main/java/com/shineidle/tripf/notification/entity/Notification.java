@@ -28,14 +28,17 @@ public class Notification extends BaseEntity {
 
     private String notifyContext;
 
+    private Long feedId;
+
     protected Notification() {}
 
-    public static Notification create(User user, User actor, NotifyType notifyType, String notifyContext) {
+    public static Notification create(User user, User actor, NotifyType notifyType, String notifyContext, Long feedId) {
         Notification notification = new Notification();
         notification.user = user;
         notification.actor = actor;
         notification.notifyType = notifyType;
         notification.notifyContext = notifyContext;
+        notification.feedId = feedId;
         return notification;
     }
 }
