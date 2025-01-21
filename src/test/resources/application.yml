@@ -81,6 +81,7 @@ spring:
     redis:
       host: localhost
       port: 6379
+      password: test
 
   mail:
     host: smtp.gmail.com
