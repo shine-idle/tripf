@@ -1,4 +1,4 @@
-package com.shineidle.tripf.product;
+package com.shineidle.tripf.product.type;
 
 public enum ProductStatus {
     IN_STOCK, // 판매중

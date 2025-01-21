@@ -1,7 +1,7 @@
 package com.shineidle.tripf.product.dto;
 
-import com.shineidle.tripf.product.ProductCategory;
-import com.shineidle.tripf.product.ProductStatus;
+import com.shineidle.tripf.product.type.ProductCategory;
+import com.shineidle.tripf.product.type.ProductStatus;
 import com.shineidle.tripf.product.entity.Product;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

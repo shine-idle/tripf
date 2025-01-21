@@ -1,4 +1,4 @@
-package com.shineidle.tripf.photo.config;
+package com.shineidle.tripf.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
