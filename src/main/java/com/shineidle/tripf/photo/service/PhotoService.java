@@ -19,4 +19,6 @@ public interface PhotoService {
     PhotoResponseDto updatePhoto(Long domainId, Long photoId, PhotoRequestDto photoRequestDto, MultipartFile file, PhotoDomain domainType);
 
     void deletePhoto(Long activityId, Long photoId, PhotoDomain domainType);
+
+    List<String> getActivityPhotoUrls(Long activityId);
 }

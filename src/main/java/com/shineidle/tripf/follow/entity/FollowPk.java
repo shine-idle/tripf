@@ -1,5 +1,6 @@
 package com.shineidle.tripf.follow.entity;
 
+import com.shineidle.tripf.user.entity.User;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,15 +11,15 @@ import java.io.Serializable;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 public class FollowPk implements Serializable {
-    private Long followerId;
-    private Long followingId;
+    private User followerId;
+    private User followingId;
 
-    public FollowPk(Long followerId, Long followingId) {
+    public FollowPk(User followerId, User followingId) {
         this.followerId = followerId;
         this.followingId = followingId;
     }
 
-    public static FollowPk of(Long followerId, Long followingId) {
+    public static FollowPk of(User followerId, User followingId) {
         return new FollowPk(followerId, followingId);
     }
 }

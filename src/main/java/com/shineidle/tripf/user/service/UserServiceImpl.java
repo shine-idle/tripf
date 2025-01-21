@@ -4,14 +4,12 @@ import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.UserErrorCode;
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.common.message.enums.PostMessage;
-import com.shineidle.tripf.common.util.AuthenticationScheme;
-import com.shineidle.tripf.common.util.JwtProvider;
-import com.shineidle.tripf.common.util.TokenType;
-import com.shineidle.tripf.common.util.UserAuthorizationUtil;
+import com.shineidle.tripf.common.util.*;
 import com.shineidle.tripf.user.dto.*;
 import com.shineidle.tripf.user.entity.RefreshToken;
 import com.shineidle.tripf.user.entity.User;
 import com.shineidle.tripf.user.repository.UserRepository;
+import com.shineidle.tripf.user.type.UserStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +20,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -31,6 +33,7 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final RefreshTokenService refreshTokenService;
+    private final RedisUtils redisUtils;
 
     /**
      * 유저 생성
@@ -42,8 +45,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public PostMessageResponseDto createUser(UserRequestDto dto) {
-        boolean duplicated = userRepository.findByEmail(dto.getEmail()).isPresent();
-        if (duplicated) {
+        Optional<User> existUser = userRepository.findByEmail(dto.getEmail());
+
+        if (existUser.isPresent() && existUser.get().getStatus().equals(UserStatus.DEACTIVATE)) {
+            throw new GlobalException(UserErrorCode.USER_DEACTIVATED);
+        }
+
+        if (existUser.isPresent()) {
             throw new GlobalException(UserErrorCode.EMAIL_DUPLICATED);
         }
 
@@ -73,6 +81,11 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(dto.getEmail()).orElseThrow(() ->
                 new GlobalException(UserErrorCode.USER_NOT_FOUND));
 
+        // 탈퇴된 회원에 대한 예외처리
+        if (user.getStatus().equals(UserStatus.DEACTIVATE)) {
+            throw new GlobalException(UserErrorCode.USER_DEACTIVATED);
+        }
+
         validatePassword(dto.getPassword(), user.getPassword());
 
         Authentication authentication = authenticationManager.authenticate(
@@ -80,7 +93,6 @@ public class UserServiceImpl implements UserService {
                         dto.getEmail(),
                         dto.getPassword())
         );
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 토큰 생성
@@ -125,8 +137,12 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserResponseDto findUser(Long userId) {
-        User findUser = getUserById(userId);
-        return UserResponseDto.toDto(findUser);
+        User user = (User) redisUtils.getFromRedis("USER:" + userId.toString());
+        if (user == null) {
+            user = getUserById(userId);
+            redisUtils.saveToRedis("USER:" + user.getId().toString(), user, Duration.ofMinutes(1));
+        }
+        return UserResponseDto.toDto(user);
     }
 
     /**
@@ -210,4 +226,14 @@ public class UserServiceImpl implements UserService {
             throw new GlobalException(UserErrorCode.PASSWORD_MISMATCH);
         }
     }
+
+    /**
+     * 활성상태의 유저 Email 반환
+     * @return getActiveUserEmails
+     */
+    @Override
+    public List<String> getActiveUserEmails() {
+        return userRepository.findAllActiveEmails();
+    }
+
 }

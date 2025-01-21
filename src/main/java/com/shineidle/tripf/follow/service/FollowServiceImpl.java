@@ -31,23 +31,28 @@ public class FollowServiceImpl implements FollowService {
     @Override
     public void createFollow(Long followingId) {
         User loginUser = UserAuthorizationUtil.getLoginUser();
-
         Long followerId = loginUser.getId();
 
         if (followerId.equals(followingId)) {
             throw new GlobalException(FollowErrorCode.NOT_SELF_FOLLOW);
         }
 
-       userRepository.findById(followingId)
+       User followingUser = userRepository.findById(followingId)
                 .orElseThrow(() -> new GlobalException(FollowErrorCode.NOT_FOUND_FOLLOW));
 
 
-        FollowPk followPk = new FollowPk(followerId, followingId);
+        FollowPk followPk = new FollowPk(loginUser, followingUser);
         if (followRepository.existsById(followPk)) {
             throw new GlobalException(FollowErrorCode.ALREADY_FOLLOWED);
         }
 
-        Follow follow = new Follow(followerId, followingId);
+        loginUser = userRepository.findById(loginUser.getId())
+                .orElseThrow(() -> new GlobalException(FollowErrorCode.NOT_FOUND_FOLLOW));
+
+        followingUser = userRepository.findById(followingUser.getId())
+                .orElseThrow(() -> new GlobalException(FollowErrorCode.NOT_FOUND_FOLLOW));
+
+        Follow follow = new Follow(loginUser, followingUser);
         followRepository.save(follow);
     }
 
@@ -61,10 +66,10 @@ public class FollowServiceImpl implements FollowService {
         User loginUser = UserAuthorizationUtil.getLoginUser();
         Long followingId = loginUser.getId();
 
-        List<Follow> followers = followRepository.findByFollowingId(followingId);
+        List<Follow> followers = followRepository.findByFollowingId(loginUser);
 
         return followers.stream()
-                .map(f -> new FollowResponseDto(f.getFollowerId()))
+                .map(f -> new FollowResponseDto(f.getFollowerId().getId()))
                 .collect(Collectors.toList());
     }
 
@@ -78,10 +83,10 @@ public class FollowServiceImpl implements FollowService {
         User loginUser = UserAuthorizationUtil.getLoginUser();
         Long followerId = loginUser.getId();
 
-        List<Follow> followings = followRepository.findByFollowerId(followerId);
+        List<Follow> followings = followRepository.findByFollowerId(loginUser);
 
         return followings.stream()
-                .map(f -> new FollowResponseDto(f.getFollowingId()))
+                .map(f -> new FollowResponseDto(f.getFollowingId().getId()))
                 .collect(Collectors.toList());
     }
 
@@ -96,7 +101,10 @@ public class FollowServiceImpl implements FollowService {
         User loginUser = UserAuthorizationUtil.getLoginUser();
         Long followerId = loginUser.getId();
 
-        FollowPk followPk = new FollowPk(followerId, followingId);
+        User followingUser = userRepository.findById(followingId)
+                .orElseThrow(() -> new GlobalException(FollowErrorCode.NOT_FOUND_FOLLOW));
+
+        FollowPk followPk = new FollowPk(loginUser, followingUser);
         if (followRepository.existsById(followPk)) {
             followRepository.deleteById(followPk);
         } else {
@@ -105,7 +113,7 @@ public class FollowServiceImpl implements FollowService {
     }
 
     /**
-     * 팔로우 취소
+     * 팔로워 취소
      *
      * @param followerId 팔로워 식별자(나를 팔로우한 사람의 식별자)
      */
@@ -115,7 +123,10 @@ public class FollowServiceImpl implements FollowService {
         User loginUser = UserAuthorizationUtil.getLoginUser();
         Long followingId = loginUser.getId();
 
-        FollowPk followPk = new FollowPk(followerId, followingId);
+        User followerUser = userRepository.findById(followerId)
+                .orElseThrow(() -> new GlobalException(FollowErrorCode.NOT_FOUND_FOLLOW));
+
+        FollowPk followPk = new FollowPk(followerUser, loginUser);
         if (followRepository.existsById(followPk)) {
             followRepository.deleteById(followPk);
         } else {

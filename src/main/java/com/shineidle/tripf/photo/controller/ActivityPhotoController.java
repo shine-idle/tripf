@@ -6,6 +6,7 @@ import com.shineidle.tripf.photo.dto.PhotoRequestDto;
 import com.shineidle.tripf.photo.dto.PhotoResponseDto;
 import com.shineidle.tripf.photo.service.PhotoService;
 import com.shineidle.tripf.photo.type.PhotoDomain;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,7 @@ public class ActivityPhotoController {
      * @param file {@link MultipartFile} 첨부할 사진
      * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
+    @Operation(summary = "활동 사진 업로드")
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<PhotoResponseDto> uploadPhotoToActivity(
             @PathVariable Long activityId,
@@ -47,6 +49,7 @@ public class ActivityPhotoController {
      * @param photoId 사진 식별자
      * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
+    @Operation(summary = "활동 사진 단건 조회")
     @GetMapping("/{photoId}")
     public ResponseEntity<PhotoResponseDto> findActivityPhoto(
             @PathVariable Long activityId,
@@ -63,6 +66,7 @@ public class ActivityPhotoController {
      * @param activityId 활동 식별
      * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
+    @Operation(summary = "활동 사진 다건 조회")
     @GetMapping()
     public ResponseEntity<List<PhotoResponseDto>> findAllActivityPhoto(
             @PathVariable Long activityId
@@ -82,6 +86,7 @@ public class ActivityPhotoController {
      * @param file {@link MultipartFile} 첨부할 사진
      * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
+    @Operation(summary = "활동 사진 수정")
     @RequestMapping(
             value = "/{photoId}",
             method = RequestMethod.PATCH,
@@ -104,6 +109,7 @@ public class ActivityPhotoController {
      * @param photoId 사진 식별자
      * @return {@link PostMessageResponseDto} 사진 삭제 문구
      */
+    @Operation(summary = "활동 사진 삭제")
     @DeleteMapping("/{photoId}")
     public ResponseEntity<PostMessageResponseDto> deleteActivityPhoto(
             @PathVariable Long activityId,
