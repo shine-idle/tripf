@@ -69,4 +69,8 @@ public interface FeedService {
      * 홈페이지
      */
     HomeResponseDto findHomeData();
+
+    List<String> findAllCountries();
+
+    HomeResponseDto findPublicHomeData();
 }

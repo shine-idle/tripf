@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<head>
+    <title>피드 상세</title>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNmfyHy0CtN4g9BNoKFWAqLOFXHVnKUWE&callback=initMap"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 50:50 비율 */
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            height: 100vh;
+        }
+
+        .main-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow-y: auto; /* 스크롤 가능 */
+            position: relative; /* 버튼 위치 조정을 위한 상대 위치 설정 */
+        }
+
+        .feed-header {
+            margin-bottom: 30px;
+        }
+
+        .feed-meta {
+            color: #666;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .feed-meta p {
+            margin: 5px 0;
+        }
+
+        .days-list {
+            margin-top: 30px;
+        }
+
+        .day-item {
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .day-date {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .activity-item {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .activity-item:hover {
+            background: #f0f0f0;
+        }
+
+        .activity-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .star-rating {
+            color: #ffd700;
+            margin: 5px 0;
+        }
+
+        .activity-memo {
+            color: #666;
+            font-style: italic;
+            margin: 5px 0;
+        }
+
+        .activity-location {
+            color: #0066cc;
+            margin-top: 5px;
+        }
+
+        .map-container {
+            height: 100vh; /* 전체 화면 높이 */
+            width: 100%; /* 전체 너비 */
+        }
+
+        #map {
+            height: 100%; /* 부모 요소에 맞게 높이 설정 */
+            width: 100%; /* 부모 요소에 맞게 너비 설정 */
+        }
+
+        .action-buttons {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .list-button {
+            background-color: #6c757d;
+            color: white;
+            font-size: 0.8em;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+        }
+
+        .edit-button { background-color: #007bff; color: white; }
+        .delete-button { background-color: #dc3545; color: white; }
+        .add-button { background-color: #28a745; color: white; }
+    </style>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+
+    <div class="main-content">
+        <h1 style="display: inline;" th:text="${feed.title}">피드 제목</h1>
+        <a th:href="@{/feeds}" class="button list-button" style="display: inline;">목록으로</a>
+
+        <div class="feed-header">
+            <div class="feed-meta">
+                <p>도시: <span th:text="${feed.city}"></span></p>
+                <p>여행 기간:
+                    <span th:text="${#temporals.format(feed.startedAt, 'yyyy-MM-dd')}"></span> ~
+                    <span th:text="${#temporals.format(feed.endedAt, 'yyyy-MM-dd')}"></span>
+                </p>
+                <p>비용: <span th:text="${#numbers.formatInteger(feed.cost, 0, 'COMMA') + '원'}"></span></p>
+                <p th:if="${feed.tag}">태그: <span th:text="${feed.tag}"></span></p>
+            </div>
+            <div class="feed-content" th:text="${feed.content}">피드 내용</div>
+        </div>
+
+        <div class="days-list">
+            <h2>일정</h2>
+            <div th:each="day : ${feed.days}" class="day-item">
+                <div class="day-date" th:text="${#temporals.format(day.date, 'yyyy년 MM월 dd일')}">날짜</div>
+
+                <div class="activities-list">
+                    <div th:each="activity : ${day.activity}"
+                         class="activity-item"
+                         th:data-lat="${activity.latitude}"
+                         th:data-lng="${activity.longitude}"
+                         th:data-title="${activity.title}"
+                         onclick="highlightLocation(this)">
+                        <div class="activity-title" th:text="${activity.title}">활동 제목</div>
+                        <div class="star-rating">
+                            <span th:each="i : ${#numbers.sequence(1, activity.star)}">★</span>
+                            <span th:each="i : ${#numbers.sequence(activity.star + 1, 5)}">☆</span>
+                        </div>
+                        <div th:if="${activity.memo}" class="activity-memo" th:text="${activity.memo}">메모</div>
+                        <div class="activity-location" th:text="${activity.city}">도시</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a th:href="@{/feeds/{id}/edit(id=${feed.id})}" class="button edit-button">수정</a>
+            <form th:action="@{/feeds/{id}(id=${feed.id})}" method="post" style="display: inline;">
+                <input type="hidden" name="_method" value="DELETE"/>
+                <button type="submit" class="button delete-button">삭제</button>
+            </form>
+            <a th:href="@{/feeds/{id}/days/new(id=${feed.id})}" class="button add-button">일정 추가</a>
+        </div>
+    </div>
+
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    let map;
+    const activities = [];
+
+    function initMap() {
+        const defaultCenter = { lat: 37.5665, lng: 126.9780 }; // 서울 중심 좌표
+
+        // 지도 초기화
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 12,
+            center: defaultCenter,
+            mapTypeControl: false,
+            streetViewControl: false
+        });
+
+        // 활동 데이터를 기반으로 마커 추가 (활동 데이터가 있을 경우에만)
+        activities.forEach(activity => {
+            const marker = new google.maps.Marker({
+                position: { lat: activity.lat, lng: activity.lng },
+                map: map,
+                title: activity.title,
+                animation: google.maps.Animation.DROP
+            });
+
+            // 마커 추가 시 콘솔에 로그 출력
+            console.log(`마커 추가: ${activity.title} (${activity.lat}, ${activity.lng})`);
+
+            const infowindow = new google.maps.InfoWindow({
+                content: `<div><strong>${activity.title}</strong></div>`
+            });
+
+            marker.addListener('click', () => {
+                infowindow.open(map, marker);
+            });
+        });
+    }
+
+    // 페이지 로드 시 지도 초기화
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof google !== 'undefined' && google.maps) {
+            initMap();
+        } else {
+            console.error('Google Maps API 로드 실패');
+        }
+    });
+</script>
+</body>
+</html>

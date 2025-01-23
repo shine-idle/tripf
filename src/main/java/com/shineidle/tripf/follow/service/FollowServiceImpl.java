@@ -80,6 +80,7 @@ public class FollowServiceImpl implements FollowService {
      */
     @Override
     public List<FollowResponseDto> findFollowings() {
+
         User loginUser = UserAuthorizationUtil.getLoginUser();
         Long followerId = loginUser.getId();
 
