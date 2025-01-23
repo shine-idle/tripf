@@ -18,4 +18,14 @@ public class HomeResponseDto {
 
     private final List<FollowResponseDto> followings;
 
+    // 빈 팔로워 설정
+    public HomeResponseDto withEmptyFollowers() {
+        return new HomeResponseDto(this.korea, this.global, List.of(), this.followings);
+    }
+
+    // 빈 팔로잉 설정
+    public HomeResponseDto withEmptyFollowings() {
+        return new HomeResponseDto(this.korea, this.global, this.followers, List.of());
+    }
+
 }

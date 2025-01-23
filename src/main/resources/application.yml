@@ -104,13 +104,18 @@ spring:
     suffix: .html
     mode: HTML
     encoding: UTF-8
+    cache: false
+
+  mvc:
+    hidden-method:
+      filter:
+        enabled: true
 
 jwt:
   secret: ${JWT_SECRET}
   expiry:
     access: 900000 # 15분 (15 * 60 * 1000)
     refresh: 604800000 # 7일 (7 * 24 * 60 * 60 * 1000)
-
 
 google:
   api:
