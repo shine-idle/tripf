@@ -6,6 +6,7 @@ import com.shineidle.tripf.common.message.constants.NotificationMessage;
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.common.message.enums.PostMessage;
 import com.shineidle.tripf.common.util.UserAuthorizationUtil;
+import com.shineidle.tripf.config.auth.UserDetailsImpl;
 import com.shineidle.tripf.feed.dto.*;
 import com.shineidle.tripf.feed.entity.Activity;
 import com.shineidle.tripf.feed.entity.Days;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -350,6 +352,28 @@ public class FeedServiceImpl implements FeedService {
 
         return new HomeResponseDto(korea, global, followers, followings);
     }
+
+    @Override
+    public HomeResponseDto findPublicHomeData() {
+
+        List<RegionResponseDto> korea = feedRepository.findByCountry("대한민국")
+                .stream()
+                .map(RegionResponseDto::toDto)
+                .toList();
+
+        List<RegionResponseDto> global = feedRepository.findByCountryNot("대한민국")
+                .stream()
+                .map(RegionResponseDto::toDto)
+                .toList();
+
+        return new HomeResponseDto(korea, global, List.of(), List.of());
+    }
+
+    @Override
+    public List<String> findAllCountries() {
+        return feedRepository.findDistinctCountries();
+    }
+
 
 
     /**

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<div th:fragment="headerFragment" class="header">
+    <style>
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #0044cc;
+            min-width: 150px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: #fff;
+            padding: 10px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+        }
+        .dropdown-content a:hover {
+            background-color: #ff9900;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #0044cc;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .header h1 a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 24px;
+        }
+        .header nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 15px;
+        }
+        .header nav ul li {
+            display: inline;
+        }
+        .header nav ul li a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+        .header nav ul li a:hover {
+            color: #ffcc00;
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .search-container input {
+            padding: 5px;
+            font-size: 14px;
+            border: none;
+            border-radius: 3px;
+        }
+        .search-container button {
+            padding: 5px 10px;
+            border: none;
+            background-color: #ffcc00;
+            color: #0044cc;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        .search-container button:hover {
+            background-color: #ff9900;
+        }
+        .notification, .create-feed, .account-logo {
+            margin-left: 15px;
+        }
+        .notification a, .create-feed a, .account-logo a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+        .notification a:hover, .create-feed a:hover, .account-logo a:hover {
+            color: #ffcc00;
+        }
+    </style>
+    <h1><a href="/home">TripF</a></h1>
+    <nav>
+        <ul>
+            <li><a href="/goods">Goods</a></li>
+            <li><a href="/countries">Countries</a></li>
+            <li><a href="/tours">Tours</a></li>
+        </ul>
+    </nav>
+    <div class="search-container">
+        <input type="text" placeholder="Search..." />
+        <button type="button">검색</button>
+    </div>
+    <div class="notification">
+        <a href="/notifications">알림</a>
+    </div>
+    <div class="create-feed">
+        <a href="/feeds/new">피드 작성</a>
+    </div>
+    <div class="account-logo dropdown">
+        <a href="/account">Account</a>
+        <div class="dropdown-content">
+            <a href="/login">로그인</a>
+            <a href="/mypage">마이페이지</a>
+            <a href="/mytrips">나의여행</a>
+            <a href="/logout">로그아웃</a>
+        </div>
+    </div>
+</div>

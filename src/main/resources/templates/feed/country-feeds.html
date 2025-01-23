@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>피드 목록</title>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .feed-list {
+            margin-top: 20px;
+        }
+
+        .feed-item {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .feed-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .feed-meta {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .feed-content {
+            color: #444;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 th:text="${country + '의 여행 피드'}">여행 피드</h1>
+            <a href="/feeds/countries" class="back-button">← 국가 목록으로 돌아가기</a>
+        </div>
+
+        <div class="feed-list">
+            <div th:each="feed : ${feeds}" class="feed-item">
+                <a th:href="@{/feeds/{id}(id=${feed.id})}" style="text-decoration: none; color: inherit;">
+                    <h3 class="feed-title" th:text="${feed.title}">피드 제목</h3>
+                    <div class="feed-meta">
+                        <span th:text="${#temporals.format(feed.startedAt, 'yyyy.MM.dd')}"></span>
+                        ~
+                        <span th:text="${#temporals.format(feed.endedAt, 'yyyy.MM.dd')}"></span>
+                    </div>
+                    <p class="feed-content" th:text="${feed.content}">피드 내용</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

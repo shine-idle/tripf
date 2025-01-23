@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<head>
+    <title>TripF - 여행 피드</title>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+
+        .main-content {
+            padding-right: 20px;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            grid-column: 1 / -1;
+        }
+
+        .feed-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .feed-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .feed-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .feed-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feed-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .feed-content {
+            color: #666;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .feed-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .follow-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .follow-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .follow-list {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .follow-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .follow-item:last-child {
+            border-bottom: none;
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            background: #fff;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 16px;
+        }
+
+        .follow-count {
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-left: 8px;
+        }
+
+        .more-button {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .more-button button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .more-button button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <h1>TripF</h1>
+        <p>여행의 모든 순간을 공유하세요</p>
+    </header>
+
+    <div class="main-content">
+        <!-- 국내 여행 섹션 -->
+        <section class="feed-section">
+            <h2 class="section-title">국내 여행</h2>
+            <th:block th:switch="${#lists.isEmpty(homeData.korea)}">
+                <!-- 데이터가 없을 때 -->
+                <div th:case="true" class="no-data-message">
+                    등록된 국내 여행 피드가 없습니다.
+                </div>
+                <!-- 데이터가 있을 때 -->
+                <div th:case="false" class="feed-grid">
+                    <div th:each="feed : ${homeData.korea}" class="feed-card">
+                        <div class="feed-title" th:text="${feed.title}"></div>
+                        <div class="feed-content" th:text="${feed.content}"></div>
+                        <div class="feed-meta">
+                            <span th:text="${feed.city}"></span>
+                        </div>
+                    </div>
+                    <!-- 더보기 버튼 -->
+                    <div th:if="${#lists.size(homeData.korea) > 4}" class="more-button">
+                        <button onclick="location.href='/feeds?region=korea'">더 보기</button>
+                    </div>
+                </div>
+            </th:block>
+        </section>
+
+        <!-- 해외 여행 섹션 -->
+        <section class="feed-section">
+            <h2 class="section-title">해외 여행</h2>
+            <th:block th:switch="${#lists.isEmpty(homeData.global)}">
+                <!-- 데이터가 없을 때 -->
+                <div th:case="true" class="no-data-message">
+                    등록된 해외 여행 피드가 없습니다.
+                </div>
+                <!-- 데이터가 있을 때 -->
+                <div th:case="false" class="feed-grid">
+                    <div th:each="feed : ${homeData.global}" class="feed-card">
+                        <div class="feed-title" th:text="${feed.title}"></div>
+                        <div class="feed-content" th:text="${feed.content}"></div>
+                        <div class="feed-meta">
+                            <span th:text="${feed.city}"></span>
+                        </div>
+                    </div>
+                    <!-- 더보기 버튼 -->
+                    <div th:if="${#lists.size(homeData.global) > 4}" class="more-button">
+                        <button onclick="location.href='/feeds?region=global'">더 보기</button>
+                    </div>
+                </div>
+            </th:block>
+        </section>
+    </div>
+
+    <!-- 사이드바 -->
+    <div class="sidebar">
+        <!-- 팔로워 -->
+        <div class="follow-container">
+            <h3 class="follow-title">
+                팔로워
+                <span class="follow-count" th:text="${#lists.size(homeData.followers)}">0</span>
+            </h3>
+            <div th:if="${#lists.isEmpty(homeData.followers)}" class="no-data-message">
+                팔로워가 없습니다.
+            </div>
+            <ul th:unless="${#lists.isEmpty(homeData.followers)}" class="follow-list">
+                <li th:each="follower : ${homeData.followers}" class="follow-item">
+                    <span th:text="${follower.userId}"></span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 팔로잉 -->
+        <div class="follow-container">
+            <h3 class="follow-title">
+                팔로잉
+                <span class="follow-count" th:text="${#lists.size(homeData.followings)}">0</span>
+            </h3>
+            <div th:if="${#lists.isEmpty(homeData.followings)}" class="no-data-message">
+                팔로잉하는 사용자가 없습니다.
+            </div>
+            <ul th:unless="${#lists.isEmpty(homeData.followings)}" class="follow-list">
+                <li th:each="following : ${homeData.followings}" class="follow-item">
+                    <span th:text="${following.userId}"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+</html>

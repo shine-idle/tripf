@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<head>
+    <title>TripF - 여행 피드</title>
+    <meta charset="UTF-8">
+    <style>
+        /* 기존 스타일 그대로 사용 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .feed-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .feed-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .feed-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .feed-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feed-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .feed-content {
+            color: #666;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .feed-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            background: #fff;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 16px;
+        }
+
+        .more-button {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .more-button button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .more-button button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <header class="header">
+        <h1>TripF</h1>
+        <p>여행의 모든 순간을 공유하세요</p>
+    </header>
+
+    <div class="main-content">
+        <!-- 국내 여행 섹션 -->
+        <section class="feed-section">
+            <h2 class="section-title">국내 여행</h2>
+            <th:block th:switch="${#lists.isEmpty(homeData.korea)}">
+                <!-- 데이터가 없을 때 -->
+                <div th:case="true" class="no-data-message">
+                    등록된 국내 여행 피드가 없습니다.
+                </div>
+                <!-- 데이터가 있을 때 -->
+                <div th:case="false" class="feed-grid">
+                    <div th:each="feed : ${homeData.korea}" class="feed-card">
+                        <div class="feed-title" th:text="${feed.title}"></div>
+                        <div class="feed-content" th:text="${feed.content}"></div>
+                        <div class="feed-meta">
+                            <span th:text="${feed.city}"></span>
+                        </div>
+                    </div>
+                </div>
+            </th:block>
+        </section>
+
+        <!-- 해외 여행 섹션 -->
+        <section class="feed-section">
+            <h2 class="section-title">해외 여행</h2>
+            <th:block th:switch="${#lists.isEmpty(homeData.global)}">
+                <!-- 데이터가 없을 때 -->
+                <div th:case="true" class="no-data-message">
+                    등록된 해외 여행 피드가 없습니다.
+                </div>
+                <!-- 데이터가 있을 때 -->
+                <div th:case="false" class="feed-grid">
+                    <div th:each="feed : ${homeData.global}" class="feed-card">
+                        <div class="feed-title" th:text="${feed.title}"></div>
+                        <div class="feed-content" th:text="${feed.content}"></div>
+                        <div class="feed-meta">
+                            <span th:text="${feed.city}"></span>
+                        </div>
+                    </div>
+                </div>
+            </th:block>
+        </section>
+    </div>
+</div>
+</body>
+</html>

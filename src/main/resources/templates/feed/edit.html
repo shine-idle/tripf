@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>피드 수정</title>
+    <meta charset="UTF-8">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNmfyHy0CtN4g9BNoKFWAqLOFXHVnKUWE&callback=initMap&libraries=places"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .save-button {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .cancel-button {
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+        }
+
+        .add-button {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .remove-button {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .day-item {
+            background: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .activity-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .day-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .activity-controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        .button-group {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .map-container {
+            position: sticky;
+            top: 20px;
+            height: calc(100vh - 40px);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .star-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .star-input input {
+            width: 80px;
+        }
+
+        .star-input span {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .location-info {
+            margin-top: 8px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="form-container">
+        <form th:action="@{/feeds/{id}(id=${feed.id})}" method="post" id="editForm">
+            <input type="hidden" name="_method" value="PUT">
+            
+            <div class="form-group">
+                <label for="title">제목</label>
+                <input type="text" id="title" name="title" th:value="${feed.title}" required maxlength="50">
+            </div>
+
+            <div class="form-group">
+                <label for="content">내용</label>
+                <textarea id="content" name="content" required maxlength="255" th:text="${feed.content}"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="startedAt">여행 시작일</label>
+                <input type="datetime-local" id="startedAt" name="startedAt" 
+                       th:value="${#temporals.format(feed.startedAt, 'yyyy-MM-dd''T''HH:mm')}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="endedAt">여행 종료일</label>
+                <input type="datetime-local" id="endedAt" name="endedAt" 
+                       th:value="${#temporals.format(feed.endedAt, 'yyyy-MM-dd''T''HH:mm')}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="cost">여행 경비</label>
+                <input type="number" id="cost" name="cost" th:value="${feed.cost}" min="0" max="100000000">
+            </div>
+
+            <div class="form-group">
+                <label for="tag">태그</label>
+                <input type="text" id="tag" name="tag" th:value="${feed.tag}" maxlength="20">
+            </div>
+
+            <div class="form-group">
+                <label for="citySearch">도시</label>
+                <input type="text" 
+                       id="citySearch" 
+                       class="citySearch"
+                       th:value="${feed.city}"
+                       placeholder="도시를 검색하세요">
+                <input type="hidden" 
+                       id="city" 
+                       name="city" 
+                       th:value="${feed.city}">
+            </div>
+
+            <div class="days-section">
+                <h2>일정 목록</h2>
+                <div id="daysList">
+                    <div th:each="day, dayStat : ${feed.days}" class="day-item">
+                        <input type="hidden" th:name="'days[' + ${dayStat.index} + '].id'" th:value="${day.id}">
+                        
+                        <div class="day-controls">
+                            <h3>일정 #<span th:text="${dayStat.count}"></span></h3>
+                            <button type="button" class="remove-button" onclick="removeDay(this)">일정 삭제</button>
+                        </div>
+
+                        <div class="form-group">
+                            <label th:for="'days[' + ${dayStat.index} + '].date'">날짜</label>
+                            <input type="date" 
+                                   th:name="'days[' + ${dayStat.index} + '].date'"
+                                   th:value="${#temporals.format(day.date, 'yyyy-MM-dd')}"
+                                   required>
+                        </div>
+
+                        <div class="activities-list">
+                            <div th:each="activity, actStat : ${day.activity}" class="activity-item">
+                                <input type="hidden" 
+                                       th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].id'"
+                                       th:value="${activity.id}">
+                                
+                                <div class="activity-controls">
+                                    <button type="button" class="remove-button" onclick="removeActivity(this)">활동 삭제</button>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>제목</label>
+                                    <input type="text" 
+                                           th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].title'"
+                                           th:value="${activity.title}"
+                                           required maxlength="20">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>별점</label>
+                                    <div class="star-input">
+                                        <input type="number" 
+                                               th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].star'"
+                                               th:value="${activity.star}"
+                                               min="1" max="5" required>
+                                        <span>(1-5점)</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>메모</label>
+                                    <textarea th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].memo'"
+                                              th:text="${activity.memo}"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>도시</label>
+                                    <input type="text" 
+                                           th:id="'citySearch' + ${dayStat.index} + '_' + ${actStat.index}"
+                                           th:value="${activity.city}" 
+                                           class="citySearch"
+                                           placeholder="도시를 검색하세요">
+                                    <input type="hidden" 
+                                           th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].city'"
+                                           th:value="${activity.city}">
+                                    <input type="hidden" 
+                                           th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].latitude'"
+                                           th:value="${activity.latitude}">
+                                    <input type="hidden" 
+                                           th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].longitude'"
+                                           th:value="${activity.longitude}">
+                                </div>
+                            </div>
+                            <button type="button" class="button add-button" onclick="addActivity(this)">활동 추가</button>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="button add-button" onclick="addDay()">일정 추가</button>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="button save-button">저장</button>
+                <a th:href="@{/feeds/{id}(id=${feed.id})}" class="button cancel-button">취소</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    let map;
+    let markers = [];
+
+    function initMap() {
+        // 서울 중심 좌표
+        const defaultCenter = { lat: 37.5665, lng: 126.9780 };
+
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 12,
+            center: defaultCenter,
+            mapTypeControl: false,
+            streetViewControl: false
+        });
+    }
+
+    function updateMap(lat, lng, title) {
+        const position = { lat: parseFloat(lat), lng: parseFloat(lng) };
+
+        // 기존 마커 제거
+        markers.forEach(marker => marker.setMap(null));
+        markers = [];
+
+        // 새 마커 추가
+        const marker = new google.maps.Marker({
+            position: position,
+            map: map,
+            title: title
+        });
+        markers.push(marker);
+
+        // 지도 중심 이동
+        map.panTo(position);
+        map.setZoom(13);
+    }
+
+    // 기존 initAutocompletesForCity 함수 수정
+    function initAutocompletesForCity() {
+        document.querySelectorAll('.citySearch').forEach(input => {
+            const autocomplete = new google.maps.places.Autocomplete(input, {
+                types: ['(cities)']
+            });
+
+            autocomplete.addListener('place_changed', function() {
+                const place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    alert('선택된 도시의 정보를 찾을 수 없습니다.');
+                    return;
+                }
+
+                const container = input.closest('.form-group');
+                container.querySelector('input[name$="].city"]').value = place.name;
+                container.querySelector('input[name$="].latitude"]').value = place.geometry.location.lat();
+                container.querySelector('input[name$="].longitude"]').value = place.geometry.location.lng();
+
+                // 지도 업데이트
+                updateMap(
+                    place.geometry.location.lat(),
+                    place.geometry.location.lng(),
+                    place.name
+                );
+            });
+        });
+    }
+
+    // 페이지 로드 시 실행
+    window.onload = function() {
+        initMap();
+        initAutocompletesForCity();
+    };
+
+    // 기존 나머지 JavaScript 코드 유지
+</script>
+</body>
+</html>
