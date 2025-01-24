@@ -12,6 +12,7 @@ import com.shineidle.tripf.product.service.ProductService;
 import com.shineidle.tripf.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,7 @@ public class OrderServiceImpl implements OrderService {
      * @param dto {@link OrderRequestDto} 주문 요청 Dto
      * @return {@link OrderResponseDto} 주문 응답 Dto
      */
+    @Transactional
     @Override
     public OrderResponseDto createOrder(OrderRequestDto dto) {
         User user = UserAuthorizationUtil.getLoginUser();
@@ -49,6 +51,7 @@ public class OrderServiceImpl implements OrderService {
      *
      * @return {@link OrderResponseDto} 주문 응답 Dto
      */
+    @Transactional(readOnly = true)
     @Override
     public List<OrderResponseDto> findAllOrder() {
         User user = UserAuthorizationUtil.getLoginUser();
@@ -70,6 +73,7 @@ public class OrderServiceImpl implements OrderService {
      * @param orderId 주문 ID
      * @return {@link OrderResponseDto} 주문 응답 Dto
      */
+    @Transactional(readOnly = true)
     @Override
     public OrderResponseDto findOrder(Long orderId) {
         User user = UserAuthorizationUtil.getLoginUser();

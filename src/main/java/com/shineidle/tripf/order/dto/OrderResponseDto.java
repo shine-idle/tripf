@@ -4,6 +4,7 @@ import com.shineidle.tripf.order.entity.Order;
 import com.shineidle.tripf.order.type.OrderStatus;
 import com.shineidle.tripf.order.type.PayStatus;
 import com.shineidle.tripf.orderProduct.dto.OrderProductDto;
+import com.shineidle.tripf.orderProduct.entity.OrderProduct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -28,12 +29,12 @@ public class OrderResponseDto {
                         orderProduct.getProduct().getName(),
                         orderProduct.getQuantity(),
                         orderProduct.getPurchasePrice(),
-                        orderProduct.getQuantity() * orderProduct.getPurchasePrice()
+                        orderProduct.getTotalPrice()
                 ))
                 .collect(Collectors.toList());
 
         Long totalPrice = order.getOrderProducts().stream()
-                .mapToLong(op -> op.getQuantity() * op.getPurchasePrice())
+                .mapToLong(OrderProduct::getTotalPrice)
                 .sum();
 
         return new OrderResponseDto(
