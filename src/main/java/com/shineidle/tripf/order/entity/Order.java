@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -36,8 +37,8 @@ public class Order extends BaseEntity {
     @ManyToOne
     private User user;
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderProduct> orderProducts;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderProduct> orderProducts = new ArrayList<>();
 
     private LocalDateTime createdAt;
 
@@ -54,7 +55,14 @@ public class Order extends BaseEntity {
     }
 
     public void addOrderProduct(OrderProduct orderProduct) {
-        orderProduct.setOrder(this);
         this.orderProducts.add(orderProduct);
+        orderProduct.setOrder(this);
+        updateTotalPrice();
+    }
+
+    private void updateTotalPrice() {
+        this.totalPrice = this.orderProducts.stream()
+                .mapToLong(OrderProduct::getTotalPrice)
+                .sum();
     }
 }
