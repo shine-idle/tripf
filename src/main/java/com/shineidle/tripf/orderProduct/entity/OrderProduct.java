@@ -1,6 +1,8 @@
 package com.shineidle.tripf.orderProduct.entity;
 
 import com.shineidle.tripf.common.BaseEntity;
+import com.shineidle.tripf.common.exception.GlobalException;
+import com.shineidle.tripf.common.exception.type.OrderErrorCode;
 import com.shineidle.tripf.order.entity.Order;
 import com.shineidle.tripf.product.entity.Product;
 import jakarta.persistence.*;
@@ -32,6 +34,9 @@ public class OrderProduct extends BaseEntity {
    public OrderProduct() {}
 
     public OrderProduct(Long quantity, Product product) {
+        if (quantity <= 0) {
+            throw new GlobalException(OrderErrorCode.INVALID_QUANTITY);
+        }
         this.quantity = quantity;
         this.purchasePrice = product.getPrice();
         this.product = product;
@@ -39,5 +44,9 @@ public class OrderProduct extends BaseEntity {
 
     public void setOrder(Order order) {
        this.order = order;
+    }
+
+    public Long getTotalPrice() {
+        return this.purchasePrice * this.quantity;
     }
 }
