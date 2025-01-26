@@ -84,6 +84,13 @@ spring:
       host: ${REDIS_HOST}
       port: 6379
       password: ${REDIS_PASSWORD}
+    mongodb:
+      username: ${MONGO_USER}
+      password: ${MONGO_PASSWORD}
+      host: ${MONGO_HOST}
+      port: 27017
+      database: tripf
+      authentication-database: admin
 
   mail:
     host: smtp.gmail.com
@@ -143,3 +150,8 @@ cloud:
       static: ${S3_REGION}
     stack:
       auto: false
+logging:
+  level:
+    org.springframework.messaging: debug
+    org.springframework.web.socket: debug
+

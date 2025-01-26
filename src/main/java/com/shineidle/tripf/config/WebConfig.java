@@ -70,6 +70,11 @@ public class WebConfig {
                                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE,
                                         DispatcherType.ERROR).permitAll()
                                 // path 별로 접근이 가능한 권한 설정
+                                .requestMatchers("/gs-guide-websocket/**").permitAll()
+                                .requestMatchers("/main.css").permitAll()
+                                .requestMatchers("/app.js").permitAll()
+                                .requestMatchers("/topic/**").permitAll()
+                                .requestMatchers("/app/**").permitAll()
                                 .requestMatchers("/api/admin/**").hasAuthority("AUTH_admin")
                                 .anyRequest().authenticated()
                 )
