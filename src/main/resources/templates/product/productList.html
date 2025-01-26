@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>상품 목록</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .product-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .product-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            width: 300px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .product-card:hover {
+            transform: scale(1.05);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-details {
+            padding: 15px;
+        }
+
+        .product-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .product-price {
+            color: #e74c3c;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .product-category, .product-status {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .product-buttons {
+            margin-top: 15px;
+        }
+
+        .product-buttons a {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+
+        .product-buttons a:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="fragments/header.html :: headerFragment"></div>
+<h1>상품 목록</h1>
+<!-- TODO: 상품 사진 가져오도록 ProductDto 수정 및 로직 추가 필요 -->
+<div class="product-container">
+    <div class="product-card" th:each="product : ${products}">
+        <!-- 첫 번째 이미지 렌더링 -->
+        <img class="product-image" th:src="${product.photos[0].url}" alt="상품 이미지">
+        <div class="product-details">
+            <div class="product-name" th:text="${product.name}"></div>
+            <div class="product-price" th:text="${product.price} + ' 원'"></div>
+            <div class="product-category" th:text="'카테고리: ' + ${product.category}"></div>
+            <div class="product-status" th:text="'상태: ' + ${product.status}"></div>
+            <div class="product-buttons">
+                <a th:href="'/products/' + ${product.id}">상세 보기</a>
+                <a th:href="'/cart/add/' + ${product.id}">장바구니 추가</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
