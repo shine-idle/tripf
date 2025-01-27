@@ -59,6 +59,7 @@ dependencies {
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.22.0'
 
     // JACKSON
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
 <head>
     <title>Countries</title>
     <style>
@@ -51,7 +52,7 @@
     </style>
 </head>
 <body>
-<div th:replace="fragments/header.html :: headerFragment"></div>
+<div layout:fragment="content">
 <h1>국가 목록</h1>
 <div class="countries-container">
     <a class="country-card" th:href="@{/feeds/countries/{country}(country='대한민국')}">
@@ -67,6 +68,7 @@
         <p>일본</p>
     </a>
     <!-- 필요한 국가 추가 -->
+</div>
 </div>
 </body>
 </html>

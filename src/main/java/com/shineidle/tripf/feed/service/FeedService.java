@@ -4,6 +4,8 @@ import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.feed.dto.*;
 import com.shineidle.tripf.feed.entity.Feed;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -69,6 +71,11 @@ public interface FeedService {
      * 홈페이지
      */
     HomeResponseDto findHomeData();
+
+    /**
+     * 본인 피드 조회
+     */
+    Page<MyFeedResponseDto> findMyFeeds(Pageable pageable);
 
     List<String> findAllCountries();
 

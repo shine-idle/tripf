@@ -13,6 +13,8 @@ public class FeedResponseDto {
 
     private final Long id;
 
+    private final String name;
+
     private final String city;
 
     private final LocalDateTime startedAt;
@@ -36,6 +38,7 @@ public class FeedResponseDto {
     public static FeedResponseDto toDto(Feed feed, List<DaysResponseDto> days) {
         return new FeedResponseDto(
                 feed.getId(),
+                feed.getUser().getName(),
                 feed.getCity(),
                 feed.getStartedAt(),
                 feed.getEndedAt(),

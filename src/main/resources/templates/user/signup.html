@@ -10,7 +10,7 @@
 <body>
 <!-- Header -->
 
-<div layout:fragment="content" class="container">
+<div layout:fragment="content">
 <div class="signup-container">
     <h2 class="text-center mb-4">회원가입</h2>
     <form th:action="@{/signup}" method="post" class="needs-validation" novalidate>
@@ -70,5 +70,6 @@
         });
     })();
 </script>
+</div>
 </body>
 </html>

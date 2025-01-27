@@ -1,11 +1,17 @@
 package com.shineidle.tripf.feed.controller;
 
+import com.shineidle.tripf.common.exception.GlobalException;
+import com.shineidle.tripf.common.exception.type.FeedErrorCode;
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.feed.dto.*;
 import com.shineidle.tripf.feed.service.FeedService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -189,5 +195,33 @@ public class FeedController {
     ) {
         List<RegionResponseDto> regionResponseDto = feedService.findRegion(country);
         return new ResponseEntity<>(regionResponseDto, HttpStatus.OK);
+    }
+
+    /**
+     * 본인 피드 조회
+     */
+    @Operation(summary = "본인 피드 조회")
+    @GetMapping("/myFeed")
+    public ResponseEntity<Page<MyFeedResponseDto>> getMyFeeds(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy
+    ) {
+        if (page < 0 || size <= 0) {
+            throw new GlobalException(FeedErrorCode.PAGE_INVALID);
+        }
+        Pageable pageable = createPageable(page, size, sortBy);
+        Page<MyFeedResponseDto> myFeeds = feedService.findMyFeeds(pageable);
+        return ResponseEntity.ok(myFeeds);
+    }
+
+    private Pageable createPageable(int page, int size, String sortBy) {
+        // 정렬 기준 설정
+        Sort sort = switch (sortBy) {
+            case "modifiedAt" -> Sort.by(Sort.Order.desc("modifiedAt"));
+            case "likes" -> Sort.by(Sort.Order.desc("likes"));
+            default -> Sort.by(Sort.Order.desc("createdAt"));
+        };
+        return PageRequest.of(page, size, sort);
     }
 }

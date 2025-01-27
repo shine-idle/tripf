@@ -1,6 +1,8 @@
 package com.shineidle.tripf.feed.repository;
 
 import com.shineidle.tripf.feed.entity.Feed;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -18,4 +20,6 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
 
     @Query("SELECT DISTINCT f.country FROM Feed f")
     List<String> findDistinctCountries();
+
+    Page<Feed> findByUserIdAndDeletedAtIsNull(Long userId, Pageable pageable);
 }
