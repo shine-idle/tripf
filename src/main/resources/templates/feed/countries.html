@@ -1,71 +1,72 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>국가 목록</title>
-    <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Countries</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Noto Sans KR', sans-serif;
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
         }
 
-        .header {
+        .countries-container {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .country-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            justify-content: center;
+            flex-wrap: wrap;
             gap: 20px;
         }
 
         .country-card {
-            background: white;
+            text-decoration: none;
+            color: #333;
+            background-color: #fff;
+            border: 1px solid #ddd;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s;
+            width: 150px;
+            padding: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .country-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .country-card p {
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: bold;
         }
 
         .country-card:hover {
             transform: translateY(-5px);
-        }
-
-        .country-name {
-            font-size: 24px;
-            font-weight: 700;
-            color: #333;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>여행 국가 목록</h1>
-            <a href="/feeds/new" class="create-button">새 피드 작성</a>
-        </div>
-
-        <div class="country-grid">
-            <div th:each="country : ${countries}" 
-                 class="country-card" 
-                 th:onclick="'window.location.href=\'/feeds?country=' + ${country} + '\''">
-                <h2 class="country-name" th:text="${country}">국가명</h2>
-            </div>
-        </div>
-    </div>
+<div th:replace="fragments/header.html :: headerFragment"></div>
+<h1>국가 목록</h1>
+<div class="countries-container">
+    <a class="country-card" th:href="@{/feeds/countries/{country}(country='대한민국')}">
+        <img src="/images/countries/korea.jpg" alt="대한민국" />
+        <p>대한민국</p>
+    </a>
+    <a class="country-card" th:href="@{/feeds/countries/{country}(country='미국')}">
+        <img src="/images/countries/usa.gif" alt="미국" />
+        <p>미국</p>
+    </a>
+    <a class="country-card" th:href="@{/feeds/countries/{country}(country='일본')}">
+        <img src="/images/countries/japan.gif" alt="일본" />
+        <p>일본</p>
+    </a>
+    <!-- 필요한 국가 추가 -->
+</div>
 </body>
-</html> 
+</html>
