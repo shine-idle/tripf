@@ -10,8 +10,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
-
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/home")
@@ -29,11 +27,11 @@ public class HomeViewController {
         if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
             HomeResponseDto homeResponseDto = feedService.findHomeData();
             model.addAttribute("homeData", homeResponseDto);
-            return "home-logged-in"; // 로그인 사용자용 뷰
+            return "home/home-logged-in"; // 로그인 사용자용 뷰
         } else {
             HomeResponseDto publicHomeResponseDto = feedService.findPublicHomeData();
             model.addAttribute("homeData", publicHomeResponseDto);
-            return "home-guest"; // 비로그인 사용자용 뷰
+            return "home/home-guest"; // 비로그인 사용자용 뷰
         }
     }
 }

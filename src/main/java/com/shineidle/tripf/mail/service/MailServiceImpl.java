@@ -14,7 +14,6 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -62,12 +61,12 @@ public class MailServiceImpl implements MailService{
             helper.setText(htmlContent, true); // HTML 설정
 
             // 이미지 추가 (인라인으로 첨부)
-            helper.addInline("backgroundImage", new ClassPathResource("static/images/image-1.png"));
-            helper.addInline("defaultImage", new ClassPathResource("static/images/image-3.png"));
-            helper.addInline("facebookImage", new ClassPathResource("static/images/image-6.png"));
-            helper.addInline("twitterImage", new ClassPathResource("static/images/image-7.png"));
-            helper.addInline("LinkedInImage", new ClassPathResource("static/images/image-8.png"));
-            helper.addInline("InstaImage", new ClassPathResource("static/images/image-9.png"));
+            helper.addInline("backgroundImage", new ClassPathResource("static/images/mail/image-1.png"));
+            helper.addInline("defaultImage", new ClassPathResource("static/images/mail/image-3.png"));
+            helper.addInline("facebookImage", new ClassPathResource("static/images/mail/image-6.png"));
+            helper.addInline("twitterImage", new ClassPathResource("static/images/mail/image-7.png"));
+            helper.addInline("LinkedInImage", new ClassPathResource("static/images/mail/image-8.png"));
+            helper.addInline("InstaImage", new ClassPathResource("static/images/mail/image-9.png"));
 
             mailSender.send(message);
         } catch (Exception e) {

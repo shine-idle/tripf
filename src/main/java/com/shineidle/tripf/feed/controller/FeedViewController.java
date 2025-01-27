@@ -8,7 +8,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -24,7 +27,17 @@ public class FeedViewController {
      * @return 피드 작성 페이지의 뷰 이름
      */
     @GetMapping("/create")
-    public String createFeedPage() {
+    public String createFeedPage(Model model) {
+        model.addAttribute("feed", new FeedRequestDto(
+                null,  // city
+                null,  // startedAt
+                null,  // endedAt
+                null,  // title
+                null,  // content
+                null,  // cost
+                null,  // tag
+                List.of() // days
+        ));
         return "feed/create";
     }
 
@@ -97,18 +110,27 @@ public class FeedViewController {
         return "redirect:/feeds";
     }
 
+    @GetMapping("/countries")
+    public String showCountriesPage() {
+        return "feed/countries"; // templates/countries.html을 반환
+    }
+
     /**
      * 특정 지역의 피드 목록을 조회합니다.
      *
-     * @param country 조회할 지역의 이름 (옵션)
+     * @param encodedCountry 조회할 지역의 이름 (옵션)
      * @param model 뷰에 데이터를 전달하기 위한 모델 객체
      * @return 지역별 피드 목록 페이지의 뷰 이름
      */
-    @GetMapping
-    public String findRegion(@RequestParam(value = "region", required = false) String country, Model model) {
-        List<RegionResponseDto> regionResponseDtos = feedService.findRegion(country);
-        model.addAttribute("regions", regionResponseDtos);
-        return "feed/region-list";
+    @GetMapping("/countries/{country}")
+    public String findFeedsByRegion(@PathVariable("country") String encodedCountry, Model model) {
+        String country = URLDecoder.decode(encodedCountry, StandardCharsets.UTF_8);
+        System.out.println("디코딩된 국가명: " + country);
+        List<RegionResponseDto> regionFeeds = feedService.findRegion(country);
+        System.out.println("조회된 피드 리스트: " + regionFeeds);
+        model.addAttribute("feeds", regionFeeds);
+        model.addAttribute("region", country);
+        return "feed/country-feeds";
     }
 
     /**
@@ -137,6 +159,12 @@ public class FeedViewController {
         FeedResponseDto feedResponseDto = feedService.createDay(feedId, daysRequestDto);
         model.addAttribute("feed", feedResponseDto);
         return "feed/detail";
+    }
+
+    public String getFeedDetail(@PathVariable Long id, Model model) {
+        FeedResponseDto feed = feedService.findFeed(id);
+        model.addAttribute("feed", feed);
+        return "detail";
     }
 
     /**

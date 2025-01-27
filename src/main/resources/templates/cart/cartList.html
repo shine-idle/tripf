@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>장바구니</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        .btn-update {
+            background-color: #3498db;
+        }
+
+        .btn-update:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-delete {
+            background-color: #e74c3c;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="fragments/header.html :: headerFragment"></div>
+<div class="container">
+    <h1>장바구니</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>상품 이름</th>
+            <th>수량</th>
+            <th>가격</th>
+            <th>총 가격</th>
+            <th>작업</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${cartItems}">
+            <td th:text="${item.productId}"></td> <!-- 상품 이름으로 대체 필요 -->
+            <td>
+                <input type="number" th:value="${item.quantity}" min="1" style="width: 60px;">
+            </td>
+            <td th:text="${item.quantity} + ' 원'"></td> <!-- 단가로 대체 필요 -->
+            <td th:text="${item.quantity * item.quantity} + ' 원'"></td> <!-- 총 가격 계산 -->
+            <td class="actions">
+                <button class="btn btn-update" th:onclick="'updateCart(' + ${item.productId} + ')'">수정</button>
+                <button class="btn btn-delete" th:onclick="'deleteCart(' + ${item.productId} + ')'">삭제</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div style="text-align: center;">
+        <a href="/products" style="color: #3498db; text-decoration: none;">상품 목록으로 돌아가기</a>
+    </div>
+</div>
+</body>
+</html>

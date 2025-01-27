@@ -5,7 +5,6 @@
     <title>피드 상세</title>
     <meta charset="UTF-8">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNmfyHy0CtN4g9BNoKFWAqLOFXHVnKUWE&callback=initMap"></script>
     <style>
         * {
             margin: 0;
@@ -146,14 +145,45 @@
         .delete-button { background-color: #dc3545; color: white; }
         .add-button { background-color: #28a745; color: white; }
     </style>
+    <script>
+        // initMap 함수 전역 선언
+        window.initMap = function () {
+            const defaultCenter = { lat: 37.5665, lng: 126.9780 }; // 서울 중심 좌표
+
+            // 지도 초기화
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: defaultCenter,
+                mapTypeControl: false,
+                streetViewControl: false
+            });
+
+            // activities 데이터를 기반으로 마커 추가
+            activities.forEach(activity => {
+                const marker = new google.maps.Marker({
+                    position: { lat: activity.latitude, lng: activity.longitude },
+                    map: map,
+                    title: activity.title,
+                    animation: google.maps.Animation.DROP
+                });
+
+                const infowindow = new google.maps.InfoWindow({
+                    content: `<div><strong>${activity.title}</strong><br>${activity.memo || '메모 없음'}</div>`
+                });
+
+                marker.addListener('click', () => {
+                    infowindow.open(map, marker);
+                });
+            });
+        };
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNmfyHy0CtN4g9BNoKFWAqLOFXHVnKUWE&callback=initMap"></script>
 </head>
 <body>
 <div layout:fragment="content" class="container">
-
     <div class="main-content">
         <h1 style="display: inline;" th:text="${feed.title}">피드 제목</h1>
         <a th:href="@{/feeds}" class="button list-button" style="display: inline;">목록으로</a>
-
         <div class="feed-header">
             <div class="feed-meta">
                 <p>도시: <span th:text="${feed.city}"></span></p>
@@ -166,19 +196,16 @@
             </div>
             <div class="feed-content" th:text="${feed.content}">피드 내용</div>
         </div>
-
         <div class="days-list">
             <h2>일정</h2>
             <div th:each="day : ${feed.days}" class="day-item">
                 <div class="day-date" th:text="${#temporals.format(day.date, 'yyyy년 MM월 dd일')}">날짜</div>
-
                 <div class="activities-list">
                     <div th:each="activity : ${day.activity}"
                          class="activity-item"
                          th:data-lat="${activity.latitude}"
                          th:data-lng="${activity.longitude}"
-                         th:data-title="${activity.title}"
-                         onclick="highlightLocation(this)">
+                         th:data-title="${activity.title}">
                         <div class="activity-title" th:text="${activity.title}">활동 제목</div>
                         <div class="star-rating">
                             <span th:each="i : ${#numbers.sequence(1, activity.star)}">★</span>
@@ -190,67 +217,15 @@
                 </div>
             </div>
         </div>
-
-        <div class="action-buttons">
-            <a th:href="@{/feeds/{id}/edit(id=${feed.id})}" class="button edit-button">수정</a>
-            <form th:action="@{/feeds/{id}(id=${feed.id})}" method="post" style="display: inline;">
-                <input type="hidden" name="_method" value="DELETE"/>
-                <button type="submit" class="button delete-button">삭제</button>
-            </form>
-            <a th:href="@{/feeds/{id}/days/new(id=${feed.id})}" class="button add-button">일정 추가</a>
-        </div>
     </div>
-
     <div class="map-container">
         <div id="map"></div>
     </div>
 </div>
 
 <script th:inline="javascript">
-    let map;
-    const activities = [];
-
-    function initMap() {
-        const defaultCenter = { lat: 37.5665, lng: 126.9780 }; // 서울 중심 좌표
-
-        // 지도 초기화
-        map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 12,
-            center: defaultCenter,
-            mapTypeControl: false,
-            streetViewControl: false
-        });
-
-        // 활동 데이터를 기반으로 마커 추가 (활동 데이터가 있을 경우에만)
-        activities.forEach(activity => {
-            const marker = new google.maps.Marker({
-                position: { lat: activity.lat, lng: activity.lng },
-                map: map,
-                title: activity.title,
-                animation: google.maps.Animation.DROP
-            });
-
-            // 마커 추가 시 콘솔에 로그 출력
-            console.log(`마커 추가: ${activity.title} (${activity.lat}, ${activity.lng})`);
-
-            const infowindow = new google.maps.InfoWindow({
-                content: `<div><strong>${activity.title}</strong></div>`
-            });
-
-            marker.addListener('click', () => {
-                infowindow.open(map, marker);
-            });
-        });
-    }
-
-    // 페이지 로드 시 지도 초기화
-    document.addEventListener('DOMContentLoaded', () => {
-        if (typeof google !== 'undefined' && google.maps) {
-            initMap();
-        } else {
-            console.error('Google Maps API 로드 실패');
-        }
-    });
+    // Thymeleaf 데이터를 JSON 형식으로 JavaScript에 주입
+    const activities = /*[[${#jsonify(feed.days[0].activity)}]]*/[];
 </script>
 </body>
 </html>

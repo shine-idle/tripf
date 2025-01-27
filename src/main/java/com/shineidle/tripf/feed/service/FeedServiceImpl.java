@@ -324,7 +324,7 @@ public class FeedServiceImpl implements FeedService {
      * @return {@link RegionResponseDto} 지역 응답 Dto
      */
     @Override
-    @Cacheable(value = "regionCache", key = "'country:' + #country")
+//    @Cacheable(value = "regionCache", key = "'country:' + #country")
     public List<RegionResponseDto> findRegion(String country) {
 
         List<Feed> feeds = feedRepository.findByCountryAndDeletedAtIsNull(country);

@@ -10,12 +10,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/account")
+@RequestMapping
 public class AccountViewController {
     private final UserService userService;
 
     @GetMapping("/login")
     public String loginPage() {
         return "user/login";
+    }
+
+    @GetMapping("/signup")
+    public String signUpPage() {
+        return "user/signup"; // signup.html 뷰 반환
+    }
+
+    @GetMapping("/logout")
+    public String logoutPage() {
+        return "user/logout"; // logout.html 뷰 반환
     }
 }

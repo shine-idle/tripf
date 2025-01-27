@@ -186,4 +186,12 @@ public class JwtProvider {
         final Claims claims = this.getClaims(token);
         return claimsResolver.apply(claims);
     }
+
+    public String resolveToken(String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            return token.replace("Bearer ", "");
+        } else {
+            return null;
+        }
+    }
 }

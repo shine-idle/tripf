@@ -73,6 +73,35 @@
         .oauth-table a:hover {
             background-color: #d6d8db;
         }
+        .signup-link-container {
+            margin-top: 20px;
+            display: flex; /* Flexbox 사용 */
+            flex-direction: column; /* 세로 방향으로 배치 */
+            align-items: center; /* 가로 축 가운데 정렬 */
+            justify-content: center; /* 세로 축 가운데 정렬 */
+            color: #555;
+            font-size: 14px;
+        }
+
+        .signup-link-container p {
+            margin-bottom: 10px; /* 문단 아래 여백 */
+            text-align: center; /* 텍스트 가운데 정렬 */
+        }
+
+        .signup-link {
+            display: inline-block; /* 인라인 블록 설정 */
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            text-align: center; /* 텍스트 정렬 */
+        }
+
+        .signup-link:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
@@ -92,6 +121,11 @@
         <a href="/oauth2/authorization/kakao">Kakao</a>
         <a href="/oauth2/authorization/google">Google</a>
     </div>
+    <div class="signup-link-container">
+        <p>회원이 아니신가요?</p>
+        <a th:href="@{/signup}" class="signup-link">회원가입</a>
+    </div>
+</div>
 </div>
 </body>
 </html>

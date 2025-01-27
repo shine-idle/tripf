@@ -44,7 +44,7 @@ public class WebConfig {
 
 
     private static final String[] WHITE_LIST = {
-            "/", "/error", "/api/", "/api/signup", "/api/login", "/login",
+            "/**", "/error", "/api/", "/api/signup", "/api/login", "/login",
             "/api/products/**",
             "/swagger-ui/**", "/v3/api-docs/**"
     };
@@ -70,6 +70,11 @@ public class WebConfig {
                                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE,
                                         DispatcherType.ERROR).permitAll()
                                 // path 별로 접근이 가능한 권한 설정
+                                .requestMatchers("/gs-guide-websocket/**").permitAll()
+                                .requestMatchers("/main.css").permitAll()
+                                .requestMatchers("/app.js").permitAll()
+                                .requestMatchers("/topic/**").permitAll()
+                                .requestMatchers("/app/**").permitAll()
                                 .requestMatchers("/api/admin/**").hasAuthority("AUTH_admin")
                                 .anyRequest().authenticated()
                 )
