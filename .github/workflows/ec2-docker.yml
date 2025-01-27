@@ -69,6 +69,9 @@ jobs:
                 -e S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }} \
                 -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
                 -e S3_REGION=${{ secrets.S3_REGION }} \
+                -e MONGO_HOST=${{ secrets.MONGO_HOST }} \
+                -e MONGO_USER=${{ secrets.MONGO_USER }} \
+                -e MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }} \
                 ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_IMAGE_TAG_NAME }}:latest
 
       # 2. 두 번째 EC2에 배포
@@ -104,4 +107,7 @@ jobs:
                 -e S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }} \
                 -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
                 -e S3_REGION=${{ secrets.S3_REGION }} \
+                -e MONGO_HOST=${{ secrets.MONGO_HOST }} \
+                -e MONGO_USER=${{ secrets.MONGO_USER }} \
+                -e MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }} \
                 ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_IMAGE_TAG_NAME }}:latest
