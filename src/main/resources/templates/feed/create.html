@@ -1,21 +1,17 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
 <head>
     <title>피드 작성</title>
     <meta charset="UTF-8">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNmfyHy0CtN4g9BNoKFWAqLOFXHVnKUWE&callback=initMap&v=weekly&libraries=places,marker"></script>
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-
-        body {
-            background-color: #f5f5f5;
-            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
         }
 
         .container {
@@ -152,8 +148,7 @@
 </head>
 <body>
 
-<div th:replace="fragments/header.html :: headerFragment"></div>
-
+<div layout:fragment="content">
 <div class="container">
     <div class="form-container">
         <form th:action="@{/feeds}" method="post" id="createForm">
@@ -280,8 +275,6 @@
         <div id="map"></div>
     </div>
 </div>
-
-<div th:replace="fragments/footer.html :: footerFragment"></div>
 
 <script th:inline="javascript">
     let map;
@@ -487,5 +480,6 @@
     document.getElementById('createForm').addEventListener('submit', submitForm);
 
 </script>
+</div>
 </body>
 </html>

@@ -1,8 +1,14 @@
 package com.shineidle.tripf.feed.controller;
 
+import com.shineidle.tripf.common.exception.GlobalException;
+import com.shineidle.tripf.common.exception.type.FeedErrorCode;
 import com.shineidle.tripf.feed.dto.*;
 import com.shineidle.tripf.feed.service.FeedService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -27,7 +33,9 @@ public class FeedViewController {
      * @return 피드 작성 페이지의 뷰 이름
      */
     @GetMapping("/create")
-    public String createFeedPage(Model model) {
+    public String createFeedPage(
+            Model model
+    ) {
         model.addAttribute("feed", new FeedRequestDto(
                 null,  // city
                 null,  // startedAt
@@ -49,7 +57,11 @@ public class FeedViewController {
      * @return 생성된 피드의 상세 페이지 뷰 이름
      */
     @PostMapping
-    public String createFeed(@ModelAttribute @Validated FeedRequestDto feedRequestDto, Model model) {
+    public String createFeed(
+            @ModelAttribute
+            @Validated FeedRequestDto feedRequestDto,
+            Model model
+    ) {
         FeedResponseDto feedResponseDto = feedService.createFeed(feedRequestDto);
         model.addAttribute("feed", feedResponseDto);
         return "feed/detail";
@@ -63,7 +75,10 @@ public class FeedViewController {
      * @return 피드 상세 페이지의 뷰 이름
      */
     @GetMapping("/{feedId}")
-    public String findFeed(@PathVariable Long feedId, Model model) {
+    public String findFeed(
+            @PathVariable Long feedId,
+            Model model
+    ) {
         FeedResponseDto feedResponseDto = feedService.findFeed(feedId);
         model.addAttribute("feed", feedResponseDto);
         return "feed/detail";
@@ -77,7 +92,10 @@ public class FeedViewController {
      * @return 피드 수정 페이지의 뷰 이름
      */
     @GetMapping("/{feedId}/update")
-    public String updateFeedPage(@PathVariable Long feedId, Model model) {
+    public String updateFeedPage(
+            @PathVariable Long feedId,
+            Model model
+    ) {
         FeedResponseDto feedResponseDto = feedService.findFeed(feedId);
         model.addAttribute("feed", feedResponseDto);
         return "feed/update";
@@ -92,7 +110,12 @@ public class FeedViewController {
      * @return 수정된 피드의 상세 페이지 뷰 이름
      */
     @PutMapping("/{feedId}")
-    public String updateFeed(@PathVariable Long feedId, @ModelAttribute @Validated FeedRequestDto feedRequestDto, Model model) {
+    public String updateFeed(
+            @PathVariable Long feedId,
+            @ModelAttribute
+            @Validated FeedRequestDto feedRequestDto,
+            Model model
+    ) {
         FeedResponseDto feedResponseDto = feedService.updateFeed(feedId, feedRequestDto);
         model.addAttribute("feed", feedResponseDto);
         return "feed/detail";
@@ -105,7 +128,9 @@ public class FeedViewController {
      * @return 피드 목록 페이지로 리다이렉트
      */
     @DeleteMapping("/{feedId}")
-    public String deleteFeed(@PathVariable Long feedId) {
+    public String deleteFeed(
+            @PathVariable Long feedId
+    ) {
         feedService.deleteFeed(feedId);
         return "redirect:/feeds";
     }
@@ -123,11 +148,12 @@ public class FeedViewController {
      * @return 지역별 피드 목록 페이지의 뷰 이름
      */
     @GetMapping("/countries/{country}")
-    public String findFeedsByRegion(@PathVariable("country") String encodedCountry, Model model) {
+    public String findFeedsByRegion(
+            @PathVariable("country") String encodedCountry,
+            Model model
+    ) {
         String country = URLDecoder.decode(encodedCountry, StandardCharsets.UTF_8);
-        System.out.println("디코딩된 국가명: " + country);
         List<RegionResponseDto> regionFeeds = feedService.findRegion(country);
-        System.out.println("조회된 피드 리스트: " + regionFeeds);
         model.addAttribute("feeds", regionFeeds);
         model.addAttribute("region", country);
         return "feed/country-feeds";
@@ -141,7 +167,10 @@ public class FeedViewController {
      * @return 일정 추가 페이지의 뷰 이름
      */
     @GetMapping("/{feedId}/days/create")
-    public String createDayPage(@PathVariable Long feedId, Model model) {
+    public String createDayPage(
+            @PathVariable Long feedId,
+            Model model
+    ) {
         model.addAttribute("feedId", feedId);
         return "feed/day-create";
     }
@@ -155,7 +184,12 @@ public class FeedViewController {
      * @return 수정된 피드의 상세 페이지 뷰 이름
      */
     @PostMapping("/{feedId}/days")
-    public String createDay(@PathVariable Long feedId, @ModelAttribute @Validated DaysRequestDto daysRequestDto, Model model) {
+    public String createDay(
+            @PathVariable Long feedId,
+            @ModelAttribute
+            @Validated DaysRequestDto daysRequestDto,
+            Model model
+    ) {
         FeedResponseDto feedResponseDto = feedService.createDay(feedId, daysRequestDto);
         model.addAttribute("feed", feedResponseDto);
         return "feed/detail";
@@ -176,7 +210,11 @@ public class FeedViewController {
      * @return 활동 추가 페이지의 뷰 이름
      */
     @GetMapping("/{feedId}/days/{daysId}/activities/create")
-    public String createActivityPage(@PathVariable Long feedId, @PathVariable Long daysId, Model model) {
+    public String createActivityPage(
+            @PathVariable Long feedId,
+            @PathVariable Long daysId,
+            Model model
+    ) {
         model.addAttribute("feedId", feedId);
         model.addAttribute("daysId", daysId);
         return "feed/activity-create";
@@ -192,7 +230,13 @@ public class FeedViewController {
      * @return 수정된 피드의 상세 페이지 뷰 이름
      */
     @PostMapping("/{feedId}/days/{daysId}/activities")
-    public String createActivity(@PathVariable Long feedId, @PathVariable Long daysId, @ModelAttribute @Validated ActivityRequestDto activityRequestDto, Model model) {
+    public String createActivity(
+            @PathVariable Long feedId,
+            @PathVariable Long daysId,
+            @ModelAttribute
+            @Validated ActivityRequestDto activityRequestDto,
+            Model model
+    ) {
         FeedResponseDto feedResponseDto = feedService.createActivity(feedId, daysId, activityRequestDto);
         model.addAttribute("feed", feedResponseDto);
         return "feed/detail";
@@ -208,7 +252,11 @@ public class FeedViewController {
      * @return 활동 수정 페이지의 뷰 이름
      */
     @GetMapping("/{feedId}/days/{daysId}/activities/{activityId}/update")
-    public String updateActivityPage(@PathVariable Long feedId, @PathVariable Long daysId, @PathVariable Long activityId, Model model) {
+    public String updateActivityPage(
+            @PathVariable Long feedId,
+            @PathVariable Long daysId,
+            @PathVariable Long activityId,
+            Model model) {
         model.addAttribute("feedId", feedId);
         model.addAttribute("daysId", daysId);
         model.addAttribute("activityId", activityId);
@@ -226,9 +274,53 @@ public class FeedViewController {
      * @return 수정된 피드의 상세 페이지 뷰 이름
      */
     @PutMapping("/{feedId}/days/{daysId}/activities/{activityId}")
-    public String updateActivity(@PathVariable Long feedId, @PathVariable Long daysId, @PathVariable Long activityId, @ModelAttribute @Validated ActivityRequestDto activityRequestDto, Model model) {
+    public String updateActivity(
+            @PathVariable Long feedId,
+            @PathVariable Long daysId,
+            @PathVariable Long activityId,
+            @ModelAttribute
+            @Validated ActivityRequestDto activityRequestDto,
+            Model model
+    ) {
         FeedResponseDto feedResponseDto = feedService.updateActivity(feedId, daysId, activityId, activityRequestDto);
         model.addAttribute("feed", feedResponseDto);
         return "feed/detail";
+    }
+
+    /**
+     * 본인 피드 리스트 페이지
+     *
+     * @param page 페이지 번호
+     * @param size 페이지 크기
+     * @param sortBy 정렬 기준
+     * @param model 모델 객체
+     * @return 본인 피드 리스트 뷰 이름
+     */
+    @GetMapping("/my")
+    public String getMyFeeds(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            Model model
+    ) {
+        if (page < 0 || size <= 0) {
+            throw new GlobalException(FeedErrorCode.PAGE_INVALID);
+        }
+
+        Pageable pageable = createPageable(page, size, sortBy);
+        Page<MyFeedResponseDto> myFeeds = feedService.findMyFeeds(pageable);
+
+        model.addAttribute("myFeeds", myFeeds.getContent());
+        model.addAttribute("page", myFeeds);
+        return "feed/my-feeds"; // templates/feed/my-feeds.html로 이동
+    }
+
+    private Pageable createPageable(int page, int size, String sortBy) {
+        Sort sort = switch (sortBy) {
+            case "modifiedAt" -> Sort.by(Sort.Order.desc("modifiedAt"));
+            case "likes" -> Sort.by(Sort.Order.desc("likes"));
+            default -> Sort.by(Sort.Order.desc("createdAt"));
+        };
+        return PageRequest.of(page, size, sort);
     }
 }
