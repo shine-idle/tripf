@@ -2,11 +2,11 @@ package com.shineidle.tripf.feed.service;
 
 import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.FeedErrorCode;
+import com.shineidle.tripf.common.exception.type.LockErrorCode;
 import com.shineidle.tripf.common.message.constants.NotificationMessage;
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.common.message.enums.PostMessage;
 import com.shineidle.tripf.common.util.UserAuthorizationUtil;
-import com.shineidle.tripf.config.auth.UserDetailsImpl;
 import com.shineidle.tripf.feed.dto.*;
 import com.shineidle.tripf.feed.entity.Activity;
 import com.shineidle.tripf.feed.entity.Days;
@@ -22,13 +22,16 @@ import com.shineidle.tripf.notification.type.NotifyType;
 import com.shineidle.tripf.user.entity.User;
 import com.shineidle.tripf.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,9 +45,11 @@ public class FeedServiceImpl implements FeedService {
     private final FollowService followService;
     private final UserService userService;
     private final NotificationService notificationService;
+    private final RedissonClient redissonClient;
 
     /**
      * 피드 생성
+     * Redis 분산락 사용
      *
      * @param feedRequestDto {@link FeedRequestDto} 피드 요청 Dto
      * @return {@link FeedResponseDto} 피드 응답 Dto
@@ -54,62 +59,79 @@ public class FeedServiceImpl implements FeedService {
     public FeedResponseDto createFeed(FeedRequestDto feedRequestDto) {
         User userId = UserAuthorizationUtil.getLoginUser();
 
-        String country = geoService.getCountryByCity(feedRequestDto.getCity());
+        String lockKey = "createFeed:lock:user:" + userId.getId();
+        RLock lock = redissonClient.getLock(lockKey);
 
-        Feed feed = new Feed(
-                userId,
-                country,
-                feedRequestDto.getCity(),
-                feedRequestDto.getStartedAt(),
-                feedRequestDto.getEndedAt(),
-                feedRequestDto.getTitle(),
-                feedRequestDto.getContent(),
-                feedRequestDto.getCost(),
-                feedRequestDto.getTag()
-        );
-        Feed savedFeed = feedRepository.save(feed);
+        try {
+            if (lock.tryLock(10, 30, TimeUnit.SECONDS)) {
 
-        if (feedRequestDto.getDays() != null) {
-            feedRequestDto.getDays().forEach(daysRequestDto -> {
-                Days days = new Days(savedFeed, daysRequestDto.getDate());
+                String country = geoService.getCountryByCity(feedRequestDto.getCity());
 
-                LocalDate date = daysRequestDto.getDate();
-                if (days.getDate().isBefore(feed.getStartedAt().toLocalDate()) || days.getDate().isAfter(feed.getEndedAt().toLocalDate())) {
-                    throw new GlobalException(FeedErrorCode.DATE_INVALID);
-                }
+                Feed feed = new Feed(
+                        userId,
+                        country,
+                        feedRequestDto.getCity(),
+                        feedRequestDto.getStartedAt(),
+                        feedRequestDto.getEndedAt(),
+                        feedRequestDto.getTitle(),
+                        feedRequestDto.getContent(),
+                        feedRequestDto.getCost(),
+                        feedRequestDto.getTag()
+                );
+                Feed savedFeed = feedRepository.save(feed);
 
-                if (daysRepository.existsByFeedAndDate(feed, date)) {
-                    throw new GlobalException(FeedErrorCode.DATE_DUPLICATE);
-                }
+                if (feedRequestDto.getDays() != null) {
+                    feedRequestDto.getDays().forEach(daysRequestDto -> {
+                        Days days = new Days(savedFeed, daysRequestDto.getDate());
 
-                Days savedDays = daysRepository.save(days);
+                        LocalDate date = daysRequestDto.getDate();
+                        if (days.getDate().isBefore(feed.getStartedAt().toLocalDate()) || days.getDate().isAfter(feed.getEndedAt().toLocalDate())) {
+                            throw new GlobalException(FeedErrorCode.DATE_INVALID);
+                        }
 
-                if (daysRequestDto.getActivity() != null) {
-                    daysRequestDto.getActivity().forEach(activityRequestDto -> {
-                        Activity activity = new Activity(
-                                savedDays,
-                                activityRequestDto.getTitle(),
-                                activityRequestDto.getStar(),
-                                activityRequestDto.getMemo(),
-                                activityRequestDto.getCity(),
-                                activityRequestDto.getLatitude(),
-                                activityRequestDto.getLongitude()
-                        );
-                        activityRepository.save(activity);
+                        if (daysRepository.existsByFeedAndDate(feed, date)) {
+                            throw new GlobalException(FeedErrorCode.DATE_DUPLICATE);
+                        }
+
+                        Days savedDays = daysRepository.save(days);
+
+                        if (daysRequestDto.getActivity() != null) {
+                            daysRequestDto.getActivity().forEach(activityRequestDto -> {
+                                Activity activity = new Activity(
+                                        savedDays,
+                                        activityRequestDto.getTitle(),
+                                        activityRequestDto.getStar(),
+                                        activityRequestDto.getMemo(),
+                                        activityRequestDto.getCity(),
+                                        activityRequestDto.getLatitude(),
+                                        activityRequestDto.getLongitude()
+                                );
+                                activityRepository.save(activity);
+                            });
+                        }
                     });
                 }
-            });
+
+                followerNewPostNotification(userId, feed.getId());
+
+                return findFeed(savedFeed.getId());
+            } else {
+                throw new GlobalException(LockErrorCode.LOCK_ACQUISITION_FAILED);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new GlobalException(LockErrorCode.LOCK_INTERRUPTED);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
-
-        followerNewPostNotification(userId, feed.getId());
-
-        return findFeed(savedFeed.getId());
     }
 
     /**
      * 피드 수정
      *
-     * @param feedId 피드 식별자
+     * @param feedId         피드 식별자
      * @param feedRequestDto {@link FeedRequestDto} 피드 요청 DTO
      * @return {@link FeedResponseDto} 피드 응답 DTO
      */
@@ -203,8 +225,8 @@ public class FeedServiceImpl implements FeedService {
     /**
      * 활동 삭제
      *
-     * @param feedId 피드 식별자
-     * @param daysId 일정 식별자
+     * @param feedId     피드 식별자
+     * @param daysId     일정 식별자
      * @param activityId 활동 식별자
      * @return {@link PostMessageResponseDto} 활동 삭제 문구
      */
@@ -221,7 +243,7 @@ public class FeedServiceImpl implements FeedService {
      * 일정 및 활동 추가
      * 일정 추가 시 활동도 같이 추가
      *
-     * @param feedId 피드 식별자
+     * @param feedId         피드 식별자
      * @param daysRequestDto {@link DaysRequestDto} 일정 요청 Dto
      * @return {@link FeedResponseDto} 일정 응답 Dto
      */
@@ -264,8 +286,8 @@ public class FeedServiceImpl implements FeedService {
     /**
      * 활동 추가
      *
-     * @param feedId 피드 식별자
-     * @param daysId 일정 식별자
+     * @param feedId             피드 식별자
+     * @param daysId             일정 식별자
      * @param activityRequestDto {@link ActivityRequestDto} 활동 요청 Dto
      * @return {@link FeedResponseDto} 활동 응답 Dto
      */
@@ -292,9 +314,9 @@ public class FeedServiceImpl implements FeedService {
     /**
      * 활동 수정
      *
-     * @param feedId 피드 식별자
-     * @param daysId 일정 식별자
-     * @param activityId 활동 식별자
+     * @param feedId             피드 식별자
+     * @param daysId             일정 식별자
+     * @param activityId         활동 식별자
      * @param activityRequestDto {@link ActivityRequestDto} 활동 요청 Dto
      * @return {@link FeedResponseDto} 활동 응답 Dto
      */
@@ -354,6 +376,20 @@ public class FeedServiceImpl implements FeedService {
     }
 
     @Override
+    public Page<MyFeedResponseDto> findMyFeeds(Pageable pageable) {
+        // 로그인한 사용자 가져오기
+        User loginUser = UserAuthorizationUtil.getLoginUser();
+
+        // 본인 피드 조회
+        return feedRepository.findByUserIdAndDeletedAtIsNull(loginUser.getId(), pageable)
+                .map(MyFeedResponseDto::toDto);
+    }
+
+    /**
+     * 홈페이지
+     * @return
+     */
+    @Override
     public HomeResponseDto findPublicHomeData() {
 
         List<RegionResponseDto> korea = feedRepository.findByCountry("대한민국")
@@ -373,7 +409,6 @@ public class FeedServiceImpl implements FeedService {
     public List<String> findAllCountries() {
         return feedRepository.findDistinctCountries();
     }
-
 
 
     /**
@@ -412,8 +447,8 @@ public class FeedServiceImpl implements FeedService {
     /**
      * 피드 및 일정 및 피드 Id로 활동 확인
      *
-     * @param feedId 피드 식별자
-     * @param daysId 일정 식별자
+     * @param feedId     피드 식별자
+     * @param daysId     일정 식별자
      * @param activityId 활동 식별자
      * @return {@link Activity}
      */
@@ -439,7 +474,8 @@ public class FeedServiceImpl implements FeedService {
 
     /**
      * 팔로우 한사람이 새로운 게시글을 작성할 경우 알림
-     * @param actor 알림 발생자
+     *
+     * @param actor  알림 발생자
      * @param feedId 알림 발생 피드
      */
     private void followerNewPostNotification(User actor, Long feedId) {
@@ -447,7 +483,7 @@ public class FeedServiceImpl implements FeedService {
         for (FollowResponseDto follower : followers) {
             User targetUser = userService.getUserById(follower.getUserId());
             String context = String.format(NotificationMessage.FOLLOW_FEED_NOTIFICATION, actor.getName());
-            notificationService.createNotification(targetUser, actor, NotifyType.NEW_FEED, context,feedId);
+            notificationService.createNotification(targetUser, actor, NotifyType.NEW_FEED, context, feedId);
         }
     }
 }

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
 <head>
     <title>상품 등록</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
         }
@@ -69,6 +70,7 @@
     </style>
 </head>
 <body>
+<div layout:fragment="content">
 <div class="container">
     <h1>상품 등록</h1>
     <form th:action="@{/api/admin/products}" method="post">
@@ -109,6 +111,7 @@
             <button type="submit" class="btn">등록</button>
         </div>
     </form>
+</div>
 </div>
 </body>
 </html>

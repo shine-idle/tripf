@@ -6,15 +6,9 @@
     <meta charset="UTF-8">
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNmfyHy0CtN4g9BNoKFWAqLOFXHVnKUWE&callback=initMap&libraries=places"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
+            background-color: #f4f4f4;
             padding: 20px;
         }
 
@@ -103,6 +97,7 @@
     </style>
 </head>
 <body>
+<div layout:fragment="content">
 <div class="container">
     <div class="form-container">
         <h1>활동 추가</h1>
@@ -219,5 +214,6 @@
 
     window.onload = initMap;
 </script>
+</div>
 </body>
 </html>

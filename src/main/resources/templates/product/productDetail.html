@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
 <head>
     <title>상품 상세</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            background-color: #f9f9f9;
+            background-color: #f4f4f4;
             color: #333;
         }
 
@@ -87,7 +88,7 @@
     </style>
 </head>
 <body>
-<div th:replace="fragments/header.html :: headerFragment"></div>
+<div layout:fragment="content">
 <!-- TODO: 상품 사진 가져오도록 ProductDto 수정 및 로직 추가 필요 -->
 <div class="container">
     <h1 th:text="${product.name}">상품 이름</h1>
@@ -102,6 +103,7 @@
         <a href="/products" class="btn back-btn">목록으로 돌아가기</a>
         <a th:href="'/cart/add/' + ${product.id}" class="btn">장바구니 추가</a>
     </div>
+</div>
 </div>
 </body>
 </html>

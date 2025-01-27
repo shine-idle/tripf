@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
 <style>
     body {
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #f9f9f9;
+        background-color: #f4f4f4;
     }
 
     header {
@@ -81,7 +82,7 @@
     <title>Country Feeds</title>
 </head>
 <body>
-    <div th:replace="fragments/header.html :: headerFragment"></div>
+<div layout:fragment="content">
 <main>
     <section>
         <div th:if="${#lists.isEmpty(feeds)}">
@@ -105,5 +106,6 @@
         </div>
     </section>
 </main>
+</div>
 </body>
 </html>
