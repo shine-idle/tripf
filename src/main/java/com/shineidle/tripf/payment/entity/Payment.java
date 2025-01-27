@@ -37,15 +37,8 @@ public class Payment extends BaseEntity {
     private LocalDateTime approvedAt;
     private LocalDateTime canceledAt;
 
-    public Payment(String paymentKey, String paymentUrl, Order order, User user, CancelStatus cancelStatus, LocalDateTime createAt, LocalDateTime approvedAt, LocalDateTime canceledAt) {
-        this.paymentKey = paymentKey;
-        this.paymentUrl = paymentUrl;
-        this.order = order;
-        this.user = user;
-        this.cancelStatus = cancelStatus;
-        this.createAt = createAt;
-        this.approvedAt = approvedAt;
-        this.canceledAt = canceledAt;
+    public Long getAmount() {
+        return this.order.getTotalPrice();
     }
 
     public void approvedPayment(LocalDateTime approvedAt) {
