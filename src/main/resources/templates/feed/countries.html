@@ -20,6 +20,8 @@
             justify-content: center;
             flex-wrap: wrap;
             gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
         .country-card {
@@ -27,28 +29,47 @@
             color: #333;
             background-color: #fff;
             border: 1px solid #ddd;
-            border-radius: 8px;
-            width: 150px;
-            padding: 10px;
+            border-radius: 12px;
+            width: 250px; /* 카드 너비를 250px로 증가 */
+            padding: 30px; /* 패딩을 30px로 증가 */
             transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .country-card img {
             width: 100%;
-            height: auto;
-            border-radius: 8px;
+            height: 180px; /* 이미지 높이를 더 크게 설정 */
+            object-fit: cover;
+            border-radius: 12px;
         }
 
         .country-card p {
-            margin-top: 10px;
-            font-size: 16px;
+            margin-top: 15px;
+            font-size: 18px; /* 텍스트 크기를 키움 */
             font-weight: bold;
+            text-align: center;
+            min-height: 30px; /* 국가명 영역 고정, 여유 공간 확보 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .country-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
+
+        .countries-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px; /* 카드 간격을 더 늘림 */
+            max-width: 1300px; /* 컨테이너 너비를 더 크게 설정 */
+            margin: 0 auto;
+        }
+
     </style>
 </head>
 <body>
