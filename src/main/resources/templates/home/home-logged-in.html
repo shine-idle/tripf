@@ -166,23 +166,21 @@
         <section class="feed-section">
             <h2 class="section-title">국내 여행</h2>
             <th:block th:switch="${#lists.isEmpty(homeData.korea)}">
-                <!-- 데이터가 없을 때 -->
                 <div th:case="true" class="no-data-message">
                     등록된 국내 여행 피드가 없습니다.
                 </div>
-                <!-- 데이터가 있을 때 -->
-                <div th:case="false" class="feed-grid">
-                    <div th:each="feed : ${homeData.korea}" class="feed-card">
+                <div class="feed-grid">
+                    <a th:href="@{/feeds/{id}(id=${feed.id})}" class="feed-card" th:each="feed : ${homeData.korea}">
+                        <!-- 대표 이미지가 없을 경우 기본 이미지 설정 -->
+                        <img th:src="${feed.representativePhotoUrl != null && !feed.representativePhotoUrl.isEmpty()
+                     ? feed.representativePhotoUrl : '/images/default.jpg'}"
+                             alt="대표 사진" class="feed-image">
                         <div class="feed-title" th:text="${feed.title}"></div>
                         <div class="feed-content" th:text="${feed.content}"></div>
                         <div class="feed-meta">
                             <span th:text="${feed.city}"></span>
                         </div>
-                    </div>
-                    <!-- 더보기 버튼 -->
-                    <div th:if="${#lists.size(homeData.korea) > 4}" class="more-button">
-                        <button onclick="location.href='/feeds?region=korea'">더 보기</button>
-                    </div>
+                    </a>
                 </div>
             </th:block>
         </section>
@@ -191,23 +189,21 @@
         <section class="feed-section">
             <h2 class="section-title">해외 여행</h2>
             <th:block th:switch="${#lists.isEmpty(homeData.global)}">
-                <!-- 데이터가 없을 때 -->
                 <div th:case="true" class="no-data-message">
                     등록된 해외 여행 피드가 없습니다.
                 </div>
-                <!-- 데이터가 있을 때 -->
-                <div th:case="false" class="feed-grid">
-                    <div th:each="feed : ${homeData.global}" class="feed-card">
+                <div class="feed-grid">
+                    <a th:href="@{/feeds/{id}(id=${feed.id})}" class="feed-card" th:each="feed : ${homeData.global}">
+                        <!-- 대표 이미지가 없을 경우 기본 이미지 설정 -->
+                        <img th:src="${feed.representativePhotoUrl != null && !feed.representativePhotoUrl.isEmpty()
+                     ? feed.representativePhotoUrl : '/images/default.jpg'}"
+                             alt="대표 사진" class="feed-image">
                         <div class="feed-title" th:text="${feed.title}"></div>
                         <div class="feed-content" th:text="${feed.content}"></div>
                         <div class="feed-meta">
                             <span th:text="${feed.city}"></span>
                         </div>
-                    </div>
-                    <!-- 더보기 버튼 -->
-                    <div th:if="${#lists.size(homeData.global) > 4}" class="more-button">
-                        <button onclick="location.href='/feeds?region=global'">더 보기</button>
-                    </div>
+                    </a>
                 </div>
             </th:block>
         </section>

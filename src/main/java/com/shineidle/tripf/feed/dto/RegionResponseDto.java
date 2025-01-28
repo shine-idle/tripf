@@ -24,7 +24,9 @@ public class RegionResponseDto {
 
     private final LocalDateTime endedAt;
 
-    public static RegionResponseDto toDto(Feed feed) {
+    private final String representativePhotoUrl;
+
+    public static RegionResponseDto toDto(Feed feed, String representativePhotoUrl) {
         return new RegionResponseDto(
                 feed.getId(),
                 feed.getCountry(),
@@ -32,7 +34,8 @@ public class RegionResponseDto {
                 feed.getTitle(),
                 feed.getContent(),
                 feed.getStartedAt(),
-                feed.getEndedAt()
+                feed.getEndedAt(),
+                representativePhotoUrl
         );
     }
 

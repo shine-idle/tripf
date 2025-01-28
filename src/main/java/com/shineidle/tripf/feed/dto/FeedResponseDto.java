@@ -1,6 +1,7 @@
 package com.shineidle.tripf.feed.dto;
 
 import com.shineidle.tripf.feed.entity.Feed;
+import com.shineidle.tripf.photo.dto.PhotoResponseDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -12,6 +13,8 @@ import java.util.List;
 public class FeedResponseDto {
 
     private final Long id;
+
+    private final String representativePhotoUrl;
 
     private final String name;
 
@@ -36,8 +39,17 @@ public class FeedResponseDto {
     private final List<DaysResponseDto> days;
 
     public static FeedResponseDto toDto(Feed feed, List<DaysResponseDto> days) {
+
+        String representativePhotoUrl = days.stream()
+                .flatMap(day -> day.getActivity().stream())
+                .flatMap(activity -> activity.getPhotos().stream())
+                .map(PhotoResponseDto::getUrl)
+                .findFirst()
+                .orElse(null);
+
         return new FeedResponseDto(
                 feed.getId(),
+                representativePhotoUrl,
                 feed.getUser().getName(),
                 feed.getCity(),
                 feed.getStartedAt(),

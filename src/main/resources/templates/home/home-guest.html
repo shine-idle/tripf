@@ -5,38 +5,6 @@
     <title>TripF - 여행 피드</title>
     <meta charset="UTF-8">
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .feed-section {
-            margin-bottom: 40px;
-        }
-
-        .section-title {
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #333;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
-        }
-
         .feed-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -47,7 +15,7 @@
             background: white;
             border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s ease;
             text-decoration: none;
             color: inherit;
@@ -55,6 +23,13 @@
 
         .feed-card:hover {
             transform: translateY(-5px);
+        }
+
+        .feed-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 10px;
         }
 
         .feed-title {
@@ -89,27 +64,8 @@
             background: #fff;
             border-radius: 8px;
             margin: 10px 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             font-size: 16px;
-        }
-
-        .more-button {
-            text-align: center;
-            padding: 20px 0;
-        }
-
-        .more-button button {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .more-button button:hover {
-            background: #0056b3;
         }
     </style>
 </head>
@@ -123,8 +79,12 @@
                 <div th:case="true" class="no-data-message">
                     등록된 국내 여행 피드가 없습니다.
                 </div>
-                <div th:case="false" class="feed-grid">
+                <div class="feed-grid">
                     <a th:href="@{/feeds/{id}(id=${feed.id})}" class="feed-card" th:each="feed : ${homeData.korea}">
+                        <!-- 대표 이미지가 없을 경우 기본 이미지 설정 -->
+                        <img th:src="${feed.representativePhotoUrl != null && !feed.representativePhotoUrl.isEmpty()
+                     ? feed.representativePhotoUrl : '/images/default.jpg'}"
+                             alt="대표 사진" class="feed-image">
                         <div class="feed-title" th:text="${feed.title}"></div>
                         <div class="feed-content" th:text="${feed.content}"></div>
                         <div class="feed-meta">
@@ -142,8 +102,12 @@
                 <div th:case="true" class="no-data-message">
                     등록된 해외 여행 피드가 없습니다.
                 </div>
-                <div th:case="false" class="feed-grid">
+                <div class="feed-grid">
                     <a th:href="@{/feeds/{id}(id=${feed.id})}" class="feed-card" th:each="feed : ${homeData.global}">
+                        <!-- 대표 이미지가 없을 경우 기본 이미지 설정 -->
+                        <img th:src="${feed.representativePhotoUrl != null && !feed.representativePhotoUrl.isEmpty()
+                     ? feed.representativePhotoUrl : '/images/default.jpg'}"
+                             alt="대표 사진" class="feed-image">
                         <div class="feed-title" th:text="${feed.title}"></div>
                         <div class="feed-content" th:text="${feed.content}"></div>
                         <div class="feed-meta">
