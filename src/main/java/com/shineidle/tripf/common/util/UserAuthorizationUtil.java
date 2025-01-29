@@ -6,6 +6,7 @@ import com.shineidle.tripf.user.type.UserAuth;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+
 public class UserAuthorizationUtil {
     private UserAuthorizationUtil() {
         throw new AssertionError();
@@ -19,6 +20,8 @@ public class UserAuthorizationUtil {
 
         return (UserDetailsImpl) authentication.getPrincipal();
     }
+
+    
 
     /**
      * JWT에서 USER 타입으로 로그인한 유저 정보 반환
