@@ -201,10 +201,12 @@
 
                         <div class="form-group">
                             <label th:for="'days[' + ${dayStat.index} + '].date'">날짜</label>
-                            <input type="date"
-                                   th:name="'days[' + ${dayStat.index} + '].date'"
-                                   th:value="${#temporals.format(day.date, 'yyyy-MM-dd')}"
-                                   required>
+                            <label>
+                                <input type="date"
+                                       th:name="'days[' + ${dayStat.index} + '].date'"
+                                       th:value="${#temporals.format(day.date, 'yyyy-MM-dd')}"
+                                       required>
+                            </label>
                         </div>
 
                         <div class="activities-list">
@@ -220,41 +222,47 @@
 
                                 <div class="form-group">
                                     <label>제목</label>
-                                    <input type="text"
-                                           th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].title'"
-                                           th:value="${activity.title}"
-                                           required maxlength="20">
+                                    <label>
+                                        <input type="text"
+                                               th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].title'"
+                                               th:value="${activity.title}"
+                                               required maxlength="20">
+                                    </label>
                                 </div>
 
                                 <div class="form-group">
                                     <label>별점</label>
-                                    <input type="number"
-                                           th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].star'"
-                                           th:value="${activity.star}"
-                                           min="1" max="5" required>
+                                    <label>
+                                        <input type="number"
+                                               th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].star'"
+                                               th:value="${activity.star}"
+                                               min="1" max="5" required>
+                                    </label>
                                 </div>
-
-
                                 <div class="form-group">
                                     <label>도시 검색</label>
-                                    <input type="text"
-                                           th:field="*{days[__${dayStat.index}__].activity[__${actStat.index}__].city}"
-                                           th:value="${activity.city}"
-                                           placeholder="도시를 입력하세요"
-                                           onfocus="initAutocomplete(this)">
+                                    <label>
+                                        <input type="text"
+                                               th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].city'"
+                                               th:value="${activity.city}"
+                                               placeholder="도시를 입력하세요"
+                                               onfocus="initAutocomplete(this)">
+                                    </label>
                                     <input type="hidden"
-                                           th:field="*{days[__${dayStat.index}__].activity[__${actStat.index}__].latitude}"
+                                           th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].latitude'"
                                            th:value="${activity.latitude}">
                                     <input type="hidden"
-                                           th:field="*{days[__${dayStat.index}__].activity[__${actStat.index}__].longitude}"
+                                           th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].longitude'"
                                            th:value="${activity.longitude}">
                                 </div>
 
                                 <div class="form-group">
                                     <label>메모</label>
-                                    <textarea
-                                            th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].memo'"
-                                            th:text="${activity.memo}"></textarea>
+                                    <label>
+                                        <textarea
+                                                th:name="'days[' + ${dayStat.index} + '].activity[' + ${actStat.index} + '].memo'"
+                                                th:text="${activity.memo}"></textarea>
+                                    </label>
                                 </div>
                             </div>
                             <button type="button" class="button add-button" onclick="addActivity(this)">활동 추가</button>
