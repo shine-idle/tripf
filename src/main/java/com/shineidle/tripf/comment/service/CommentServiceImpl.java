@@ -6,6 +6,7 @@ import com.shineidle.tripf.comment.entity.Comment;
 import com.shineidle.tripf.comment.repository.CommentRepository;
 import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.CommentErrorCode;
+import com.shineidle.tripf.common.exception.type.LockErrorCode;
 import com.shineidle.tripf.common.message.constants.NotificationMessage;
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.common.message.enums.PostMessage;
@@ -16,9 +17,12 @@ import com.shineidle.tripf.notification.service.NotificationService;
 import com.shineidle.tripf.notification.type.NotifyType;
 import com.shineidle.tripf.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,11 +32,12 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final FeedService feedService;
     private final NotificationService notificationService;
+    private final RedissonClient redissonClient;
 
     /**
      * 댓글 작성
      *
-     * @param feedId 피드 식별자
+     * @param feedId            피드 식별자
      * @param commentRequestDto {@link CommentRequestDto} 댓글 요청 Dto
      * @return {@link CommentResponseDto} 댓글 응답 Dto
      */
@@ -41,22 +46,39 @@ public class CommentServiceImpl implements CommentService {
         User user = UserAuthorizationUtil.getLoginUser();
         Feed feed = checkFeed(feedId);
 
-        Comment comment = new Comment(
-                feed,
-                user,
-                commentRequestDto.getComment()
-        );
-        Comment savecomment = commentRepository.save(comment);
+        String lockKey = "createFeed:lock:user:" + user.getId();
+        RLock lock = redissonClient.getLock(lockKey);
 
-        createCommentNotification(feed.getUser(), user, feedId);
+        try {
+            if (lock.tryLock(10, 30, TimeUnit.SECONDS)) {
+                Comment comment = new Comment(
+                        feed,
+                        user,
+                        commentRequestDto.getComment()
+                );
+                Comment savecomment = commentRepository.save(comment);
 
-        return CommentResponseDto.toDto(savecomment);
+                createCommentNotification(feed.getUser(), user, feedId);
+
+                return CommentResponseDto.toDto(savecomment);
+            } else {
+                throw new GlobalException(LockErrorCode.LOCK_ACQUISITION_FAILED);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new GlobalException(LockErrorCode.LOCK_INTERRUPTED);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
     }
 
     /**
      * 댓글 수정
-     * @param feedId 피드 식별자
-     * @param commentId 댓글 식별자
+     *
+     * @param feedId            피드 식별자
+     * @param commentId         댓글 식별자
      * @param commentRequestDto {@link CommentRequestDto} 댓글 요청 Dto
      * @return {@link CommentResponseDto} 댓글 응답 Dto
      */
@@ -91,7 +113,7 @@ public class CommentServiceImpl implements CommentService {
     /**
      * 댓글 삭제
      *
-     * @param feedId 피드 식별자
+     * @param feedId    피드 식별자
      * @param commentId 댓글 식별자
      * @return {@link PostMessageResponseDto} 댓글 삭제 문구
      */
@@ -150,7 +172,7 @@ public class CommentServiceImpl implements CommentService {
      * 댓글을 달 경우 알림 발생
      *
      * @param targetUser 알림 수신자 (알림 조회자)
-     * @param actor 알림 발생자
+     * @param actor      알림 발생자
      */
     private void createCommentNotification(User targetUser, User actor, Long feedId) {
         String context = String.format(NotificationMessage.NEW_COMMENT_NOTIFICATION, actor.getName());
