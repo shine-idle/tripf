@@ -77,7 +77,5 @@ public interface FeedService {
      */
     Page<MyFeedResponseDto> findMyFeeds(Pageable pageable);
 
-    List<String> findAllCountries();
-
     HomeResponseDto findPublicHomeData();
 }

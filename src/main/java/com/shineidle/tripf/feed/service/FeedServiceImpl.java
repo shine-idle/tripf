@@ -19,6 +19,7 @@ import com.shineidle.tripf.follow.service.FollowService;
 import com.shineidle.tripf.geo.service.GeoService;
 import com.shineidle.tripf.notification.service.NotificationService;
 import com.shineidle.tripf.notification.type.NotifyType;
+import com.shineidle.tripf.photo.dto.PhotoResponseDto;
 import com.shineidle.tripf.user.entity.User;
 import com.shineidle.tripf.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -173,21 +174,23 @@ public class FeedServiceImpl implements FeedService {
                 .map(days -> {
                     List<ActivityResponseDto> activityResponseDto = activityRepository.findByDays(days)
                             .stream()
-                            .map(activity -> new ActivityResponseDto(
-                                    activity.getId(),
-                                    activity.getTitle(),
-                                    activity.getStar(),
-                                    activity.getMemo(),
-                                    activity.getCity(),
-                                    activity.getLatitude(),
-                                    activity.getLongitude()
-                            )).toList();
+                            .map(activity -> {
+                                List<PhotoResponseDto> photoDtos = activity.getActivityPhotos().stream()
+                                        .map(activityPhoto -> PhotoResponseDto.toDto(activityPhoto.getPhoto()))
+                                        .toList();
+
+                                String representativePhotoUrl = activity.getRepresentativePhotoUrl();
+
+                                return ActivityResponseDto.toDto(activity, photoDtos, representativePhotoUrl);
+                            }).toList();
+
                     return new DaysResponseDto(
                             days.getId(),
                             days.getDate(),
                             activityResponseDto
                     );
                 }).toList();
+
         return FeedResponseDto.toDto(feed, daysResponseDto);
     }
 
@@ -352,21 +355,29 @@ public class FeedServiceImpl implements FeedService {
         List<Feed> feeds = feedRepository.findByCountryAndDeletedAtIsNull(country);
 
         return feeds.stream()
-                .map(RegionResponseDto::toDto)
+                .map(feed -> {
+                    String representativePhotoUrl = getRepresentativePhotoUrl(feed.getId());
+                    return RegionResponseDto.toDto(feed, representativePhotoUrl);
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
     public HomeResponseDto findHomeData() {
-
         List<RegionResponseDto> korea = feedRepository.findByCountry("대한민국")
                 .stream()
-                .map(RegionResponseDto::toDto)
+                .map(feed -> {
+                    String representativePhotoUrl = getRepresentativePhotoUrl(feed.getId());
+                    return RegionResponseDto.toDto(feed, representativePhotoUrl);
+                })
                 .toList();
 
         List<RegionResponseDto> global = feedRepository.findByCountryNot("대한민국")
                 .stream()
-                .map(RegionResponseDto::toDto)
+                .map(feed -> {
+                    String representativePhotoUrl = getRepresentativePhotoUrl(feed.getId());
+                    return RegionResponseDto.toDto(feed, representativePhotoUrl);
+                })
                 .toList();
 
         List<FollowResponseDto> followers = followService.findFollowers();
@@ -382,7 +393,10 @@ public class FeedServiceImpl implements FeedService {
 
         // 본인 피드 조회
         return feedRepository.findByUserIdAndDeletedAtIsNull(loginUser.getId(), pageable)
-                .map(MyFeedResponseDto::toDto);
+                .map(feed -> {
+                    String representativePhotoUrl = getRepresentativePhotoUrl(feed.getId());
+                    return MyFeedResponseDto.toDto(feed, representativePhotoUrl);
+                });
     }
 
     /**
@@ -394,20 +408,21 @@ public class FeedServiceImpl implements FeedService {
 
         List<RegionResponseDto> korea = feedRepository.findByCountry("대한민국")
                 .stream()
-                .map(RegionResponseDto::toDto)
+                .map(feed -> {
+                    String representativePhotoUrl = getRepresentativePhotoUrl(feed.getId());
+                    return RegionResponseDto.toDto(feed, representativePhotoUrl);
+                })
                 .toList();
 
         List<RegionResponseDto> global = feedRepository.findByCountryNot("대한민국")
                 .stream()
-                .map(RegionResponseDto::toDto)
+                .map(feed -> {
+                    String representativePhotoUrl = getRepresentativePhotoUrl(feed.getId());
+                    return RegionResponseDto.toDto(feed, representativePhotoUrl);
+                })
                 .toList();
 
         return new HomeResponseDto(korea, global, List.of(), List.of());
-    }
-
-    @Override
-    public List<String> findAllCountries() {
-        return feedRepository.findDistinctCountries();
     }
 
 
@@ -485,5 +500,18 @@ public class FeedServiceImpl implements FeedService {
             String context = String.format(NotificationMessage.FOLLOW_FEED_NOTIFICATION, actor.getName());
             notificationService.createNotification(targetUser, actor, NotifyType.NEW_FEED, context, feedId);
         }
+    }
+
+    public String getRepresentativePhotoUrl(Long feedId) {
+        // Feed에 속한 Days 리스트 조회
+        List<Days> daysList = daysRepository.findByFeedId(feedId);
+
+        // Days에 속한 Activity 리스트 조회 및 대표 사진 URL 추출
+        return daysList.stream()
+                .flatMap(day -> activityRepository.findByDays(day).stream()) // Activity 조회
+                .flatMap(activity -> activity.getActivityPhotos().stream()) // ActivityPhoto 조회
+                .map(activityPhoto -> activityPhoto.getPhoto().getUrl()) // URL 추출
+                .findFirst()
+                .orElse(null); // 대표 사진이 없으면 null 반환
     }
 }

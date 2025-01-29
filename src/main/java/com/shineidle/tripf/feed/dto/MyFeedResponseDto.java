@@ -25,8 +25,10 @@ public class MyFeedResponseDto {
 
     private final LocalDateTime endedAt;
 
-    public static MyFeedResponseDto toDto(Feed feed) {
-        return new MyFeedResponseDto (
+    private final String representativePhotoUrl;
+
+    public static MyFeedResponseDto toDto(Feed feed, String representativePhotoUrl) {
+        return new MyFeedResponseDto(
                 feed.getId(),
                 feed.getUser().getName(),
                 feed.getCountry(),
@@ -34,7 +36,8 @@ public class MyFeedResponseDto {
                 feed.getTitle(),
                 feed.getContent(),
                 feed.getStartedAt(),
-                feed.getEndedAt()
+                feed.getEndedAt(),
+                representativePhotoUrl
         );
     }
 }

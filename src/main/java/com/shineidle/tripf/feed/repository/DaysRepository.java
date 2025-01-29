@@ -23,6 +23,14 @@ public interface DaysRepository extends JpaRepository<Days, Long> {
     List<Days> findByFeed(Feed feed);
 
     /**
+     * 피드 Id를 기준으로 Days 리스트 반환
+     *
+     * @param feedId 피드 식별자
+     * @return findByFeedId
+     */
+    List<Days> findByFeedId(Long feedId);
+
+    /**
      * 일정이 피드에 속하는지 확인
      *
      * @param daysId 일정 식별자

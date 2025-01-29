@@ -296,7 +296,7 @@ public class FeedViewController {
      * @param model 모델 객체
      * @return 본인 피드 리스트 뷰 이름
      */
-    @GetMapping("/my")
+    @GetMapping("/myFeed")
     public String getMyFeeds(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
