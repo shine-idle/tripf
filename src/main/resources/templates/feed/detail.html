@@ -154,6 +154,33 @@
             background-color: #28a745;
             color: white;
         }
+
+        .comments-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #comment-input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .comment-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .comment-item strong {
+            display: block;
+            font-size: 1.1em;
+            color: #333;
+        }
     </style>
     <title>피드 상세</title>
     <script>
@@ -212,6 +239,36 @@
                 map.setZoom(14);
             }
         }
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const feedId = /*[[${feed.id}]]*/ 0;
+            const commentList = document.getElementById("comment-list");
+            const commentInput = document.getElementById("comment-input");
+            const submitButton = document.getElementById("submit-comment");
+
+            submitButton.addEventListener("click", function () {
+                const commentText = commentInput.value.trim();
+                if (!commentText) return alert("댓글을 입력하세요!");
+
+                fetch(`/api/feeds/${feedId}/comments`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ comment: commentText }),
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload(); // 댓글 작성 후 새로고침하여 Thymeleaf로 다시 렌더링
+                        } else {
+                            alert("댓글 작성 실패");
+                        }
+                    });
+            });
+
+            fetchComments();
+        });
     </script>
     <script async defer
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNmfyHy0CtN4g9BNoKFWAqLOFXHVnKUWE&callback=initMap"></script>
@@ -249,6 +306,20 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="comments-section">
+            <h2>댓글</h2>
+            <div id="comment-list">
+                <!-- 타임리프를 이용해 댓글 리스트를 서버에서 렌더링 -->
+                <div th:each="comment : ${comments}" class="comment-item">
+                    <strong th:text="${comment.name}">사용자 이름</strong>
+                    <span th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">작성 시간</span>
+                    <p th:text="${comment.comment}">댓글 내용</p>
+                </div>
+                <p th:if="${#lists.isEmpty(comments)}">댓글이 없습니다.</p>
+            </div>
+            <label for="comment-input"></label><textarea id="comment-input" placeholder="댓글을 입력하세요..."></textarea>
+            <button id="submit-comment" class="button add-button">댓글 작성</button>
         </div>
     </div>
     <div class="map-container">
