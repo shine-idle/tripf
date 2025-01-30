@@ -459,12 +459,18 @@
         event.preventDefault();
         const form = document.getElementById('createForm');
         const formData = new FormData(form);
+        const jsonData = Object.fromEntries(formData);
 
         try {
-            const response = await fetch('/feeds', { method: 'POST', body: formData });
+            const response = await fetch('/feeds', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/JSON' },
+                body: JSON.stringify(jsonData)
+            });
 
             if (!response.ok) {
                 const errorData = await response.json();
+                console.error('Error Response:', errorData);  // 디버깅 추가
                 document.getElementById('error-message').innerText = errorData.message;
                 return;
             }
@@ -473,6 +479,7 @@
             window.location.href = '/feeds';
 
         } catch (error) {
+            console.error('Fetch Error:', error);  // 디버깅 추가
             alert('네트워크 오류가 발생했습니다.');
         }
     }

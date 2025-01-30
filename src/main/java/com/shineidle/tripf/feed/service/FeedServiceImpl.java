@@ -6,6 +6,7 @@ import com.shineidle.tripf.common.exception.type.LockErrorCode;
 import com.shineidle.tripf.common.message.constants.NotificationMessage;
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.common.message.enums.PostMessage;
+import com.shineidle.tripf.common.util.JwtProvider;
 import com.shineidle.tripf.common.util.UserAuthorizationUtil;
 import com.shineidle.tripf.feed.dto.*;
 import com.shineidle.tripf.feed.entity.Activity;
@@ -27,6 +28,8 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +50,7 @@ public class FeedServiceImpl implements FeedService {
     private final UserService userService;
     private final NotificationService notificationService;
     private final RedissonClient redissonClient;
+    private final JwtProvider jwtProvider;
 
     /**
      * 피드 생성
@@ -57,7 +61,10 @@ public class FeedServiceImpl implements FeedService {
      */
     @Override
     @Transactional
-    public FeedResponseDto createFeed(FeedRequestDto feedRequestDto) {
+    public FeedResponseDto createFeed(FeedRequestDto feedRequestDto, String token) {
+        Authentication authentication = jwtProvider.getAuthentication(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication); // 인증 객체 설정
+
         User userId = UserAuthorizationUtil.getLoginUser();
 
         String lockKey = "createFeed:lock:user:" + userId.getId();

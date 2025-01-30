@@ -67,7 +67,7 @@ public class HomeViewController {
             HomeResponseDto homeResponseDto = feedService.findHomeData();
             model.addAttribute("username", authentication.getName());
             model.addAttribute("homeData", homeResponseDto);
-            return "/home/home-logged-in"; // 로그인된 사용자용 뷰
+            return "/home/home-guest"; // 로그인된 사용자용 뷰
         }
 
         HomeResponseDto publicHomeResponseDto = feedService.findPublicHomeData();
