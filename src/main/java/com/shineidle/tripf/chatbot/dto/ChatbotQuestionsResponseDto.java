@@ -4,21 +4,17 @@ import com.shineidle.tripf.chatbot.entity.Chatbot;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @RequiredArgsConstructor
 public class ChatbotQuestionsResponseDto {
 
-    private String question;
+    private String category;
+    private List<String> question;
 
-    public ChatbotQuestionsResponseDto(String question) {
-        System.out.println("Creating DTO with question: " + question);
+    public ChatbotQuestionsResponseDto(String category, List<String> question) {
+        this.category = category;
         this.question = question;
-    }
-
-    @Override
-    public String toString() {
-        return "ChatbotQuestionsResponseDto{" +
-                "question='" + question + '\'' +
-                '}';
     }
 }

@@ -15,6 +15,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import opennlp.tools.doccat.DoccatModel;
 import opennlp.tools.doccat.DocumentCategorizerME;
 import org.apache.lucene.analysis.Analyzer;
@@ -32,24 +33,23 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ChatbotServiceImpl implements ChatbotService {
 
     private final RedissonClient redissonClient;
     private final RedisService redisService;
-    private final RedisTemplate<String, Object> redisTemplate;
     private DocumentCategorizerME categorizer;  // NLP 모델을 통한 분류기
     private final ChatbotRepository chatbotRepository;
-
-//    @PersistenceContext
-//    private final EntityManager entityManager;
 
     // 애플리케이션 시작 시 NLP 모델 초기화
     @PostConstruct
@@ -59,14 +59,14 @@ public class ChatbotServiceImpl implements ChatbotService {
                throw new IllegalStateException("NLP 모델 파일을 찾을 수 없습니다: /models/doccat.bin");
            }
             DoccatModel model = new DoccatModel(modelIn);
+            log.info("Model loaded successfully.");
+
             categorizer = new DocumentCategorizerME(model);
         }
     }
 
     // 사용자 질문 입력 및 챗봇 답변 생성
     @Override
-//    @Transactional(isolation = Isolation.SERIALIZABLE)
-    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
     public ChatbotResponseDto createChatbotResponse(ChatbotRequestDto chatbotRequestDto) {
 
         User userId = UserAuthorizationUtil.getLoginUser();
@@ -79,17 +79,40 @@ public class ChatbotServiceImpl implements ChatbotService {
 
                 // 질문 분석 및 분류
                 String[] tokens = tokenizeKorean(chatbotRequestDto.getQuestion());
+                log.info("Tokens: " + Arrays.toString(tokens));   // 토큰화된 질문 출력
+
                 double[] outcomes = categorizer.categorize(tokens);
+                log.info("Outcomes: " + Arrays.toString(outcomes));   // 분류 결과 출력
+
                 String category = categorizer.getBestCategory(outcomes);
+                log.info("Categorized Question: " + category);    // 분류된 카테고리 출력 (디버그용)
+
+                double maxScore = Arrays.stream(outcomes).max().orElse(0.0);
+                log.info("Max Score: " + maxScore); // 최대 확률 값 출력
+
+                // 신뢰도 낮으면 UNKNOWN 처리
+                boolean isUnknown = maxScore < 0.5;
+                if (isUnknown) {
+                    category = "UNKNOWN";
+                }
 
                 // Redis에서 해당 카테고리의 답변 조회
                 String answer = redisService.getAnswer(category);
+                if (answer == null) {
+                    answer = "알아듣지 못했어요.";
+                }
+                log.info("Answer from Redis: " + answer);  // 답변 확인용 로그
+
+                // 응답 상태 결정
+                ResponseStatus responseStatus = isUnknown || "알아듣지 못했어요.".equals(answer)
+                        ? ResponseStatus.FAILURE
+                        : ResponseStatus.SUCCESS;
 
                 // 대화 기록 저장
                 Chatbot log = new Chatbot(
                         chatbotRequestDto.getQuestion(),
-                        answer != null ? answer : "알아듣지 못했어요.",
-                        answer != null ? ResponseStatus.SUCCESS : ResponseStatus.FAILURE,
+                        answer,
+                        responseStatus,
                         LocalDateTime.now(),
                         userId
                 );
@@ -117,42 +140,27 @@ public class ChatbotServiceImpl implements ChatbotService {
     @Override
     public List<ChatbotQuestionsResponseDto> findAllChatbotQuestion() {
 
-        checkRedisData();
+        String lockKey = "chatbot:lock:questions";
+        RLock lock = redissonClient.getLock(lockKey);
 
-        List<String> allQuestions = redisService.getAllQuestions();
+        try {
+            if (lock.tryLock(10, 30, TimeUnit.SECONDS)) {
 
-        // 타입을 확인하는 로그 추가
-        System.out.println("All Questions from Redis: " + allQuestions);
-        for (Object question : allQuestions) {
-            System.out.println("Question Type: " + question.getClass().getName());  // 타입 출력
-        }
-        return allQuestions.stream()
-                .map(question -> new ChatbotQuestionsResponseDto(question))
-                .collect(Collectors.toList());
+                // Redis에서 모든 질문 조회
+                Map<String, List<String>> allQuestions = redisService.getAllQuestions();
 
-//        return allQuestions.stream()
-//                .filter(question -> question instanceof String)
-//                .map(question -> new ChatbotQuestionsResponseDto((String) question))
-//                .collect(Collectors.toList());
-
-//        return allQuestions.stream()
-//                .filter(question -> question instanceof String)
-//                .map(question -> {
-//                    try {
-//                        return new ChatbotQuestionsResponseDto((String) question);
-//                    } catch (ClassCastException e) {
-//                        return null;
-//                    }
-//                })
-//                .filter(Objects::nonNull)
-//                .collect(Collectors.toList());
-    }
-
-    public void checkRedisData() {
-        Set<String> keys = redisTemplate.keys("*:questions");
-        if (keys != null) {
-            for (String key : keys) {
-                System.out.println("Key: " + key + ", Data: " + redisTemplate.opsForList().range(key, 0, -1));
+                return allQuestions.entrySet().stream()
+                        .map(entry -> new ChatbotQuestionsResponseDto(entry.getKey(), entry.getValue()))
+                        .collect(Collectors.toList());
+            } else {
+                throw new GlobalException(LockErrorCode.LOCK_ACQUISITION_FAILED);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new GlobalException(LockErrorCode.LOCK_INTERRUPTED);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
             }
         }
     }
@@ -173,9 +181,4 @@ public class ChatbotServiceImpl implements ChatbotService {
         }
         return tokens.toArray(new String[0]);
     }
-
-    // 사용자 검증
-    public User getAuthenticatedUser() {
-        Long userId = UserAuthorizationUtil.getLoginUserId();
-        return userId != null ? new User(userId) : null;
-    }}
+}

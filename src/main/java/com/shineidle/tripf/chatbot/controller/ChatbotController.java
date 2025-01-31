@@ -40,7 +40,6 @@ public class ChatbotController {
     public ResponseEntity<List<ChatbotQuestionsResponseDto>> findAllChatbotQuestion() {
 
         List<ChatbotQuestionsResponseDto> responseDtos = chatbotService.findAllChatbotQuestion();
-        System.out.println("Response DTOs in Controller: " + responseDtos);
         return new ResponseEntity<>(responseDtos, HttpStatus.OK);
     }
 }
