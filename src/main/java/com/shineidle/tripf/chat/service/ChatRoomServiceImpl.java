@@ -4,12 +4,15 @@ import com.shineidle.tripf.chat.dto.ChatRoomRequestDto;
 import com.shineidle.tripf.chat.dto.ChatRoomResponseDto;
 import com.shineidle.tripf.chat.entity.ChatRoom;
 import com.shineidle.tripf.chat.repository.ChatRoomRepository;
+import com.shineidle.tripf.common.exception.GlobalException;
+import com.shineidle.tripf.common.exception.type.ChatErrorCode;
 import com.shineidle.tripf.common.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,14 +38,32 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public ChatRoomResponseDto getRoom(String roomId) {
+    public ChatRoomResponseDto findRoom(String roomId) {
         ChatRoom room = (ChatRoom) redisUtils.getFromRedis("chatRoom:" + roomId);
 
         if (room == null) {
-            room = chatRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다."));
+            room = chatRoomRepository.findById(roomId).orElseThrow(() -> new GlobalException(ChatErrorCode.CHATROOM_NOT_FOUND));
             redisUtils.saveToRedis("chatRoom:" + roomId, room, Duration.ofHours(1));
         }
 
         return new ChatRoomResponseDto(room.getId(), room.getName(), room.getUsers());
+    }
+
+    @Override
+    public List<ChatRoomResponseDto> findRooms() {
+        List<ChatRoom> all = chatRoomRepository.findAll();
+        return all.stream().
+                map(chatRoom -> new ChatRoomResponseDto(
+                        chatRoom.getId(),
+                        chatRoom.getName(),
+                        chatRoom.getUsers()
+                ))
+                .toList();
+    }
+
+    @Override
+    public void deleteRoom(String roomId) {
+        ChatRoom room = chatRoomRepository.findById(roomId).orElseThrow(() -> new GlobalException(ChatErrorCode.CHATROOM_NOT_FOUND));
+        chatRoomRepository.delete(room);
     }
 }

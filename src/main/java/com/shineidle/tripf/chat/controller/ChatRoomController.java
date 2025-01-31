@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/chat-room")
 @RequiredArgsConstructor
@@ -21,10 +23,23 @@ public class ChatRoomController {
         return new ResponseEntity<>(chatRoomService.createOrGetRoom(chatRoomRequestDto), HttpStatus.OK);
     }
 
+    @GetMapping
+    public ResponseEntity<List<ChatRoomResponseDto>> findChatRooms() {
+        return new ResponseEntity<>(chatRoomService.findRooms(), HttpStatus.OK);
+    }
+
     @GetMapping("/{roomId}")
-    public ResponseEntity<ChatRoomResponseDto> getChatRoom(
+    public ResponseEntity<ChatRoomResponseDto> findChatRoom(
             @PathVariable String roomId
     ) {
-        return new ResponseEntity<>(chatRoomService.getRoom(roomId), HttpStatus.OK);
+        return new ResponseEntity<>(chatRoomService.findRoom(roomId), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{roomId}")
+    public ResponseEntity<Void> deleteChatRoom(
+            @PathVariable String roomId
+    ) {
+        chatRoomService.deleteRoom(roomId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
