@@ -2,6 +2,7 @@ package com.shineidle.tripf.chat.service;
 
 import com.shineidle.tripf.chat.dto.ChatRoomRequestDto;
 import com.shineidle.tripf.chat.dto.ChatRoomResponseDto;
+import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 
 import java.util.List;
 
@@ -12,5 +13,5 @@ public interface ChatRoomService {
 
     List<ChatRoomResponseDto> findRooms();
 
-    void deleteRoom(String roomId);
+    PostMessageResponseDto deleteRoom(String roomId);
 }

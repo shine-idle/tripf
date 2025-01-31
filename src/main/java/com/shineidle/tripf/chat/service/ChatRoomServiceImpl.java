@@ -6,6 +6,8 @@ import com.shineidle.tripf.chat.entity.ChatRoom;
 import com.shineidle.tripf.chat.repository.ChatRoomRepository;
 import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.ChatErrorCode;
+import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
+import com.shineidle.tripf.common.message.enums.PostMessage;
 import com.shineidle.tripf.common.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -62,8 +64,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public void deleteRoom(String roomId) {
+    public PostMessageResponseDto deleteRoom(String roomId) {
         ChatRoom room = chatRoomRepository.findById(roomId).orElseThrow(() -> new GlobalException(ChatErrorCode.CHATROOM_NOT_FOUND));
         chatRoomRepository.delete(room);
+        return new PostMessageResponseDto(PostMessage.CHATROOM_DELETED);
     }
 }

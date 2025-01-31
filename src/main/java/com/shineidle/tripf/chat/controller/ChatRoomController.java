@@ -3,6 +3,7 @@ package com.shineidle.tripf.chat.controller;
 import com.shineidle.tripf.chat.dto.ChatRoomRequestDto;
 import com.shineidle.tripf.chat.dto.ChatRoomResponseDto;
 import com.shineidle.tripf.chat.service.ChatRoomService;
+import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,10 +37,9 @@ public class ChatRoomController {
     }
 
     @DeleteMapping("/{roomId}")
-    public ResponseEntity<Void> deleteChatRoom(
+    public ResponseEntity<PostMessageResponseDto> deleteChatRoom(
             @PathVariable String roomId
     ) {
-        chatRoomService.deleteRoom(roomId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(chatRoomService.deleteRoom(roomId), HttpStatus.OK);
     }
 }
