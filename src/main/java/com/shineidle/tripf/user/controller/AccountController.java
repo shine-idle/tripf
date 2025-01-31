@@ -48,9 +48,10 @@ public class AccountController {
     @Operation(summary = "로그인")
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDto> login(
-            @RequestBody UserRequestDto dto
+            @RequestBody UserRequestDto dto,
+            HttpServletResponse response
     ) {
-        return new ResponseEntity<>(userService.login(dto), HttpStatus.OK);
+        return new ResponseEntity<>(userService.login(dto, response), HttpStatus.OK);
     }
 
     /**
