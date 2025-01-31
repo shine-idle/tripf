@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<head>
+    <title>활동 추가</title>
+    <meta charset="UTF-8">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNmfyHy0CtN4g9BNoKFWAqLOFXHVnKUWE&callback=initMap&libraries=places"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+        }
+
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .star-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .map-container {
+            position: sticky;
+            top: 20px;
+            height: calc(100vh - 40px);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .location-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+<div class="container">
+    <div class="form-container">
+        <h1>활동 추가</h1>
+        <form th:action="@{/feeds/{feedId}/days/{daysId}/activities(feedId=${feedId},daysId=${daysId})}"
+              method="post"
+              id="activityForm">
+            <div class="form-group">
+                <label for="title">제목</label>
+                <input type="text" id="title" name="title" required maxlength="20">
+            </div>
+
+            <div class="form-group">
+                <label for="star">별점</label>
+                <div class="star-input">
+                    <input type="number" id="star" name="star" min="1" max="5" required>
+                    <span>(1-5점)</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="memo">메모</label>
+                <textarea id="memo" name="memo"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="citySearch">도시 검색</label>
+                <input type="text" id="citySearch" placeholder="도시를 검색하세요">
+                <div class="location-info" id="locationInfo"></div>
+
+                <!-- 실제 form 제출에 사용될 hidden 필드들 -->
+                <input type="hidden" id="city" name="city" required>
+                <input type="hidden" id="latitude" name="latitude" required>
+                <input type="hidden" id="longitude" name="longitude" required>
+            </div>
+
+            <button type="submit" class="button">활동 추가</button>
+        </form>
+    </div>
+
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
+</div>
+
+<script>
+    let map;
+    let marker;
+    let autocomplete;
+
+    function initMap() {
+        // 기본 중심 좌표 (서울)
+        const defaultCenter = { lat: 37.5665, lng: 126.9780 };
+
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 13,
+            center: defaultCenter,
+            mapTypeControl: false,
+            streetViewControl: false
+        });
+
+        // Places Autocomplete 설정
+        const input = document.getElementById('citySearch');
+        autocomplete = new google.maps.places.Autocomplete(input, {
+            types: ['(cities)']  // 도시만 검색되도록 제한
+        });
+
+        // 장소 선택 시 이벤트
+        autocomplete.addListener('place_changed', function() {
+            const place = autocomplete.getPlace();
+
+            if (!place.geometry) {
+                alert('선택된 도시의 정보를 찾을 수 없습니다.');
+                return;
+            }
+
+            // 지도 업데이트
+            map.setCenter(place.geometry.location);
+            map.setZoom(13);
+
+            // 마커 업데이트
+            if (marker) {
+                marker.setMap(null);
+            }
+            marker = new google.maps.Marker({
+                map: map,
+                position: place.geometry.location
+            });
+
+            // hidden 필드 업데이트
+            document.getElementById('city').value = place.name;
+            document.getElementById('latitude').value = place.geometry.location.lat();
+            document.getElementById('longitude').value = place.geometry.location.lng();
+
+            // 위치 정보 표시
+            const locationInfo = document.getElementById('locationInfo');
+            locationInfo.style.display = 'block';
+            locationInfo.innerHTML = `
+                    <strong>선택된 도시:</strong> ${place.name}<br>
+                    <strong>위도:</strong> ${place.geometry.location.lat().toFixed(6)}<br>
+                    <strong>경도:</strong> ${place.geometry.location.lng().toFixed(6)}
+                `;
+        });
+    }
+
+    // 폼 제출 전 유효성 검사
+    document.getElementById('activityForm').onsubmit = function(e) {
+        if (!document.getElementById('city').value) {
+            e.preventDefault();
+            alert('도시를 선택해주세요.');
+            return false;
+        }
+        return true;
+    };
+
+    window.onload = initMap;
+</script>
+</div>
+</body>
+</html>

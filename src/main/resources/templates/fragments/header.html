@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<div th:fragment="headerFragment" class="header">
+    <style>
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #0044cc;
+            min-width: 150px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: #fff;
+            padding: 10px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+        }
+        .dropdown-content a:hover {
+            background-color: #ff9900;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #0044cc;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .header h1 a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 24px;
+        }
+        .header nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 15px;
+        }
+        .header nav ul li {
+            display: inline;
+        }
+        .header nav ul li a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+        .header nav ul li a:hover {
+            color: #ffcc00;
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .search-container input {
+            padding: 5px;
+            font-size: 14px;
+            border: none;
+            border-radius: 3px;
+        }
+        .search-container button {
+            padding: 5px 10px;
+            border: none;
+            background-color: #ffcc00;
+            color: #0044cc;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        .search-container button:hover {
+            background-color: #ff9900;
+        }
+        .notification, .create-feed, .account-logo {
+            margin-left: 15px;
+        }
+        .notification a, .create-feed a, .account-logo a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+        .notification a:hover, .create-feed a:hover, .account-logo a:hover {
+            color: #ffcc00;
+        }
+
+        /* 📌 알림 컨테이너 스타일 */
+        .notification-dropdown {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .notification-dropdown a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .notification-dropdown a:hover {
+            color: #ffcc00;
+        }
+
+        /* 📌 알림 목록 (드롭다운) */
+        .notification-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 30px;
+            background-color: #ffffff;
+            min-width: 280px;
+            max-height: 300px;
+            overflow-y: auto; /* 스크롤 가능 */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            z-index: 1000;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        /* 📌 알림 항목 스타일 */
+        .notification-item {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+            color: #333;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+
+        /* 📌 마지막 항목은 보더 제거 */
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        /* 📌 알림 항목 hover 효과 */
+        .notification-item:hover {
+            background-color: #f7f7f7;
+        }
+
+        /* 📌 새로운 알림 강조 */
+        .notification-item.unread {
+            font-weight: bold;
+            background-color: #eef5ff; /* 밝은 파란색 */
+        }
+
+        /* 📌 알림 메시지 스타일 */
+        .notification-item p {
+            margin: 5px 0;
+            color: #444;
+        }
+
+        /* 📌 알림 날짜 스타일 */
+        .notification-item .notification-date {
+            font-size: 12px;
+            color: #888;
+        }
+
+        /* 📌 관련 피드 보기 링크 */
+        .notification-item a {
+            display: inline-block;
+            margin-top: 5px;
+            color: #0044cc;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .notification-item a:hover {
+            text-decoration: underline;
+        }
+
+        /* 📌 로그인 필요 메시지 */
+        .notification-content p {
+            text-align: center;
+            color: #555;
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        /* 📌 반응형 (모바일) */
+        @media (max-width: 600px) {
+            .notification-content {
+                width: 100%;
+                left: 0;
+                right: auto;
+                min-width: unset;
+            }
+        }
+
+    </style>
+    <h1><a href="/home">TripF</a></h1>
+    <nav>
+        <ul>
+            <li><a href="/products/goods">Goods</a></li>
+            <li><a href="/feeds/countries">Countries</a></li>
+            <li><a href="/products/tours">Tours</a></li>
+        </ul>
+    </nav>
+    <div class="search-container">
+        <input type="text" placeholder="Search..." />
+        <button type="button">검색</button>
+    </div>
+    <div class="notification dropdown notification-dropdown">
+        <a>알림</a>
+        <div class="dropdown-content">
+            <th:block th:if="${loginRequired}">
+                <p>로그인이 필요합니다.</p>
+            </th:block>
+
+            <th:block th:unless="${loginRequired}">
+                <th:block th:if="${notifications != null and notifications.size() > 0}">
+                    <th:block th:each="notification : ${notifications}">
+                        <div class="notification-item" th:classappend="${notification.notifyType == 'NEW' ? 'unread' : ''}">
+                            <p><strong th:text="${notification.actorName}"></strong>님이 <span th:text="${notification.notifyContext}"></span>하셨습니다.</p>
+                            <p class="notification-date" th:text="${#temporals.format(notification.createAt, 'yyyy-MM-dd HH:mm:ss')}"></p>
+                            <a th:href="@{/feeds/{feedId}(feedId=${notification.feedId})}">관련 피드 보기</a>
+                        </div>
+                    </th:block>
+                </th:block>
+                <th:block th:if="${notifications == null or notifications.size() == 0}">
+                    <p>새로운 알림이 없습니다.</p>
+                </th:block>
+            </th:block>
+        </div>
+    </div>
+
+
+    <div class="create-feed">
+        <a href="/feeds/create">피드 작성</a>
+    </div>
+    <div class="account-logo dropdown">
+        <a>Account</a>
+        <div class="dropdown-content">
+            <a href="/login">로그인</a>
+            <a href="/mypage">마이페이지</a>
+            <a href="/feeds/myFeed">나의여행</a>
+            <a href="/logout">로그아웃</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title th:text="${title}">기본 제목</title>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* 공통 스타일 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="header">
+        <th:block th:replace="fragments/header.html"></th:block>
+    </div>
+
+    <div layout:fragment="content">
+        <!-- 페이지 내용이 여기에 들어갑니다. -->
+    </div>
+
+    <div layout:fragment="footer">
+        <th:block th:replace="fragments/footer.html"></th:block>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<head>
+    <title>TripF - 여행 피드</title>
+    <meta charset="UTF-8">
+    <style>
+        .feed-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .feed-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .feed-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feed-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .feed-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .feed-content {
+            color: #666;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .feed-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            background: #fff;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <div class="main-content">
+        <!-- 국내 여행 섹션 -->
+        <section class="feed-section">
+            <h2 class="section-title">국내 여행</h2>
+            <th:block th:switch="${#lists.isEmpty(homeData.korea)}">
+                <div th:case="true" class="no-data-message">
+                    등록된 국내 여행 피드가 없습니다.
+                </div>
+                <div class="feed-grid">
+                    <a th:href="@{/feeds/{id}(id=${feed.id})}" class="feed-card" th:each="feed : ${homeData.korea}">
+                        <!-- 대표 이미지가 없을 경우 기본 이미지 설정 -->
+                        <img th:src="${feed.representativePhotoUrl != null && !feed.representativePhotoUrl.isEmpty()
+                     ? feed.representativePhotoUrl : '/images/default.jpg'}"
+                             alt="대표 사진" class="feed-image">
+                        <div class="feed-title" th:text="${feed.title}"></div>
+                        <div class="feed-content" th:text="${feed.content}"></div>
+                        <div class="feed-meta">
+                            <span th:text="${feed.city}"></span>
+                        </div>
+                    </a>
+                </div>
+            </th:block>
+        </section>
+
+        <!-- 해외 여행 섹션 -->
+        <section class="feed-section">
+            <h2 class="section-title">해외 여행</h2>
+            <th:block th:switch="${#lists.isEmpty(homeData.global)}">
+                <div th:case="true" class="no-data-message">
+                    등록된 해외 여행 피드가 없습니다.
+                </div>
+                <div class="feed-grid">
+                    <a th:href="@{/feeds/{id}(id=${feed.id})}" class="feed-card" th:each="feed : ${homeData.global}">
+                        <!-- 대표 이미지가 없을 경우 기본 이미지 설정 -->
+                        <img th:src="${feed.representativePhotoUrl != null && !feed.representativePhotoUrl.isEmpty()
+                     ? feed.representativePhotoUrl : '/images/default.jpg'}"
+                             alt="대표 사진" class="feed-image">
+                        <div class="feed-title" th:text="${feed.title}"></div>
+                        <div class="feed-content" th:text="${feed.content}"></div>
+                        <div class="feed-meta">
+                            <span th:text="${feed.city}"></span>
+                        </div>
+                    </a>
+                </div>
+            </th:block>
+        </section>
+    </div>
+</div>
+</body>
+</html>

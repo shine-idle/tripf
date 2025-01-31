@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 50:50 비율 */
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            height: 100vh;
+        }
+
+        .main-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow-y: auto; /* 스크롤 가능 */
+            position: relative; /* 버튼 위치 조정을 위한 상대 위치 설정 */
+        }
+
+        .feed-header {
+            margin-bottom: 30px;
+        }
+
+        .feed-meta {
+            color: #666;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .feed-meta p {
+            margin: 5px 0;
+        }
+
+        .days-list {
+            margin-top: 30px;
+        }
+
+        .day-item {
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .day-date {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .activity-item {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .activity-item:hover {
+            background: #f0f0f0;
+        }
+
+        .activity-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .star-rating {
+            color: #ffd700;
+            margin: 5px 0;
+        }
+
+        .activity-memo {
+            color: #666;
+            font-style: italic;
+            margin: 5px 0;
+        }
+
+        .activity-location {
+            color: #0066cc;
+            margin-top: 5px;
+        }
+
+        .map-container {
+            height: 100vh; /* 전체 화면 높이 */
+            width: 100%; /* 전체 너비 */
+        }
+
+        #map {
+            height: 100%; /* 부모 요소에 맞게 높이 설정 */
+            width: 100%; /* 부모 요소에 맞게 너비 설정 */
+        }
+
+        .action-buttons {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .list-button {
+            background-color: #6c757d;
+            color: white;
+            font-size: 0.8em;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+        }
+
+        .edit-button {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .delete-button {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .add-button {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .comments-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #comment-input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .comment-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .comment-item strong {
+            display: block;
+            font-size: 1.1em;
+            color: #333;
+        }
+    </style>
+    <title>피드 상세</title>
+    <script>
+        let map; // 지도 객체
+        let markers = []; // 마커 리스트
+
+        // 지도 초기화 함수
+        window.initMap = function () {
+            document.addEventListener("DOMContentLoaded", () => {
+                const mapElement = document.getElementById("map");
+                if (!mapElement) {
+                    console.error("Error: #map element not found.");
+                    return;
+                }
+
+                map = new google.maps.Map(mapElement, {
+                    zoom: 12,
+                    center: { lat: 37.5665, lng: 126.9780 }
+                });
+
+                // 마커 렌더링
+                renderMarkers();
+            });
+        };
+
+        // 마커 렌더링 함수
+        function renderMarkers() {
+            // 기존 마커 제거
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+
+            // activities 데이터를 기반으로 마커 추가
+            activities.forEach(activity => {
+                if (!activity || !activity.latitude || !activity.longitude) {
+                    console.warn("Invalid activity data:", activity); // 디버깅용
+                    return;
+                }
+
+                const marker = new google.maps.Marker({
+                    position: { lat: activity.latitude, lng: activity.longitude },
+                    map: map,
+                    title: activity.title,
+                });
+
+                const infowindow = new google.maps.InfoWindow({
+                    content: `<div><strong>${activity.title}</strong><br>${activity.memo || "메모 없음"}</div>`,
+                });
+
+                marker.addListener('click', () => infowindow.open(map, marker));
+                markers.push(marker);
+            });
+
+            // 첫 번째 활동의 좌표로 지도 중심 설정
+            if (activities.length > 0 && activities[0].latitude && activities[0].longitude) {
+                map.setCenter({ lat: activities[0].latitude, lng: activities[0].longitude });
+                map.setZoom(14);
+            }
+        }
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const feedId = /*[[${feed.id}]]*/ 0;
+            const commentList = document.getElementById("comment-list");
+            const commentInput = document.getElementById("comment-input");
+            const submitButton = document.getElementById("submit-comment");
+
+            submitButton.addEventListener("click", function () {
+                const commentText = commentInput.value.trim();
+                if (!commentText) return alert("댓글을 입력하세요!");
+
+                fetch(`/api/feeds/${feedId}/comments`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ comment: commentText }),
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload(); // 댓글 작성 후 새로고침하여 Thymeleaf로 다시 렌더링
+                        } else {
+                            alert("댓글 작성 실패");
+                        }
+                    });
+            });
+
+            fetchComments();
+        });
+    </script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNmfyHy0CtN4g9BNoKFWAqLOFXHVnKUWE&callback=initMap"></script>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <div class="main-content">
+        <h1 th:text="${feed.title}">피드 제목</h1>
+        <a th:href="@{/feeds}" class="button list-button">목록으로</a>
+        <div class="feed-header">
+            <div class="feed-meta">
+                <p>도시: <span th:text="${feed.city}"></span></p>
+                <p>여행 기간: <span th:text="${#temporals.format(feed.startedAt, 'yyyy-MM-dd')}"></span> ~
+                    <span th:text="${#temporals.format(feed.endedAt, 'yyyy-MM-dd')}"></span>
+                </p>
+                <p>비용: <span th:text="${#numbers.formatInteger(feed.cost, 0, 'COMMA') + '원'}"></span></p>
+                <p th:if="${feed.tag}">태그: <span th:text="${feed.tag}"></span></p>
+            </div>
+            <div class="feed-content" th:text="${feed.content}">피드 내용</div>
+        </div>
+        <div class="days-list">
+            <h2>일정</h2>
+            <div th:each="day : ${feed.days}" class="day-item">
+                <div class="day-date" th:text="${#temporals.format(day.date, 'yyyy년 MM월 dd일')}">날짜</div>
+                <div class="activities-list">
+                    <div th:each="activity : ${day.activity}"
+                         class="activity-item">
+                        <div class="activity-title" th:text="${activity.title}">활동 제목</div>
+                        <div class="star-rating">
+                            <span th:each="i : ${#numbers.sequence(1, activity.star)}">★</span>
+                            <span th:each="i : ${#numbers.sequence(activity.star + 1, 5)}">☆</span>
+                        </div>
+                        <div th:if="${activity.memo}" class="activity-memo" th:text="${activity.memo}">메모</div>
+                        <div class="activity-location" th:text="${activity.city}">도시</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="comments-section">
+            <h2>댓글</h2>
+            <div id="comment-list">
+                <!-- 타임리프를 이용해 댓글 리스트를 서버에서 렌더링 -->
+                <div th:each="comment : ${comments}" class="comment-item">
+                    <strong th:text="${comment.name}">사용자 이름</strong>
+                    <span th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">작성 시간</span>
+                    <p th:text="${comment.comment}">댓글 내용</p>
+                </div>
+                <p th:if="${#lists.isEmpty(comments)}">댓글이 없습니다.</p>
+            </div>
+            <label for="comment-input"></label><textarea id="comment-input" placeholder="댓글을 입력하세요..."></textarea>
+            <button id="submit-comment" class="button add-button">댓글 작성</button>
+        </div>
+    </div>
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
+</div>
+
+<!-- 데이터 주입 -->
+<script th:inline="javascript">
+    // Thymeleaf 데이터를 JSON으로 주입
+    console.log(/*[[${#jsonify(#lists.flatten(feed.days.?activity))}]]*/); // 데이터 확인
+    const activities = /*[[${#jsonify(#lists.flatten(feed.days.?activity))}]]*/ [];
+</script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+        .login-container h2 {
+            margin-bottom: 25px;
+            text-align: center;
+            color: #333;
+        }
+        .login-container input {
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .login-container button:hover {
+            background-color: #0056b3;
+        }
+        .oauth-table {
+            margin-top: 20px;
+        }
+        .oauth-table h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #555;
+        }
+        .oauth-table a {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            margin: 5px 0;
+            background-color: #e9ecef;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .oauth-table a:hover {
+            background-color: #d6d8db;
+        }
+        .signup-link-container {
+            margin-top: 20px;
+            display: flex; /* Flexbox 사용 */
+            flex-direction: column; /* 세로 방향으로 배치 */
+            align-items: center; /* 가로 축 가운데 정렬 */
+            justify-content: center; /* 세로 축 가운데 정렬 */
+            color: #555;
+            font-size: 14px;
+        }
+
+        .signup-link-container p {
+            margin-bottom: 10px; /* 문단 아래 여백 */
+            text-align: center; /* 텍스트 가운데 정렬 */
+        }
+
+        .signup-link {
+            display: inline-block; /* 인라인 블록 설정 */
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            text-align: center; /* 텍스트 정렬 */
+        }
+
+        .signup-link:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+<!-- 헤더 포함 -->
+<div layout:fragment="content">
+<div class="login-container">
+    <h2>로그인</h2>
+    <form th:action="@{/login}" method="post">
+        <input type="email" name="email" placeholder="이메일" required />
+        <input type="password" name="password" placeholder="비밀번호" required />
+        <button type="submit">로그인</button>
+    </form>
+
+    <div class="oauth-table">
+        <h2>소셜 로그인</h2>
+        <a href="/oauth2/authorization/naver">Naver</a>
+        <a href="/oauth2/authorization/kakao">Kakao</a>
+        <a href="/oauth2/authorization/google">Google</a>
+    </div>
+    <div class="signup-link-container">
+        <p>회원이 아니신가요?</p>
+        <a th:href="@{/signup}" class="signup-link">회원가입</a>
+    </div>
+</div>
+</div>
+</body>
+</html>
