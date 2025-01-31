@@ -9,14 +9,18 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 
 @Component
@@ -193,5 +197,20 @@ public class JwtProvider {
         } else {
             return null;
         }
+    }
+
+    public Authentication getAuthentication(String token) {
+        Claims claims = getClaims(token);
+
+        if (claims.getSubject() == null) {
+            throw new MalformedJwtException("Invalid token: no subject found");
+        }
+
+        String username = claims.getSubject();
+        String auth = claims.get("auth", String.class);
+
+        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(auth));
+
+        return new UsernamePasswordAuthenticationToken(username, null, authorities);
     }
 }

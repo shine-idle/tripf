@@ -1,111 +1,105 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f4f4f4;
-    }
-
-    header {
-        background-color: #4CAF50;
-        color: white;
-        padding: 1em 0;
-        text-align: center;
-        font-size: 1.5em;
-    }
-
-    h1 {
-        margin: 0;
-    }
-
-    main {
-        margin: 20px auto;
-        max-width: 1200px;
-        padding: 10px;
-    }
-
-    .feed-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        justify-content: center;
-    }
-
-    .feed-card {
-        background-color: white;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        width: 300px;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .feed-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .feed-card h2 {
-        color: #4CAF50;
-        margin-bottom: 10px;
-        font-size: 1.2em;
-    }
-
-    .feed-card p {
-        margin: 5px 0;
-        color: #555;
-        font-size: 0.95em;
-    }
-
-    .details-link {
-        display: inline-block;
-        margin-top: 10px;
-        text-decoration: none;
-        color: white;
-        background-color: #4CAF50;
-        padding: 8px 15px;
-        border-radius: 5px;
-        font-size: 0.9em;
-        transition: background-color 0.3s;
-    }
-
-    .details-link:hover {
-        background-color: #45a049;
-    }
-</style>
 <head>
     <meta charset="UTF-8">
     <title>Country Feeds</title>
+    <style>
+        .feed-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 카드 크기 자동 조절 */
+            gap: 15px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .feed-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+            max-width: 320px;
+        }
+
+        .feed-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feed-card img {
+            width: 100%;
+            height: 180px; /* 이미지 크기 고정 */
+            border-radius: 8px;
+            object-fit: cover; /* 비율 유지하면서 크기 조정 */
+            margin-bottom: 10px;
+        }
+
+        .feed-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .feed-content {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .feed-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 12px;
+            border-top: 1px solid #eee;
+            padding-top: 5px;
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            background: #fff;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
 <div layout:fragment="content">
-<main>
-    <section>
-        <div th:if="${#lists.isEmpty(feeds)}">
-            <p>해당 국가의 피드가 없습니다.</p>
-        </div>
-        <div th:if="${!#lists.isEmpty(feeds)}">
-        <div class="feed-container">
-            <div class="feed-card" th:each="feed : ${feeds}">
-                <h2 th:text="${feed.title}"></h2>
-                <p><strong>국가:</strong> <span th:text="${feed.country}"></span></p>
-                <p><strong>도시:</strong> <span th:text="${feed.city}"></span></p>
-                <p><strong>설명:</strong> <span th:text="${feed.content}"></span></p>
-                <p th:if="${feed.startedAt != null}">
-                    <strong>여행 기간:</strong>
-                    <span th:text="${#temporals.format(feed.startedAt, 'yyyy-MM-dd')}"></span> ~
-                    <span th:text="${#temporals.format(feed.endedAt, 'yyyy-MM-dd')}"></span>
-                </p>
-                <a th:href="@{/detail/{id}(id=${feed.id})}" class="details-link">View Details</a>
-            </div>
-        </div>
-        </div>
-    </section>
-</main>
+    <main>
+        <section>
+            <th:block th:switch="${#lists.isEmpty(feeds)}">
+                <div th:case="true" class="no-data-message">
+                    해당 국가의 피드가 없습니다.
+                </div>
+                <div class="feed-grid">
+                    <a th:href="@{/feeds/{id}(id=${feed.id})}" class="feed-card" th:each="feed : ${feeds}">
+                        <!-- 대표 이미지 표시 (없을 경우 기본 이미지) -->
+                        <img th:src="${not #strings.isEmpty(feed.representativePhotoUrl)
+                                 ? feed.representativePhotoUrl
+                                 : '/images/default.jpg'}"
+                             alt="피드 대표 이미지"
+                             class="feed-image">
+                        <div class="feed-title" th:text="${feed.title}"></div>
+                        <div class="feed-content" th:text="${feed.content}"></div>
+                        <div class="feed-meta">
+                            <span th:text="${feed.city}"></span>
+                        </div>
+                    </a>
+                </div>
+            </th:block>
+        </section>
+    </main>
 </div>
 </body>
 </html>

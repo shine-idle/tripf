@@ -75,4 +75,11 @@ public class Activity extends BaseEntity {
         this.latitude = latitude;
         this.longitude = longitude;
     }
+
+    public String getRepresentativePhotoUrl() {
+        return activityPhotos.stream()
+                .map(activityPhoto -> activityPhoto.getPhoto().getUrl())
+                .findFirst()
+                .orElse(null);
+    }
 }
