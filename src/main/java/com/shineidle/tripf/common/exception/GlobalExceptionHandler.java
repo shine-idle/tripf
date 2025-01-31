@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
@@ -23,8 +22,6 @@ public class GlobalExceptionHandler {
         response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-
-}
         String message = CommonErrorCode.INVALID_USER.getMessage();
         response.getWriter().write("{\"error\": \"Authentication required\", \"message\": \"" + message + "\"}");
     }
