@@ -1,6 +1,5 @@
 package com.shineidle.tripf.chatbot.dto;
 
-import com.shineidle.tripf.chatbot.entity.Chatbot;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -10,7 +9,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatbotQuestionsResponseDto {
 
-    private String category;
+    private final String category;
     private List<String> question;
 
     public ChatbotQuestionsResponseDto(String category, List<String> question) {

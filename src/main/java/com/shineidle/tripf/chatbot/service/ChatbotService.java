@@ -10,4 +10,6 @@ public interface ChatbotService {
     ChatbotResponseDto createChatbotResponse(ChatbotRequestDto chatbotRequestDto);
 
     List<ChatbotQuestionsResponseDto> findAllChatbotQuestion();
+
+    List<ChatbotResponseDto> findConversationLogs();
 }
