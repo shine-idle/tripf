@@ -3,8 +3,9 @@ package com.shineidle.tripf.feed.service;
 import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.FeedErrorCode;
 import com.shineidle.tripf.common.util.JwtProvider;
-import com.shineidle.tripf.feed.dto.FeedRequestDto;
-import com.shineidle.tripf.feed.dto.FeedResponseDto;
+import com.shineidle.tripf.feed.dto.*;
+import com.shineidle.tripf.feed.entity.Activity;
+import com.shineidle.tripf.feed.entity.Days;
 import com.shineidle.tripf.feed.entity.Feed;
 import com.shineidle.tripf.feed.repository.FeedRepository;
 import com.shineidle.tripf.feed.repository.DaysRepository;
@@ -23,12 +24,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -84,6 +89,14 @@ class FeedServiceImplTest {
                 "Test Title", "Test Content", 10000L, "#tag");
         ReflectionTestUtils.setField(feed, "id", 1L);
 
+        Days days = new Days();
+        ReflectionTestUtils.setField(days, "id", 1L);
+        Activity activity = new Activity();
+
+        ReflectionTestUtils.setField(activity, "id", 1L);
+        loginUser = new User("test@example.com", "password123", "testUser", UserAuth.NORMAL, "123 Street, City");
+        ReflectionTestUtils.setField(loginUser, "id", 1L);
+
         UserDetailsImpl userDetails = new UserDetailsImpl(loginUser);
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -94,7 +107,7 @@ class FeedServiceImplTest {
     }
 
     @Test
-    void createFeed_Success() throws InterruptedException {
+    void createFeedSuccessTest() throws InterruptedException {
         // Given
         FeedRequestDto requestDto = new FeedRequestDto(
                 "Seoul",
@@ -156,7 +169,7 @@ class FeedServiceImplTest {
 
 
     @Test
-    void updateFeed_Success() {
+    void updateFeedSuccessTest() {
         // Given
         FeedRequestDto requestDto = new FeedRequestDto("Seoul", LocalDateTime.now(), LocalDateTime.now().plusDays(5),
                 "Updated Title", "Updated Content", 5000L, "#travel", List.of());
@@ -174,7 +187,7 @@ class FeedServiceImplTest {
     }
 
     @Test
-    void updateFeed_FeedNotFound() {
+    void updateFeedFeedNotFoundTest() {
         // Given
         FeedRequestDto requestDto = new FeedRequestDto("Seoul", LocalDateTime.now(), LocalDateTime.now().plusDays(5),
                 "New Title", "New Content", 5000L, "#travel", List.of());
@@ -188,7 +201,7 @@ class FeedServiceImplTest {
     }
 
     @Test
-    void findFeed_Success() {
+    void findFeedSuccessTest() {
         // Given
         when(feedRepository.findById(1L)).thenReturn(Optional.of(feed));
         when(daysRepository.findByFeed(feed)).thenReturn(List.of());
@@ -202,7 +215,7 @@ class FeedServiceImplTest {
     }
 
     @Test
-    void findFeed_NotFound() {
+    void findFeedNotFoundTest() {
         // Given
         when(feedRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -213,7 +226,7 @@ class FeedServiceImplTest {
     }
 
     @Test
-    void deleteFeed_Success() {
+    void deleteFeedSuccessTest() {
         // Given
         when(feedRepository.findById(1L)).thenReturn(Optional.of(feed));
 
@@ -225,7 +238,7 @@ class FeedServiceImplTest {
     }
 
     @Test
-    void deleteFeed_FeedNotFound() {
+    void deleteFeedFeedNotFoundTest() {
         // Given
         when(feedRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -233,5 +246,114 @@ class FeedServiceImplTest {
         assertThatThrownBy(() -> feedService.deleteFeed(1L))
                 .isInstanceOf(GlobalException.class)
                 .hasMessage(FeedErrorCode.FEED_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void findMyFeedsSuccessTest() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(feedRepository.findByUserIdAndDeletedAtIsNull(anyLong(), any(Pageable.class)))
+                .thenReturn(Page.empty());
+
+        Page<MyFeedResponseDto> response = feedService.findMyFeeds(pageable);
+
+        assertThat(response).isNotNull();
+        verify(feedRepository, times(1)).findByUserIdAndDeletedAtIsNull(anyLong(), any(Pageable.class));
+    }
+
+    @Test
+    void findRegionSuccessTest() {
+        when(feedRepository.findByCountryAndDeletedAtIsNull(anyString()))
+                .thenReturn(List.of(feed));
+
+        List<RegionResponseDto> response = feedService.findRegion("Korea");
+
+        assertThat(response).isNotNull();
+        assertThat(response).hasSize(1);
+        verify(feedRepository, times(1)).findByCountryAndDeletedAtIsNull(anyString());
+    }
+
+    @Test
+    void findHomeDataSuccessTest() {
+        when(feedRepository.findByCountry(anyString())).thenReturn(List.of(feed));
+        when(feedRepository.findByCountryNot(anyString())).thenReturn(List.of(feed));
+        when(followService.findFollowers()).thenReturn(List.of());
+        when(followService.findFollowings()).thenReturn(List.of());
+
+        HomeResponseDto response = feedService.findHomeData();
+
+        assertThat(response).isNotNull();
+        verify(feedRepository, times(1)).findByCountry("대한민국");
+        verify(feedRepository, times(1)).findByCountryNot("대한민국");
+    }
+
+    @Test
+    void findPublicHomeDataSuccessTest() {
+        when(feedRepository.findByCountry(anyString())).thenReturn(List.of(feed));
+        when(feedRepository.findByCountryNot(anyString())).thenReturn(List.of(feed));
+
+        HomeResponseDto response = feedService.findPublicHomeData();
+
+        assertThat(response).isNotNull();
+        verify(feedRepository, times(1)).findByCountry("대한민국");
+        verify(feedRepository, times(1)).findByCountryNot("대한민국");
+    }
+
+    @Test
+    void deleteDaysSuccessTest() {
+        // Given
+        Days mockDays = new Days();
+        ReflectionTestUtils.setField(mockDays, "id", 1L);
+
+        when(daysRepository.findByIdWithFeed(anyLong(), anyLong())).thenReturn(Optional.of(mockDays));
+        when(feedRepository.findById(anyLong())).thenReturn(Optional.of(feed));
+
+        doNothing().when(daysRepository).deleteById(anyLong());
+
+        // When
+        feedService.deleteDays(1L, 1L);
+
+        // Then
+        verify(daysRepository, times(1)).deleteById(anyLong());
+    }
+
+    @Test
+    void deleteActivitySuccessTest() {
+        // Given
+        Activity mockActivity = new Activity();
+        ReflectionTestUtils.setField(mockActivity, "id", 1L);
+
+        when(activityRepository.findByIdWithFeedAndDays(anyLong(), anyLong(), anyLong()))
+                .thenReturn(Optional.of(mockActivity));
+        when(feedRepository.findById(anyLong())).thenReturn(Optional.of(feed));
+
+        doNothing().when(activityRepository).deleteById(anyLong());
+
+        // When
+        feedService.deleteActivity(1L, 1L, 1L);
+
+        // Then
+        verify(activityRepository, times(1)).deleteById(anyLong());
+    }
+
+    @Test
+    void createDaySuccessTest() {
+        when(feedRepository.findById(anyLong())).thenReturn(Optional.of(feed));
+        when(daysRepository.save(any(Days.class))).thenReturn(mock(Days.class));
+
+        feedService.createDay(1L, new DaysRequestDto(LocalDate.now(), List.of()));
+
+        verify(daysRepository, times(1)).save(any(Days.class));
+    }
+
+    @Test
+    void createActivitySuccessTest() {
+        when(daysRepository.findByIdWithFeed(anyLong(), anyLong())).thenReturn(Optional.of(mock(Days.class)));
+
+        when(feedRepository.findById(anyLong())).thenReturn(Optional.of(feed));
+        when(activityRepository.save(any(Activity.class))).thenReturn(mock(Activity.class));
+
+        feedService.createActivity(1L, 1L, new ActivityRequestDto("Test Title", 5, "Test Memo", "Seoul", 37.5665, 126.9780));
+
+        verify(activityRepository, times(1)).save(any(Activity.class));
     }
 }
