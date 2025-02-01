@@ -2,9 +2,11 @@ package com.shineidle.tripf.common.util;
 
 import com.shineidle.tripf.config.auth.UserDetailsImpl;
 import com.shineidle.tripf.user.entity.User;
+import com.shineidle.tripf.user.repository.UserRepository;
 import com.shineidle.tripf.user.type.UserAuth;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
 
 public class UserAuthorizationUtil {
     private UserAuthorizationUtil() {
@@ -17,7 +19,25 @@ public class UserAuthorizationUtil {
             throw new IllegalArgumentException("인증된 사용자가 없습니다.");
         }
 
-        return (UserDetailsImpl) authentication.getPrincipal();
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof String) {
+            // `String` 타입이면 다시 DB에서 `UserDetailsImpl`을 로드
+            return loadUserDetailsByUsername((String) principal);
+        } else if (principal instanceof UserDetailsImpl) {
+            return (UserDetailsImpl) principal;
+        } else {
+            throw new IllegalStateException("인증된 사용자 정보가 예상과 다릅니다.");
+        }
+    }
+
+    private static UserDetailsImpl loadUserDetailsByUsername(String username) {
+        UserRepository userRepository = ApplicationContextProvider.getBean(UserRepository.class);
+
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+
+        return new UserDetailsImpl(user);
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.shineidle.tripf.feed.controller;
 
+import com.shineidle.tripf.comment.dto.CommentResponseDto;
+import com.shineidle.tripf.comment.service.CommentService;
 import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.FeedErrorCode;
 import com.shineidle.tripf.feed.dto.*;
@@ -26,6 +28,7 @@ import java.util.Map;
 public class FeedViewController {
 
     private final FeedService feedService;
+    private final CommentService commentService;
 
     /**
      * 피드 작성 페이지를 렌더링합니다.
@@ -58,13 +61,13 @@ public class FeedViewController {
      */
     @PostMapping
     public String createFeed(
-            @ModelAttribute
-            @Validated FeedRequestDto feedRequestDto,
+            @CookieValue(name = "Authorization") String token,
+            @RequestBody @Validated FeedRequestDto feedRequestDto,
             Model model
     ) {
-        FeedResponseDto feedResponseDto = feedService.createFeed(feedRequestDto);
+        FeedResponseDto feedResponseDto = feedService.createFeed(feedRequestDto, token);
         model.addAttribute("feed", feedResponseDto);
-        return "feed/detail";
+        return "forward:/";
     }
 
     /**
@@ -80,7 +83,13 @@ public class FeedViewController {
             Model model
     ) {
         FeedResponseDto feedResponseDto = feedService.findFeed(feedId);
+        List<CommentResponseDto> comments = commentService.findAllComment(feedId);
+        // 댓글 목록 조회
+        System.out.println("조회된 댓글 개수: " + comments.size());
+
         model.addAttribute("feed", feedResponseDto);
+        model.addAttribute("comments", comments); // 댓글 리스트 추가
+
         return "feed/detail";
     }
 

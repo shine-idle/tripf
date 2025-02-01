@@ -5,11 +5,13 @@ import com.shineidle.tripf.common.exception.type.UserErrorCode;
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.common.message.enums.PostMessage;
 import com.shineidle.tripf.common.util.*;
+import com.shineidle.tripf.oauth2.util.CookieUtils;
 import com.shineidle.tripf.user.dto.*;
 import com.shineidle.tripf.user.entity.RefreshToken;
 import com.shineidle.tripf.user.entity.User;
 import com.shineidle.tripf.user.repository.UserRepository;
 import com.shineidle.tripf.user.type.UserStatus;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -77,7 +79,7 @@ public class UserServiceImpl implements UserService {
      * @apiNote 최초 로그인 시 엑세스토큰과 리프레시 토큰을 발급
      */
     @Override
-    public JwtResponseDto login(UserRequestDto dto) {
+    public JwtResponseDto login(UserRequestDto dto, HttpServletResponse response) {
         User user = userRepository.findByEmail(dto.getEmail()).orElseThrow(() ->
                 new GlobalException(UserErrorCode.USER_NOT_FOUND));
 
@@ -101,9 +103,11 @@ public class UserServiceImpl implements UserService {
 
         log.info("일반 로그인 accessToken: {}", accessToken);
         log.info("일반 로그인 refreshToken: {}", refreshToken.getToken());
-        log.info("로그인 유저의 Id: {}", UserAuthorizationUtil.getLoginUserId());
-        log.info("로그인 유저의 Email: {}", UserAuthorizationUtil.getLoginUserEmail());
-        log.info("로그인 유저의 권한: {}", UserAuthorizationUtil.getLoginUserAuthority().toString());
+//        log.info("로그인 유저의 Id: {}", UserAuthorizationUtil.getLoginUserId());
+//        log.info("로그인 유저의 Email: {}", UserAuthorizationUtil.getLoginUserEmail());
+//        log.info("로그인 유저의 권한: {}", UserAuthorizationUtil.getLoginUserAuthority().toString());
+
+        CookieUtils.addCookie(response, "Authorization", accessToken, jwtProvider.getRefreshExpiryMillis().intValue());
 
         return new JwtResponseDto(AuthenticationScheme.BEARER.getName(), accessToken, refreshToken.getToken());
     }
