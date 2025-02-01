@@ -65,7 +65,7 @@ class CartServiceImplTest {
     }
 
     @Test
-    void createCart_Success() {
+    void createCartSuccessTest() {
         // Given
         CartRequestDto requestDto = new CartRequestDto(2L);
 
@@ -85,7 +85,7 @@ class CartServiceImplTest {
     }
 
     @Test
-    void createCart_ProductNotFound() {
+    void createCartProductNotFoundTest() {
         // Given
         CartRequestDto requestDto = new CartRequestDto(2L);
 
@@ -101,7 +101,7 @@ class CartServiceImplTest {
     }
 
     @Test
-    void findCart_Success() {
+    void findCartSuccessTest() {
         // Given
         try (MockedStatic<UserAuthorizationUtil> mockedUserAuth = mockStatic(UserAuthorizationUtil.class)) {
             mockedUserAuth.when(UserAuthorizationUtil::getLoginUserId).thenReturn(1L);
@@ -118,7 +118,7 @@ class CartServiceImplTest {
     }
 
     @Test
-    void updateCart_Success() {
+    void updateCartSuccessTest() {
         // Given
         CartRequestDto requestDto = new CartRequestDto(5L);
 
@@ -137,7 +137,7 @@ class CartServiceImplTest {
     }
 
     @Test
-    void updateCart_CartNotFound() {
+    void updateCartCartNotFoundTest() {
         // Given
         CartRequestDto requestDto = new CartRequestDto(5L);
 
@@ -154,7 +154,7 @@ class CartServiceImplTest {
     }
 
     @Test
-    void deleteCart_Success() {
+    void deleteCartSuccessTest() {
         // Given
         try (MockedStatic<UserAuthorizationUtil> mockedUserAuth = mockStatic(UserAuthorizationUtil.class)) {
             mockedUserAuth.when(UserAuthorizationUtil::getLoginUserId).thenReturn(1L);
