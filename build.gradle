@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.1'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
 }
 
 group = 'com.shine-idle'
@@ -61,6 +62,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.redisson:redisson-spring-boot-starter:3.22.0'
 
+    // NLP
+    implementation 'org.apache.opennlp:opennlp-tools:2.0.0'
+    implementation 'org.apache.lucene:lucene-core:8.11.1'
+    implementation 'org.apache.lucene:lucene-analyzers-nori:8.11.1'
+
     // JACKSON
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
@@ -85,8 +91,40 @@ dependencies {
     // thymeleaf
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
+    // test
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+jacocoTestReport {
+    reports {
+        html.required = true
+        xml.required = false
+        csv.required = false
+
+// 리포트의 저장 경로를 설정합니다.
+        html.outputLocation = file("jacoco/jacocoHtml")
+        xml.outputLocation = file("jacoco/jacoco.xml")
+    }
+}
+
+jacocoTestCoverageVerification {
+
+    violationRules { // 커버리지의 범위와 퍼센테이지를 설정합니다.
+        rule {
+            element = 'CLASS'
+
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.00
+            }
+        }
+    }
 }
