@@ -1,6 +1,6 @@
-package com.shineidle.tripf.order.type;
+package com.shineidle.tripf.payment.type;
 
-public enum PayStatus {
+public enum PaymentStatus {
     PENDING, // 결제대기
     PAID, //결제완료
     FAILED //결제실채

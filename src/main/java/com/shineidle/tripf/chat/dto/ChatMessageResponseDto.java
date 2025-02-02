@@ -5,12 +5,12 @@ import lombok.Getter;
 @Getter
 public class ChatMessageResponseDto {
     private String content;
-    private String senderEmail;
+    private String sender;
     private String timestamp;
 
-    public ChatMessageResponseDto(String content, String senderEmail, String timestamp) {
+    public ChatMessageResponseDto(String content, String sender, String timestamp) {
         this.content = content;
-        this.senderEmail = senderEmail;
+        this.sender = sender;
         this.timestamp = timestamp;
     }
 }
