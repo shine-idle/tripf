@@ -47,15 +47,16 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         RefreshToken refreshToken = refreshTokenService.generateToken(user.getId(), authentication, true);
 
         // 쿠키에 사용
+        addAccessTokenToCookie(request, response, accessToken);
         addRefreshTokenToCookie(request, response, refreshToken);
 
-        //Path 뒤에 accessToken 붙이기
-        String targetUrl = getTargetUrl(accessToken);
+//        //Path 뒤에 accessToken 붙이기
+//        String targetUrl = getTargetUrl(accessToken);
 
         clearAuthenticationAttributes(request, response);
 
         // 리다이렉트
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        getRedirectStrategy().sendRedirect(request, response, REDIRECT_URL);
     }
 
     protected String getTargetUrl(String accessToken) {
@@ -72,6 +73,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         return null;
+    }
+
+    private void addAccessTokenToCookie(HttpServletRequest request, HttpServletResponse response, String accessToken) {
+        int cookieMaxAge = jwtProvider.getRefreshExpiryMillis().intValue();
+        CookieUtils.deleteCookie(request, response, "Authorization");
+        CookieUtils.addCookie(response, "Authorization", accessToken, cookieMaxAge);
     }
 
     private void addRefreshTokenToCookie(HttpServletRequest request, HttpServletResponse response, RefreshToken refreshToken) {
