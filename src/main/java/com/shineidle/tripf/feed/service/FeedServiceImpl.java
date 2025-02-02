@@ -136,6 +136,79 @@ public class FeedServiceImpl implements FeedService {
         }
     }
 
+    @Override
+    public FeedResponseDto createFeed(FeedRequestDto feedRequestDto) {
+        User userId = UserAuthorizationUtil.getLoginUser();
+
+        String lockKey = "createFeed:lock:user:" + userId.getId();
+        RLock lock = redissonClient.getLock(lockKey);
+
+        try {
+            if (lock.tryLock(10, 30, TimeUnit.SECONDS)) {
+
+                String country = geoService.getCountryByCity(feedRequestDto.getCity());
+
+                Feed feed = new Feed(
+                        userId,
+                        country,
+                        feedRequestDto.getCity(),
+                        feedRequestDto.getStartedAt(),
+                        feedRequestDto.getEndedAt(),
+                        feedRequestDto.getTitle(),
+                        feedRequestDto.getContent(),
+                        feedRequestDto.getCost(),
+                        feedRequestDto.getTag()
+                );
+                Feed savedFeed = feedRepository.save(feed);
+
+                if (feedRequestDto.getDays() != null) {
+                    feedRequestDto.getDays().forEach(daysRequestDto -> {
+                        Days days = new Days(savedFeed, daysRequestDto.getDate());
+
+                        LocalDate date = daysRequestDto.getDate();
+                        if (days.getDate().isBefore(feed.getStartedAt().toLocalDate()) || days.getDate().isAfter(feed.getEndedAt().toLocalDate())) {
+                            throw new GlobalException(FeedErrorCode.DATE_INVALID);
+                        }
+
+                        if (daysRepository.existsByFeedAndDate(feed, date)) {
+                            throw new GlobalException(FeedErrorCode.DATE_DUPLICATE);
+                        }
+
+                        Days savedDays = daysRepository.save(days);
+
+                        if (daysRequestDto.getActivity() != null) {
+                            daysRequestDto.getActivity().forEach(activityRequestDto -> {
+                                Activity activity = new Activity(
+                                        savedDays,
+                                        activityRequestDto.getTitle(),
+                                        activityRequestDto.getStar(),
+                                        activityRequestDto.getMemo(),
+                                        activityRequestDto.getCity(),
+                                        activityRequestDto.getLatitude(),
+                                        activityRequestDto.getLongitude()
+                                );
+                                activityRepository.save(activity);
+                            });
+                        }
+                    });
+                }
+
+                followerNewPostNotification(userId, feed.getId());
+
+                return findFeed(savedFeed.getId());
+            } else {
+                throw new GlobalException(LockErrorCode.LOCK_ACQUISITION_FAILED);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new GlobalException(LockErrorCode.LOCK_INTERRUPTED);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
+
     /**
      * 피드 수정
      *

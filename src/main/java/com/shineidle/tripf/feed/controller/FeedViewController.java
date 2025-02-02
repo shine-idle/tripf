@@ -67,7 +67,7 @@ public class FeedViewController {
     ) {
         FeedResponseDto feedResponseDto = feedService.createFeed(feedRequestDto, token);
         model.addAttribute("feed", feedResponseDto);
-        return "forward:/";
+        return "redirect:/";
     }
 
     /**
