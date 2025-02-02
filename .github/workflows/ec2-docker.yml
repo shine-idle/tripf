@@ -2,7 +2,7 @@ name: Docker Multi-Stage Build and EC2 Deployment
 
 on:
   push:
-    branches: [ CI_CD ] # CI_CD 브랜치에 push된 경우 트리거
+    branches: [ develop ] # develop 브랜치에 push된 경우 트리거 -> 추후 main으로 수정 필요
 
 jobs:
   docker-build-and-push:
@@ -72,6 +72,8 @@ jobs:
                 -e MONGO_HOST=${{ secrets.MONGO_HOST }} \
                 -e MONGO_USER=${{ secrets.MONGO_USER }} \
                 -e MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }} \
+                -e TOSS_CLIENT_KEY=${{ secrets.TOSS_CLIENT_KEY }} \
+                -e TOSS_SECRET_KEY=${{ secrets.TOSS_SECRET_KEY }} \
                 ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_IMAGE_TAG_NAME }}:latest
 
       # 2. 두 번째 EC2에 배포
@@ -110,4 +112,6 @@ jobs:
                 -e MONGO_HOST=${{ secrets.MONGO_HOST }} \
                 -e MONGO_USER=${{ secrets.MONGO_USER }} \
                 -e MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }} \
+                -e TOSS_CLIENT_KEY=${{ secrets.TOSS_CLIENT_KEY }} \
+                -e TOSS_SECRET_KEY=${{ secrets.TOSS_SECRET_KEY }} \
                 ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_IMAGE_TAG_NAME }}:latest
