@@ -160,3 +160,9 @@ logging:
     org.springframework.messaging: debug
     org.springframework.web.socket: debug
 
+payment:
+  toss:
+    test_client_api_key: ${TOSS_CLIENT_KEY}
+    test_secrete_api_key: ${TOSS_SECRET_KEY}
+    success_url : "http://localhost:8080/api/vi/payments/toss/success"
+    fail_url : "http://localhost:8080/api/vi/payments/toss/fail"

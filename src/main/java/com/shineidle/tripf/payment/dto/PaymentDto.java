@@ -32,4 +32,12 @@ public class PaymentDto {
         this.approvedAt = payment.getApprovedAt() != null ? payment.getApprovedAt() : null;
         this.canceledAt = payment.getCanceledAt() != null ? payment.getCanceledAt() : null;
     }
+
+    public PaymentDto(Long id, String paymentKey, Long amount, Long orderId) {
+        this.id = id;
+        this.paymentKey = paymentKey;
+        this.amount = amount;
+        this.orderId = orderId;
+        this.createAt = LocalDateTime.now();
+    }
 }

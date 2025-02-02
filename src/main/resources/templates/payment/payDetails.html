@@ -13,9 +13,11 @@
   <p><strong>결제 금액:</strong> <span th:text="${payment.amount}"></span></p>
   <p><strong>주문 ID:</strong> <span th:text="${payment.orderId}"></span></p>
   <p><strong>사용자 ID:</strong> <span th:text="${payment.userId}"></span></p>
-  <p><strong>결제 상태:</strong> <span th:text="${payment.cancelStatus}"></span></p>
-  <p><strong>결제 승인 일시:</strong> <span th:text="${payment.approvedAt}"></span></p>
-  <p><strong>결제 취소 일시:</strong> <span th:text="${payment.canceledAt}"></span></p>
+  <p><strong>결제 상태:</strong>
+    <span th:text="${payment.cancelStatus == 'SUCCESS' ? '성공' : (payment.cancelStatus == 'FAILED' ? '실패' : '대기')}"></span>
+  </p>
+  <p><strong>결제 승인 일시:</strong> <span th:text="${#dates.format(payment.approvedAt, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+  <p><strong>결제 취소 일시:</strong> <span th:text="${#dates.format(payment.canceledAt, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
 </div>
 
 <div>
