@@ -61,6 +61,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.redisson:redisson-spring-boot-starter:3.22.0'
 
+    // NLP
+    implementation 'org.apache.opennlp:opennlp-tools:2.0.0'
+    implementation 'org.apache.lucene:lucene-core:8.11.1'
+    implementation 'org.apache.lucene:lucene-analyzers-nori:8.11.1'
+
     // JACKSON
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
