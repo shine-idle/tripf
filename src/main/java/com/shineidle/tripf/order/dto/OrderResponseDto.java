@@ -2,9 +2,10 @@ package com.shineidle.tripf.order.dto;
 
 import com.shineidle.tripf.order.entity.Order;
 import com.shineidle.tripf.order.type.OrderStatus;
-import com.shineidle.tripf.order.type.PayStatus;
 import com.shineidle.tripf.orderProduct.dto.OrderProductDto;
 import com.shineidle.tripf.orderProduct.entity.OrderProduct;
+import com.shineidle.tripf.payment.entity.Payment;
+import com.shineidle.tripf.payment.type.PaymentStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -20,10 +21,13 @@ public class OrderResponseDto {
     private final List<OrderProductDto> orderProducts;
     private final Long totalPrice;
     private final OrderStatus orderStatus;
-    private final PayStatus payStatus;
+    private final PaymentStatus paymentStatus;
     private final LocalDateTime createTime;
 
     public static OrderResponseDto toDto(Order order) {
+        Payment payment = order.getPayment(); // 결제 정보
+        PaymentStatus paymentStatus = (payment != null) ? payment.getPaymentStatus() : PaymentStatus.PENDING;
+
         List<OrderProductDto> orderProductDtos = order.getOrderProducts().stream()
                 .map(orderProduct -> new OrderProductDto(
                         orderProduct.getProduct().getName(),
@@ -43,7 +47,7 @@ public class OrderResponseDto {
                 orderProductDtos,
                 totalPrice,
                 order.getOrderStatus(),
-                order.getPayStatus(),
+                paymentStatus,
                 order.getCreatedAt()
         );
     }

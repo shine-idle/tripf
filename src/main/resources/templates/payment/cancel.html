@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>결제 취소</title>
+</head>
+<body>
+<h1>결제 취소 결과</h1>
+
+<div>
+  <p>결제 취소 성공!</p>
+  <p>결제 Key: <span th:text="${payment.paymentKey}"></span></p>
+  <p>결제 취소일: <span th:text="${#dates.format(payment.canceledAt, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+</div>
+
+<div>
+  <a href="/payments/details/{paymentKey}" th:href="@{/payments/details/{paymentKey}(paymentKey=${payment.paymentKey})}">결제 상세보기</a>
+</div>
+</body>
+</html>
