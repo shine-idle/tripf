@@ -32,14 +32,14 @@ public class FeedController {
      * @param feedRequestDto {@link FeedRequestDto} 피드 요청 Dto
      * @return {@link FeedResponseDto} 피드 응답 Dto
      */
-//    @Operation(summary = "피드 작성")
-//    @PostMapping
-//    public ResponseEntity<FeedResponseDto> createFeed(
-//            @Valid @RequestBody FeedRequestDto feedRequestDto
-//    ) {
-//        FeedResponseDto feedResponseDto = feedService.createFeed(feedRequestDto);
-//        return new ResponseEntity<>(feedResponseDto, HttpStatus.CREATED);
-//    }
+    @Operation(summary = "피드 작성")
+    @PostMapping
+    public ResponseEntity<FeedResponseDto> createFeed(
+            @Valid @RequestBody FeedRequestDto feedRequestDto
+    ) {
+        FeedResponseDto feedResponseDto = feedService.createFeed(feedRequestDto);
+        return new ResponseEntity<>(feedResponseDto, HttpStatus.CREATED);
+    }
 
     /**
      * 피드 수정

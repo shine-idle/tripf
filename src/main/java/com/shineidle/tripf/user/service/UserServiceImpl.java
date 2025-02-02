@@ -101,13 +101,9 @@ public class UserServiceImpl implements UserService {
         String accessToken = jwtProvider.generateToken(authentication, false, TokenType.ACCESS);
         RefreshToken refreshToken = refreshTokenService.generateToken(user.getId(), authentication, false);
 
-        log.info("일반 로그인 accessToken: {}", accessToken);
-        log.info("일반 로그인 refreshToken: {}", refreshToken.getToken());
-//        log.info("로그인 유저의 Id: {}", UserAuthorizationUtil.getLoginUserId());
-//        log.info("로그인 유저의 Email: {}", UserAuthorizationUtil.getLoginUserEmail());
-//        log.info("로그인 유저의 권한: {}", UserAuthorizationUtil.getLoginUserAuthority().toString());
-
-        CookieUtils.addCookie(response, "Authorization", accessToken, jwtProvider.getRefreshExpiryMillis().intValue());
+        // 쿠키 저장
+        CookieUtils.addCookie(response, "Authorization", accessToken, jwtProvider.getAccessExpiryMillis().intValue());
+        CookieUtils.addCookie(response, "refresh_token", refreshToken.getToken(), jwtProvider.getRefreshExpiryMillis().intValue());
 
         return new JwtResponseDto(AuthenticationScheme.BEARER.getName(), accessToken, refreshToken.getToken());
     }
