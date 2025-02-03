@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>토스 결제 테스트</title>
+    <script src="https://js.tosspayments.com/v1/payment"></script>
+</head>
+<body>
+<h1>결제 테스트 페이지</h1>
+<p>결제 금액: <span th:text="${amount}"></span> 원</p>
+<button id="paymentButton">결제하기</button>
+
+<script>
+    document.getElementById("paymentButton").addEventListener("click", async function() {
+        const response = await fetch("/paymentsTest/requestTest", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount: 5000 })
+        });
+
+        const data = await response.json();
+        const tossPayments = TossPayments("test_ck_DLJOpm5QrlDZnZeKMBMLrPNdxbWn"); // 클라이언트 키 입력
+
+        tossPayments.requestPayment("카드", {
+            amount: data.amount,
+            orderId: data.orderId,
+            orderName: "테스트 결제",
+            customerEmail: "user@example.com",
+            successUrl: window.location.origin + "/paymentsTest/successTest",
+            failUrl: window.location.origin + "/paymentsTest/failTest"
+        });
+    });
+</script>
+</body>
+</html>
