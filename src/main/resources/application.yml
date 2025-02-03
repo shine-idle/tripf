@@ -162,7 +162,12 @@ logging:
 
 payment:
   toss:
-    test_client_api_key: ${TOSS_CLIENT_KEY}
-    test_secrete_api_key: ${TOSS_SECRET_KEY}
+#    test_client_api_key: ${TOSS_CLIENT_KEY}
+#    test_secrete_api_key: ${TOSS_SECRET_KEY}
     success_url : "http://localhost:8080/api/vi/payments/toss/success"
     fail_url : "http://localhost:8080/api/vi/payments/toss/fail"
+
+toss:
+  client-key: ${TOSS_CLIENT_KEY}
+  secret-key: ${TOSS_SECRET_KEY}
+

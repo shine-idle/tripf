@@ -2,6 +2,9 @@ package com.shineidle.tripf.paymentTest.service;
 
 import com.shineidle.tripf.paymentTest.entity.PaymentTest;
 import com.shineidle.tripf.paymentTest.repository.PaymentRepositoryTest;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,15 +15,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Getter
+@RequiredArgsConstructor
 public class PaymentServiceTest {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final PaymentRepositoryTest paymentRepositoryTest;
-    private static final String SECRET_KEY = "test_sk_DpexMgkW36bdQR2NkvN93GbR5ozO"; // Toss 시크릿 키
+    private final PaymentRepositoryTest paymentRepositoryTest;// Toss 시크릿 키
 
-    public PaymentServiceTest(PaymentRepositoryTest paymentRepositoryTest) {
-        this.paymentRepositoryTest = paymentRepositoryTest;
-    }
+    @Value("${toss.secret-key}")
+    private String secretKey;
 
     public Map<String, String> createPaymentRequestTest(int amount) {
         String orderId = "ORDER-" + System.currentTimeMillis();
@@ -37,7 +40,7 @@ public class PaymentServiceTest {
         String url = "https://api.tosspayments.com/v1/payments/confirm";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(SECRET_KEY, "");
+        headers.setBasicAuth(secretKey, "");
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         Map<String, String> body = new HashMap<>();

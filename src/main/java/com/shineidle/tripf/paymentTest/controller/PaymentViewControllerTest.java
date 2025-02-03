@@ -2,6 +2,7 @@ package com.shineidle.tripf.paymentTest.controller;
 
 import com.shineidle.tripf.paymentTest.dto.PaymentRequestDtoTest;
 import com.shineidle.tripf.paymentTest.service.PaymentServiceTest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +19,13 @@ public class PaymentViewControllerTest {
         this.paymentServiceTest = paymentServiceTest;
     }
 
+    @Value("${toss.client-key}") // application.properties에서 값 불러오기
+    private String tossClientKey;
+
     @GetMapping
     public String showPaymentPageTest(Model model) {
         model.addAttribute("amount", 5000);
+        model.addAttribute("tossClientKey", tossClientKey);
         return "paymentTest/paymentTest";
     }
 
