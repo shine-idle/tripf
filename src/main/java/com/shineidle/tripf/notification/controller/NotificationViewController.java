@@ -11,16 +11,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
-
+// TODO : javadoc
 @Controller
 @RequestMapping("/notifications")
 @RequiredArgsConstructor
 public class NotificationViewController {
-
     private final NotificationService notificationService;
 
     @GetMapping
-    public String getNotifications(@AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
+    public String getNotifications(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            Model model
+    ) {
         if (userDetails == null) {
             model.addAttribute("loginRequired", true); // 로그인 필요 플래그 추가
             model.addAttribute("notifications", null); // 알림 데이터 없음

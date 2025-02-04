@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-
+    // TODO : 주석 필요
     Optional<Comment> findByIdAndFeedId(Long commentId, Long feedId);
 
     List<Comment> findAllByFeedId(Long feedId);
