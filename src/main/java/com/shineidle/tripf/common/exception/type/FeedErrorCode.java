@@ -16,8 +16,7 @@ public enum FeedErrorCode implements ExceptionType {
     DATE_DUPLICATE(HttpStatus.CONFLICT, "동일한 일정이 이미 존재합니다."),
     FEED_ALREADY_DELETED(HttpStatus.GONE, "피드가 이미 삭제되었습니다."),
     COUNTRY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 국가가 존재하지 않습니다."),
-    PAGE_INVALID(HttpStatus.BAD_REQUEST, "페이지는 0보다 큰 수를 입력해야합니다.")
-    ;
+    PAGE_INVALID(HttpStatus.BAD_REQUEST, "페이지는 0보다 큰 수를 입력해야합니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

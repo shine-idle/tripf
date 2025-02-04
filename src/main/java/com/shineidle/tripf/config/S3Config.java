@@ -20,6 +20,7 @@ public class S3Config {
     @Value("${cloud.aws.region.static}")
     private String region;
 
+    //TODO : javadoc
     @Bean
     public S3Client s3Client() {
 

@@ -2,7 +2,7 @@ package com.shineidle.tripf.product.service;
 
 import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
-import com.shineidle.tripf.common.message.enums.PostMessage;
+import com.shineidle.tripf.common.message.type.PostMessage;
 import com.shineidle.tripf.product.dto.ProductRequestDto;
 import com.shineidle.tripf.product.dto.ProductResponseDto;
 import com.shineidle.tripf.product.entity.Product;

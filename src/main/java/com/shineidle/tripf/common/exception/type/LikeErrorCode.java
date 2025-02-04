@@ -11,7 +11,6 @@ public enum LikeErrorCode implements ExceptionType {
     ALREADY_LIKE(HttpStatus.BAD_REQUEST,"이미 좋아요를 눌렀습니다"),
     LIKED_YET(HttpStatus.BAD_REQUEST, "좋아요를 먼저 해주세요");
 
-
     private final HttpStatus httpStatus;
     private final String message;
 

@@ -15,8 +15,8 @@ import org.springframework.messaging.support.ChannelInterceptor;
 @RequiredArgsConstructor
 public class StompHandler implements ChannelInterceptor {
     private final WebSocketSessionManager sessionManager;
-    //private final JwtProvider jwtProvider;
 
+    //TODO : javadoc
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
@@ -65,19 +65,4 @@ public class StompHandler implements ChannelInterceptor {
             sessionManager.removeSession(sessionId);
         }
     }
-
-//    private void validateAndSetUser(StompHeaderAccessor accessor) {
-//        String userEmail = getUserEmailAndValidateToken(accessor);
-//        accessor.setUser(() -> userEmail);
-//    }
-//
-//    private String getUserEmailAndValidateToken(StompHeaderAccessor accessor) {
-//        String accessToken = jwtProvider.resolveToken(accessor.getFirstNativeHeader(HttpHeaders.AUTHORIZATION));
-//
-//        if (accessToken == null) {
-//            throw new GlobalException(UserErrorCode.TOKEN_NOT_FOUND);
-//        }
-//
-//        return jwtProvider.getUsername(accessToken);
-//    }
 }

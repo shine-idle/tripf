@@ -1,7 +1,7 @@
 package com.shineidle.tripf.photo.controller;
 
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
-import com.shineidle.tripf.common.message.enums.PostMessage;
+import com.shineidle.tripf.common.message.type.PostMessage;
 import com.shineidle.tripf.photo.dto.PhotoRequestDto;
 import com.shineidle.tripf.photo.dto.PhotoResponseDto;
 import com.shineidle.tripf.photo.service.PhotoService;

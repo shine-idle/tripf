@@ -1,6 +1,6 @@
 package com.shineidle.tripf.product.entity;
 
-import com.shineidle.tripf.common.BaseEntity;
+import com.shineidle.tripf.common.entity.BaseEntity;
 import com.shineidle.tripf.photo.entity.ProductPhoto;
 import com.shineidle.tripf.product.type.ProductCategory;
 import com.shineidle.tripf.product.type.ProductStatus;

@@ -7,7 +7,7 @@ import com.shineidle.tripf.cart.repository.CartRepository;
 import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.CartErrorCode;
 import com.shineidle.tripf.common.exception.type.ProductErrorCode;
-import com.shineidle.tripf.common.util.UserAuthorizationUtil;
+import com.shineidle.tripf.common.util.auth.UserAuthorizationUtil;
 import com.shineidle.tripf.product.entity.Product;
 import com.shineidle.tripf.product.repository.ProductRepository;
 import com.shineidle.tripf.user.entity.User;

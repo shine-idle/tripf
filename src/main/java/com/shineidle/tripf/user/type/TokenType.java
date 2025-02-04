@@ -1,4 +1,4 @@
-package com.shineidle.tripf.common.util;
+package com.shineidle.tripf.user.type;
 
 public enum TokenType {
     ACCESS,

@@ -1,6 +1,6 @@
 package com.shineidle.tripf.config.auth;
 
-import com.shineidle.tripf.common.util.RedisUtils;
+import com.shineidle.tripf.common.util.redis.RedisUtils;
 import com.shineidle.tripf.user.entity.User;
 import com.shineidle.tripf.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     private User loadUser(String username) {
-
         return this.userRepository.findByEmail(username)
                 .orElseGet(() -> this.userRepository.findByProviderId(username)
                         .orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다.")));

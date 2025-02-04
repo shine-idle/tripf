@@ -1,6 +1,6 @@
 package com.shineidle.tripf.feed.entity;
 
-import com.shineidle.tripf.common.BaseEntity;
+import com.shineidle.tripf.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
