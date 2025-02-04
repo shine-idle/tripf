@@ -35,7 +35,7 @@ public class AdminProductController {
      * 상품 수정
      *
      * @param productId 상품 식별자
-     * @param dto {@link ProductRequestDto} 상품 요청 Dto
+     * @param dto       {@link ProductRequestDto} 상품 요청 Dto
      * @return {@link ProductResponseDto} 상품 응답 Dto
      */
     @Operation(summary = "상품 수정")

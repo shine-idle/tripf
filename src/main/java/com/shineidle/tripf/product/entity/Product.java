@@ -40,6 +40,9 @@ public class Product extends BaseEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductPhoto> productPhotos = new ArrayList<>();
 
+    /**
+     * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
+     */
     public Product(ProductCategory category, ProductStatus status, String name, Long price, String description, Long stock) {
         this.category = category;
         this.status = status;
@@ -48,7 +51,9 @@ public class Product extends BaseEntity {
         this.description = description;
         this.stock = stock;
     }
-    protected Product() {}
+
+    protected Product() {
+    }
 
     public void update(ProductRequestDto dto) {
         this.category = dto.getCategory();
@@ -59,6 +64,9 @@ public class Product extends BaseEntity {
         this.stock = dto.getStock();
     }
 
+    /**
+     * 서비스 메소드 - 외부에서 엔티티를 수정할 메소드를 정의합니다. (단일 책임을 가지도록 주의합니다.)
+     */
     public void delete() {
         this.status = ProductStatus.DISCONTINUED;
     }

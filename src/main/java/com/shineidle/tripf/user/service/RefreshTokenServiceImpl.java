@@ -23,11 +23,10 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
 
-
     /**
      * 리프레시 토큰 생성
      *
-     * @param userId 유저 식별자
+     * @param userId         유저 식별자
      * @param authentication {@link Authentication} 인증 객체
      * @param isSocialLogin  소셜로그인 = true 또는 일반로그인 = false
      * @return {@link RefreshToken}
@@ -66,7 +65,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
      * 리프레시 토큰 갱신
      *
      * @param validRefreshToken {@link RefreshToken}
-     * @param authentication {@link Authentication}}
+     * @param authentication    {@link Authentication}}
      * @return {@link RefreshToken} 새 리프레시 토큰
      * @apiNote 기존의 리프레시 토큰을 삭제하고 새 리프레시 토큰을 저장
      */
@@ -90,6 +89,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     /**
      * 유저 식별자로 리프레시 토큰 조회
+     *
      * @param userId 유저 식별자
      * @return {@link RefreshToken}
      */

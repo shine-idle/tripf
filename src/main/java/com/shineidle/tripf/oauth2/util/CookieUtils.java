@@ -9,6 +9,8 @@ import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
 
+// TODO : javadoc 작성
+// TODO : 예외처리 수정 필요
 public class CookieUtils {
 
     public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {

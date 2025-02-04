@@ -12,7 +12,7 @@
         const orderId = urlParams.get('orderId');
         const amount = urlParams.get('amount');
 
-        fetch("/paymentsTest/confirmTest", {
+        fetch("/payments/confirmTest", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ paymentKey, orderId, amount })

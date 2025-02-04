@@ -26,7 +26,8 @@ public class ProductController {
      */
     @Operation(summary = "상품 조회(다건)")
     @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> findAllProduct() {
+    public ResponseEntity<List<ProductResponseDto>> findAllProduct(
+    ) {
         return new ResponseEntity<>(productService.findAllProduct(), HttpStatus.OK);
     }
 

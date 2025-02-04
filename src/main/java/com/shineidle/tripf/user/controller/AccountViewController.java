@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+// TODO : javadoc 작성
+// TODO : 예외처리 컨트롤러로 처리 필요
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class AccountViewController {
 
     @GetMapping("/signup")
     public String signUpPage() {
-        return "user/signup"; // signup.html 뷰 반환
+        return "user/signup";
     }
 
     @PostMapping("/signup")
@@ -55,16 +57,16 @@ public class AccountViewController {
         try {
             userService.login(dto, response);
             redirectAttributes.addFlashAttribute("message", "로그인 성공!");
-            return "redirect:/"; // 로그인 후 홈으로 리다이렉트
+            return "redirect:/";
         } catch (GlobalException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/login"; // 로그인 실패 시 로그인 페이지로 리다이렉트
+            return "redirect:/login";
         }
     }
 
     @GetMapping("/logout")
     public String logoutPage() {
 
-        return "user/logout"; // logout.html 뷰 반환
+        return "user/logout";
     }
 }

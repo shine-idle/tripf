@@ -18,6 +18,9 @@ public class ChatRoom {
     private List<String> users;
     private LocalDateTime createdAt;
 
+    /**
+     * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
+     */
     public ChatRoom(String name, List<String> users, LocalDateTime createdAt) {
         this.name = name;
         this.users = users;

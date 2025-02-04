@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+// TODO : javadoc 작성
 @Component
 @RequiredArgsConstructor
 public class KakaoOAuth2UserUnlink implements OAuth2UserUnlink {

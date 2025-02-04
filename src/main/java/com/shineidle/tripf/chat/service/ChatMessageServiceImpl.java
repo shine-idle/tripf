@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+// TODO : javadoc 작성
 @Service
 @RequiredArgsConstructor
 public class ChatMessageServiceImpl implements ChatMessageService {
@@ -32,11 +33,10 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
     @Override
     public List<ChatMessage> getMessages(String roomId, LocalDateTime lastTimestamp, int limit) {
-        // Redis에서 메시지 조회
+
         List<ChatMessage> messages = getMessagesFromRedis(roomId);
 
         if (messages.isEmpty()) {
-            // Redis에 없으면 DB에서 조회 후 Redis에 캐싱
             messages = getMessagesFromDBAndCache(roomId);
         }
 

@@ -16,6 +16,9 @@ public class ChatMessage {
     private String content;
     private LocalDateTime timestamp;
 
+    /**
+     * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
+     */
     public ChatMessage(String roomId, String sender, String content) {
         this.roomId = roomId;
         this.sender = sender;

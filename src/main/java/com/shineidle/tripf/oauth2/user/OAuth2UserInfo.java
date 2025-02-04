@@ -2,6 +2,7 @@ package com.shineidle.tripf.oauth2.user;
 
 import java.util.Map;
 
+// TODO : javadoc 작성
 public interface OAuth2UserInfo {
     OAuth2Provider getProvider();
 

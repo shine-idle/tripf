@@ -7,6 +7,7 @@ import com.shineidle.tripf.oauth2.user.naver.NaverOAuth2UserUnlink;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+// TODO : javadoc 작성
 @Component
 @RequiredArgsConstructor
 public class OAuth2UserUnlinkManager {

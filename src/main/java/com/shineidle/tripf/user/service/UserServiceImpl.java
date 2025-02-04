@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
      * 유저 생성
      *
      * @param dto {@link UserRequestDto} <br>
-     * email(이메일,String), password(비밀번호, String), name(이름, String), address(주소, String), auth(권한, UserAuth)
+     *            email(이메일,String), password(비밀번호, String), name(이름, String), address(주소, String), auth(권한, UserAuth)
      * @return {@link PostMessageResponseDto} 회원가입 완료 문구
      */
     @Override
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
      * 로그인
      *
      * @param dto {@link UserRequestDto} <br>
-     * email(이메일,String), password(비밀번호, String)
+     *            email(이메일,String), password(비밀번호, String)
      * @return {@link JwtResponseDto}
      * @apiNote 최초 로그인 시 엑세스토큰과 리프레시 토큰을 발급
      */
@@ -153,7 +153,7 @@ public class UserServiceImpl implements UserService {
      * 비밀번호 변경
      *
      * @param dto {@link PasswordUpdateRequestDto} <br>
-     * password(비밀번호, String), newPassword(새 비민번호, String)
+     *            password(비밀번호, String), newPassword(새 비민번호, String)
      * @return {@link PostMessageResponseDto} 비밀번호 수정완료 문구
      */
     @Override
@@ -173,7 +173,7 @@ public class UserServiceImpl implements UserService {
      * 이름 수정
      *
      * @param dto {@link UsernameUpdateRequestDto} <br>
-     * name(이름, String)
+     *            name(이름, String)
      * @return {@link PostMessageResponseDto} 이름 수정완료 문구
      */
     @Override
@@ -189,7 +189,7 @@ public class UserServiceImpl implements UserService {
      * 유저 탈퇴 처리
      *
      * @param dto {@link UserRequestDto} <br>
-     * password(비밀번호, String)
+     *            password(비밀번호, String)
      * @return {@link PostMessageResponseDto} 탈퇴처리 문구
      */
     @Override
@@ -233,6 +233,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 활성상태의 유저 Email 반환
+     *
      * @return getActiveUserEmails
      */
     @Override

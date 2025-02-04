@@ -4,6 +4,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+// TODO : javadoc 작성
 @Component
 public class RestTemplateFactory {
     private final RestTemplateBuilder restTemplateBuilder;

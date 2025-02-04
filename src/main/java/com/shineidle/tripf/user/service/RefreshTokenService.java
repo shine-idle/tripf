@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication;
 
 import java.util.Optional;
 
+// TODO : javadoc 작성
 public interface RefreshTokenService {
     RefreshToken generateToken(Long userId, Authentication authentication, boolean isSocialLogin);
 

@@ -23,6 +23,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
+// TODO : javadoc 작성
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -46,7 +47,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String accessToken = jwtProvider.generateToken(authentication, true, TokenType.ACCESS);
         RefreshToken refreshToken = refreshTokenService.generateToken(user.getId(), authentication, true);
 
-        // 쿠키에 사용
         addAccessTokenToCookie(request, response, accessToken);
         addRefreshTokenToCookie(request, response, refreshToken);
 
@@ -55,7 +55,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         clearAuthenticationAttributes(request, response);
 
-        // 리다이렉트
         getRedirectStrategy().sendRedirect(request, response, REDIRECT_URL);
     }
 

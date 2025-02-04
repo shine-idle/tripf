@@ -5,6 +5,7 @@ import com.shineidle.tripf.oauth2.user.OAuth2UserInfo;
 
 import java.util.Map;
 
+// TODO : javadoc 작성
 public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
     private final Map<String, Object> attributes;
     private final String accessToken;
