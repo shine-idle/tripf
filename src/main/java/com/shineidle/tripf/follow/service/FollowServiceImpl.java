@@ -2,7 +2,7 @@ package com.shineidle.tripf.follow.service;
 
 import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.FollowErrorCode;
-import com.shineidle.tripf.common.util.UserAuthorizationUtil;
+import com.shineidle.tripf.common.util.auth.UserAuthorizationUtil;
 import com.shineidle.tripf.follow.dto.FollowResponseDto;
 import com.shineidle.tripf.follow.entity.Follow;
 import com.shineidle.tripf.follow.entity.FollowPk;

@@ -2,7 +2,7 @@ package com.shineidle.tripf.oauth2.controller;
 
 import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.UserErrorCode;
-import com.shineidle.tripf.common.util.UserAuthorizationUtil;
+import com.shineidle.tripf.common.util.auth.UserAuthorizationUtil;
 import com.shineidle.tripf.oauth2.user.OAuth2Provider;
 import com.shineidle.tripf.oauth2.user.OAuth2UserUnlinkManager;
 import com.shineidle.tripf.oauth2.util.CookieUtils;

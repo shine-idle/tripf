@@ -1,4 +1,4 @@
-package com.shineidle.tripf.common;
+package com.shineidle.tripf.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

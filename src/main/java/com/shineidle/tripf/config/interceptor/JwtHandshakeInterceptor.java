@@ -12,6 +12,7 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import java.util.Map;
 
+// TODO : 추후 구현
 @Slf4j
 @RequiredArgsConstructor
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
@@ -20,21 +21,18 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-        // Query Parameter에서 JWT 가져오기
         String query = request.getURI().getQuery();
         String token = null;
 
         if (query != null && query.contains("token=")) {
-            token = query.split("token=")[1].split("&")[0]; // token= 뒤의 값을 추출
+            token = query.split("token=")[1].split("&")[0];
         }
 
-        // JWT 유효성 검증
         if (token == null || !jwtProvider.validToken(token)) {
             log.error("Invalid or missing JWT token during WebSocket handshake");
             throw new GlobalException(UserErrorCode.TOKEN_NOT_FOUND);
         }
 
-        // 유저 정보 저장
         String userEmail = jwtProvider.getUsername(token);
         attributes.put("userEmail", userEmail);
 

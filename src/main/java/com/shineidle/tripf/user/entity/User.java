@@ -1,6 +1,6 @@
 package com.shineidle.tripf.user.entity;
 
-import com.shineidle.tripf.common.BaseEntity;
+import com.shineidle.tripf.common.entity.BaseEntity;
 import com.shineidle.tripf.oauth2.user.OAuth2UserInfo;
 import com.shineidle.tripf.user.type.UserAuth;
 import com.shineidle.tripf.user.type.UserStatus;

@@ -13,7 +13,6 @@ public enum FollowErrorCode implements ExceptionType {
     NOT_FOUND_FOLLOW(HttpStatus.NOT_FOUND, "팔로우 할 사용자가 존재하지 않습니다"),
     FOLLOW_RELATION_NOT_FOUND(HttpStatus.NOT_FOUND, "팔로우 된 상태가 아닙니다");
 
-
     private final HttpStatus httpStatus;
     private final String message;
 

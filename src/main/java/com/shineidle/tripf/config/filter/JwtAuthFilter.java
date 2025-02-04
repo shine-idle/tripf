@@ -1,6 +1,6 @@
 package com.shineidle.tripf.config.filter;
 
-import com.shineidle.tripf.common.util.AuthenticationScheme;
+import com.shineidle.tripf.common.util.auth.AuthenticationScheme;
 import com.shineidle.tripf.common.util.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -40,19 +40,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      * @param request {@link HttpServletRequest}
      */
     private void authenticate(HttpServletRequest request) {
-        // 토큰 검증
         String token = this.getTokenFromRequest(request);
         if (!jwtProvider.validToken(token)) {
             return;
         }
 
-        // 토큰에서 username 가져오기
         String username = this.jwtProvider.getUsername(token);
 
-        // username에 해당하는 유저 찾기
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        // SecurityContext에 인증 객체를 저장
         this.setAuthentication(request, userDetails);
     }
 

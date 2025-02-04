@@ -42,7 +42,9 @@ public class WebConfig {
 
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
-
+    /**
+     * 화이트 리스트
+     */
     private static final String[] WHITE_LIST = {
             "/", "/error", "/api/", "/signup", "/api/signup", "/api/login", "/login",
             "/api/products/**", "/chat/**", "/feeds/*", "/feeds/countries/**",

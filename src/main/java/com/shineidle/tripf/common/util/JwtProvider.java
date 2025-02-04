@@ -2,6 +2,7 @@ package com.shineidle.tripf.common.util;
 
 import com.shineidle.tripf.user.entity.User;
 import com.shineidle.tripf.user.repository.UserRepository;
+import com.shineidle.tripf.user.type.TokenType;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.persistence.EntityNotFoundException;
@@ -199,6 +200,7 @@ public class JwtProvider {
         }
     }
 
+    //TODO : javadoc
     public Authentication getAuthentication(String token) {
         Claims claims = getClaims(token);
 

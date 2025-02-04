@@ -1,6 +1,6 @@
 package com.shineidle.tripf.orderProduct.entity;
 
-import com.shineidle.tripf.common.BaseEntity;
+import com.shineidle.tripf.common.entity.BaseEntity;
 import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.OrderErrorCode;
 import com.shineidle.tripf.order.entity.Order;

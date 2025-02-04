@@ -1,6 +1,6 @@
 package com.shineidle.tripf.payment.entity;
 
-import com.shineidle.tripf.common.BaseEntity;
+import com.shineidle.tripf.common.entity.BaseEntity;
 import com.shineidle.tripf.order.entity.Order;
 import com.shineidle.tripf.payment.dto.PaymentRequestDto;
 import com.shineidle.tripf.payment.type.CancelStatus;
