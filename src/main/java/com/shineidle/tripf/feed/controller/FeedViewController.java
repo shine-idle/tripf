@@ -26,7 +26,6 @@ import java.util.Map;
 @RequestMapping("/feeds")
 @Validated
 public class FeedViewController {
-
     private final FeedService feedService;
     private final CommentService commentService;
 

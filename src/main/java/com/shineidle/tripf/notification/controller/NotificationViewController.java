@@ -11,13 +11,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
-// TODO : javadoc
+
 @Controller
 @RequestMapping("/notifications")
 @RequiredArgsConstructor
 public class NotificationViewController {
     private final NotificationService notificationService;
 
+    /**
+     * 알림 조회 view를 반환합니다.
+     *
+     * @param userDetails 로그인한 사용자 정보 (null일 경우 로그인 필요)
+     * @param model       뷰에 전달할 데이터
+     * @return 알림이 포함된 헤더 뷰 (로그인 상태에 따라 다름)
+     */
     @GetMapping
     public String getNotifications(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -28,7 +35,6 @@ public class NotificationViewController {
             model.addAttribute("notifications", null); // 알림 데이터 없음
             return "header"; // header.html 렌더링
         }
-
         Long userId = userDetails.getUserId();
         List<NotificationResponseDto> notifications = notificationService.findNotification(userId);
         model.addAttribute("notifications", notifications);

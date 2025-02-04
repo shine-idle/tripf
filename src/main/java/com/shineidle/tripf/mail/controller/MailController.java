@@ -15,9 +15,10 @@ public class MailController {
 
     /**
      * 상위 피드 이메일 발송
-     *
      * 매주 월요일 오후 2시 메일 발송
      * 락을 통해 한 서버에서만 실행되도록 설정
+     *
+     * @return Void
      */
     @Operation(summary = "상위 피드 이메일 정기 발송")
     @GetMapping("/sendTopFeedsMail")
@@ -28,6 +29,8 @@ public class MailController {
 
     /**
      * 즉시 메일 발송 API
+     *
+     * @return Void
      */
     @Operation(summary = "즉시 메일 발송")
     @PostMapping("/sendTopFeedsMailNow")

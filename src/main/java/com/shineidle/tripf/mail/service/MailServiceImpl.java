@@ -26,7 +26,6 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-//TODO : javadoc
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -39,6 +38,11 @@ public class MailServiceImpl implements MailService {
 
     private static final String MAIL_LOCK_KEY = "sendTopFeedsMailLock";
 
+    /**
+     * 상위 피드 정기 메일 발송
+     * 매주 14시 월요일 메일 발송
+     * 관리자 이메일 : chews26@naver.com
+     */
     @Override
     @Scheduled(cron = "0 0 14 * * MON", zone = "Asia/Seoul")
     public void sendTopFeedsMail() {
@@ -91,6 +95,10 @@ public class MailServiceImpl implements MailService {
         }
     }
 
+    /**
+     * 상위 피드 즉시 메일 발송
+     * 관리자 이메일 : chews26@naver.com
+     */
     @Override
     public void sendTopFeedsMailNow() {
         RLock lock = redissonClient.getLock(MAIL_LOCK_KEY);
@@ -132,6 +140,13 @@ public class MailServiceImpl implements MailService {
         }
     }
 
+    /**
+     * HTML 형식의 이메일을 전송합니다.
+     *
+     * @param to          수신자 이메일 주소
+     * @param subject     이메일 제목
+     * @param htmlContent 이메일 본문 (HTML 형식)
+     */
     private void sendHtmlMail(String to, String subject, String htmlContent) {
         try {
             MimeMessage message = mailSender.createMimeMessage();

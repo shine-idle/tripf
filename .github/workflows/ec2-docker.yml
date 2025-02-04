@@ -44,6 +44,10 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
+            echo "Redis 캐시 초기화 중..."
+            redis-cli -h ${{ secrets.REDIS_HOST }} -a ${{ secrets.REDIS_PASSWORD }} FLUSHALL
+            echo "Redis 캐시 삭제 완료"
+            
             CONTAINER_ID=$(sudo docker ps -q --filter "publish=8080-8080")
             if [ ! -z "$CONTAINER_ID" ]; then
               sudo docker stop $CONTAINER_ID
@@ -85,6 +89,10 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
+            echo "Redis 캐시 초기화 중..."
+            redis-cli -h ${{ secrets.REDIS_HOST }} -a ${{ secrets.REDIS_PASSWORD }} FLUSHALL
+            echo "Redis 캐시 삭제 완료"
+            
             CONTAINER_ID=$(sudo docker ps -q --filter "publish=8080-8080")
             if [ ! -z "$CONTAINER_ID" ]; then
               sudo docker stop $CONTAINER_ID
