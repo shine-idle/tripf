@@ -1,48 +1,61 @@
 package com.shineidle.tripf.payment.service;
 
-import com.shineidle.tripf.order.entity.Order;
-import com.shineidle.tripf.payment.dto.PaymentCancelDto;
-import com.shineidle.tripf.payment.dto.PaymentConfirmDto;
-import com.shineidle.tripf.payment.dto.PaymentDto;
-import com.shineidle.tripf.payment.dto.PaymentRequestDto;
 import com.shineidle.tripf.payment.entity.Payment;
+import com.shineidle.tripf.payment.repository.PaymentRepository;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
-public interface PaymentService {
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
-    /**
-     * 결제 요청
-     * @param paymentRequestDto
-     * @return
-     */
-    PaymentDto requestPayment(PaymentRequestDto paymentRequestDto);
+@Service
+@Getter
+@RequiredArgsConstructor
+public class PaymentService {
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final PaymentRepository paymentRepository;// Toss 시크릿 키
 
-    /**
-     * 결제 승인
-     * @param paymentConfirmDto 결제 승인 정보
-     * @return 결제 정보
-     */
-    PaymentDto confirmPayment(PaymentConfirmDto paymentConfirmDto);
+    @Value("${toss.secret-key}")
+    private String secretKey;
 
-    /**
-     * 결제 취소
-     * @param paymentCancelDto 결제 취소 정보
-     * @return 결제 취소 정보
-     */
-    PaymentDto cancelPayment(PaymentCancelDto paymentCancelDto);
+    public Map<String, String> createPaymentRequestTest(int amount) {
+        String orderId = "ORDER-" + System.currentTimeMillis();
 
-    /**
-     * 결제 정보 조회
-     * @param paymentKey 결제 키
-     * @return 결제 정보
-     */
-    PaymentDto getPaymentDetails(String paymentKey);
+        Map<String, String> response = new HashMap<>();
+        response.put("orderId", orderId);
+        response.put("amount", String.valueOf(amount));
 
-    /**
-     * 결제 취소 정보 조회
-     * @param paymentKey 결제 키
-     * @return 결제 취소 정보
-     */
-    PaymentDto getCancelDetails(String paymentKey);
+        return response;
+    }
 
+    @Transactional
+    public void confirmPaymentTest(String paymentKey, String orderId, int amount) {
+        String url = "https://api.tosspayments.com/v1/payments/confirm";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBasicAuth(secretKey, "");
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, String> body = new HashMap<>();
+        body.put("paymentKey", paymentKey);
+        body.put("orderId", orderId);
+        body.put("amount", String.valueOf(amount));
+
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            Payment payment = new Payment(
+                    orderId, paymentKey, amount, "테스트 결제",
+                    "SUCCESS", "카드", LocalDateTime.now()
+            );
+            paymentRepository.save(payment);
+        }
+    }
 }

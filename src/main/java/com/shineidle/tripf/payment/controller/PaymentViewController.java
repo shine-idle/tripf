@@ -1,7 +1,7 @@
-package com.shineidle.tripf.paymentTest.controller;
+package com.shineidle.tripf.payment.controller;
 
-import com.shineidle.tripf.paymentTest.dto.PaymentRequestDtoTest;
-import com.shineidle.tripf.paymentTest.service.PaymentServiceTest;
+import com.shineidle.tripf.payment.dto.PaymentRequestDto;
+import com.shineidle.tripf.payment.service.PaymentService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,12 +11,12 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/paymentsTest")
-public class PaymentViewControllerTest {
+public class PaymentViewController {
 
-    private final PaymentServiceTest paymentServiceTest;
+    private final PaymentService paymentService;
 
-    public PaymentViewControllerTest(PaymentServiceTest paymentServiceTest) {
-        this.paymentServiceTest = paymentServiceTest;
+    public PaymentViewController(PaymentService paymentService) {
+        this.paymentService = paymentService;
     }
 
     @Value("${toss.client-key}") // application.properties에서 값 불러오기
@@ -31,15 +31,15 @@ public class PaymentViewControllerTest {
 
     @PostMapping("/requestTest")
     @ResponseBody
-    public Map<String, String> requestPaymentTest(@RequestBody PaymentRequestDtoTest request) {
-        return paymentServiceTest.createPaymentRequestTest(request.getAmount());
+    public Map<String, String> requestPaymentTest(@RequestBody PaymentRequestDto request) {
+        return paymentService.createPaymentRequestTest(request.getAmount());
     }
 
     @GetMapping("/successTest")
     public String showSuccessPageTest(@RequestParam("paymentKey") String paymentKey,
                                       @RequestParam("orderId") String orderId,
                                       @RequestParam("amount") int amount) {
-        paymentServiceTest.confirmPaymentTest(paymentKey, orderId, amount);
+        paymentService.confirmPaymentTest(paymentKey, orderId, amount);
         return "paymentTest/successTest";
     }
 
