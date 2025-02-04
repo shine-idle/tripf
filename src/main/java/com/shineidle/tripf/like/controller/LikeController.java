@@ -1,7 +1,7 @@
 package com.shineidle.tripf.like.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
 import com.shineidle.tripf.like.service.LikeService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +25,7 @@ public class LikeController {
             @PathVariable Long feedId
     ) {
         likeService.createLike(feedId);
+
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -40,6 +41,7 @@ public class LikeController {
             @PathVariable Long feedId
     ) {
         likeService.deleteLike(feedId);
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -9,19 +9,28 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-// TODO: javadoc
 public interface LikeRepository extends JpaRepository<Like, LikePk> {
     /**
-     * 이미 좋아요 했는지 확인
+     * 사용자가 피드에 좋아요를 눌렀는지 확인
+     *
+     * @param likePk {@link LikePk} 객체로, 팔로우 관계를 나타내는 복합 키
+     * @return 좋아요가 눌렸으면 {@code true}, 누르지 않았다면 {@code false}
      */
     boolean existsById(LikePk likePk);
 
     /**
      * 좋아요 취소
+     *
+     * @param likePk {@link LikePk} 객체로, 좋아요를 취소할 피드와 사용자 식별
      */
     void deleteById(LikePk likePk);
 
-    // 좋아요 상위 5개
+    /**
+     * 좋아요 상위 5개 피드 조회
+     *
+     * @param pageable 페이징 정보, 상위 5개의 피드 가져 옴
+     * @return {@Link FeedLikeDto}
+     */
     @Query("SELECT new com.shineidle.tripf.like.dto.FeedLikeDto(" +
             "l.feed.id, f.title, COUNT(l)) " +
             "FROM Like l " +

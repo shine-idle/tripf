@@ -14,6 +14,9 @@ public class FollowPk implements Serializable {
     private User followerId;
     private User followingId;
 
+    /**
+     * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
+     */
     public FollowPk(User followerId, User followingId) {
         this.followerId = followerId;
         this.followingId = followingId;

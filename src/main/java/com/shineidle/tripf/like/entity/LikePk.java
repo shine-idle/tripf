@@ -15,6 +15,9 @@ public class LikePk implements Serializable {
     private Feed feed;
     private User user;
 
+    /**
+     * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
+     */
     public LikePk(Feed feed, User user) {
         this.feed = feed;
         this.user = user;

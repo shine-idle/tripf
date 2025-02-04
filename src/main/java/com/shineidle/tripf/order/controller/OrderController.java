@@ -4,8 +4,8 @@ import com.shineidle.tripf.order.dto.OrderRequestDto;
 import com.shineidle.tripf.order.dto.OrderResponseDto;
 import com.shineidle.tripf.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +30,7 @@ public class OrderController {
             @Valid @RequestBody OrderRequestDto dto
     ) {
         OrderResponseDto orderResponseDto = orderService.createOrder(dto);
+
         return new ResponseEntity<>(orderResponseDto, HttpStatus.CREATED);
     }
 
@@ -42,6 +43,7 @@ public class OrderController {
     @GetMapping
     public ResponseEntity<List<OrderResponseDto>> findAllOrder() {
         List<OrderResponseDto> orderResponseDtoList = orderService.findAllOrder();
+
         return new ResponseEntity<>(orderResponseDtoList, HttpStatus.OK);
     }
 
@@ -57,6 +59,7 @@ public class OrderController {
             @PathVariable Long orderId
     ) {
         OrderResponseDto orderResponseDto = orderService.findOrder(orderId);
+
         return new ResponseEntity<>(orderResponseDto, HttpStatus.OK);
     }
 }
