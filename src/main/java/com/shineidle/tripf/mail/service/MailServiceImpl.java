@@ -1,10 +1,14 @@
 package com.shineidle.tripf.mail.service;
 
+import com.shineidle.tripf.common.exception.GlobalException;
+import com.shineidle.tripf.common.exception.type.LockErrorCode;
+import com.shineidle.tripf.common.exception.type.MailErrorCode;
 import com.shineidle.tripf.like.dto.FeedLikeDto;
 import com.shineidle.tripf.like.service.LikeService;
 import com.shineidle.tripf.user.service.UserService;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.core.io.ClassPathResource;
@@ -22,7 +26,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MailServiceImpl implements MailService{
@@ -38,57 +42,93 @@ public class MailServiceImpl implements MailService{
     @Override
     @Scheduled(cron = "0 0 14 * * MON", zone = "Asia/Seoul")
     public void sendTopFeedsMail() {
+        log.info("📩 sendTopFeedsMail() 실행됨");
 
         RLock lock = redissonClient.getLock(MAIL_LOCK_KEY);
         boolean acquired = false;
 
         try {
-            // 10초 동안 락을 기다리고, 락을 획득하면 1분 후 자동 해제
             acquired = lock.tryLock(10, 60, TimeUnit.SECONDS);
 
             if (!acquired) {
-                // 다른 서버에서 실행 중이면 중단
-                return;
+                throw new GlobalException(LockErrorCode.LOCK_ACQUISITION_FAILED);
             }
 
-            // 오늘이 월요일인지 추가 검증 (예방 차원)
             LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
             if (now.getDayOfWeek() != DayOfWeek.MONDAY || now.getHour() != 14) {
-                return; // 월요일 오후 2시가 아니면 실행하지 않음
+                throw new GlobalException(MailErrorCode.TIME_INVALID);
             }
 
-            // 상위 5개의 피드와 이메일 수신자 목록 가져오기
             List<FeedLikeDto> topFeeds = likeService.getTop5LikedFeedsWithImages();
             List<String> recipientEmails = userService.getActiveUserEmails();
 
+            if (topFeeds.isEmpty()) {
+                throw new GlobalException(MailErrorCode.MAIL_EMPTY);
+            }
 
-            String adminEmail = "mail.tripf@gmail.com";
+            String adminEmail = "chews26@naver.com";
             if (!recipientEmails.contains(adminEmail)) {
                 recipientEmails.add(adminEmail);
             }
 
-            if (recipientEmails.isEmpty()) {
-                return; // 수신자가 없으면 중단
-            }
-
-            // Thymeleaf Context 생성
             Context context = new Context();
             context.setVariable("feeds", topFeeds);
             context.setVariable("defaultImage", "cid:defaultImage");
 
-            // HTML 템플릿 렌더링
-            String htmlContent = templateEngine.process("top-feeds-email", context);
+            String htmlContent = templateEngine.process("mail/top-feeds-email", context);
 
-            // 테스트용 (실제 운영에서는 recipientEmails를 사용)
             for (String email : recipientEmails) {
                 sendHtmlMail(email, "Tripf 오늘의 상위 5개 피드", htmlContent);
             }
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new GlobalException(LockErrorCode.LOCK_INTERRUPTED);
         } finally {
             if (acquired) {
-                lock.unlock(); // 락 해제
+                lock.unlock();
+            }
+        }
+    }
+
+    @Override
+    public void sendTopFeedsMailNow() {
+
+        RLock lock = redissonClient.getLock(MAIL_LOCK_KEY);
+        boolean acquired = false;
+
+        try {
+            acquired = lock.tryLock(10, 60, TimeUnit.SECONDS);
+
+            if (!acquired) {
+                throw new GlobalException(LockErrorCode.LOCK_ACQUISITION_FAILED);
+            }
+
+            List<FeedLikeDto> topFeeds = likeService.getTop5LikedFeedsWithImages();
+            List<String> recipientEmails = userService.getActiveUserEmails();
+
+
+            String adminEmail = "chews26@naver.com";
+            if (!recipientEmails.contains(adminEmail)) {
+                recipientEmails.add(adminEmail);
+            }
+
+            Context context = new Context();
+            context.setVariable("feeds", topFeeds);
+            context.setVariable("defaultImage", "cid:defaultImage");
+
+            String htmlContent = templateEngine.process("mail/top-feeds-email", context);
+
+            for (String email : recipientEmails) {
+                sendHtmlMail(email, "Tripf 오늘의 상위 5개 피드", htmlContent);
+            }
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new GlobalException(LockErrorCode.LOCK_INTERRUPTED);
+        } finally {
+            if (acquired) {
+                lock.unlock();
             }
         }
     }
