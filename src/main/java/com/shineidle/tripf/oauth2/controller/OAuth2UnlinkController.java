@@ -23,7 +23,6 @@ public class OAuth2UnlinkController {
     private final OAuth2UserUnlinkManager unlinkManager;
     private final RefreshTokenService refreshTokenService;
 
-
     /**
      * 소셜 연동해제 (탈퇴)
      *
