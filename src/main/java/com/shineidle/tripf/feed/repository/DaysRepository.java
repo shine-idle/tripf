@@ -1,5 +1,7 @@
 package com.shineidle.tripf.feed.repository;
 
+import com.shineidle.tripf.feed.dto.DaysActivityDto;
+import com.shineidle.tripf.feed.entity.Activity;
 import com.shineidle.tripf.feed.entity.Days;
 import com.shineidle.tripf.feed.entity.Feed;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -51,4 +53,7 @@ public interface DaysRepository extends JpaRepository<Days, Long> {
      * @return existsByFeedAndDate
      */
     boolean existsByFeedAndDate(Feed feed, LocalDate date);
+
+    @Query("SELECT d FROM Days d WHERE d.feed.id = :feedId")
+    List<Days> findAllByFeedId(@Param("feedId") Long feedId);
 }

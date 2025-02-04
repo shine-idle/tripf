@@ -28,13 +28,17 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -51,6 +55,10 @@ public class FeedServiceImpl implements FeedService {
     private final NotificationService notificationService;
     private final RedissonClient redissonClient;
     private final JwtProvider jwtProvider;
+
+
+    private final RedisTemplate<String, Object> redisTemplate;
+    private static final String FEED_CACHE_PREFIX = "feed:";
 
     /**
      * 피드 생성
@@ -248,30 +256,31 @@ public class FeedServiceImpl implements FeedService {
     public FeedResponseDto findFeed(Long feedId) {
         Feed feed = checkFeed(feedId);
 
-        List<Days> daysList = daysRepository.findByFeed(feed);
+        List<Days> daysList = daysRepository.findAllByFeedId(feedId);
 
-        List<DaysResponseDto> daysResponseDto = daysList.stream()
-                .map(days -> {
-                    List<ActivityResponseDto> activityResponseDto = activityRepository.findByDays(days)
-                            .stream()
-                            .map(activity -> {
-                                List<PhotoResponseDto> photoDtos = activity.getActivityPhotos().stream()
-                                        .map(activityPhoto -> PhotoResponseDto.toDto(activityPhoto.getPhoto()))
-                                        .toList();
+        List<Long> daysIds = daysList.stream()
+                .map(Days::getId)
+                .toList();
 
-                                String representativePhotoUrl = activity.getRepresentativePhotoUrl();
+        List<Activity> activities = activityRepository.findAllWithPhotosByDaysIds(daysIds);
 
-                                return ActivityResponseDto.toDto(activity, photoDtos, representativePhotoUrl);
-                            }).toList();
+        Map<Long, List<ActivityResponseDto>> activityMap = activities.stream()
+                .collect(Collectors.groupingBy(
+                        activity -> activity.getDays().getId(),
+                        Collectors.mapping(activity -> {
+                            List<PhotoResponseDto> photoDtos = activity.getActivityPhotos().stream()
+                                    .map(activityPhoto -> PhotoResponseDto.toDto(activityPhoto.getPhoto()))
+                                    .toList();
 
-                    return new DaysResponseDto(
-                            days.getId(),
-                            days.getDate(),
-                            activityResponseDto
-                    );
-                }).toList();
+                            return ActivityResponseDto.toDto(activity, photoDtos, activity.getRepresentativePhotoUrl());
+                        }, Collectors.toList())
+                ));
 
-        return FeedResponseDto.toDto(feed, daysResponseDto);
+        List<DaysResponseDto> daysResponseDtos = daysList.stream()
+                .map(days -> new DaysResponseDto(days.getId(), days.getDate(), activityMap.getOrDefault(days.getId(), List.of())))
+                .toList();
+
+        return FeedResponseDto.toDto(feed, daysResponseDtos);
     }
 
     /**
