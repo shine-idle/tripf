@@ -27,10 +27,10 @@ public class OAuth2UnlinkController {
     /**
      * 소셜 연동해제 (탈퇴)
      *
-     * @param provider {@link OAuth2Provider}
+     * @param provider            {@link OAuth2Provider}
      * @param authorizationHeader Authorization 헤더
-     * @param request {@link HttpServletRequest}
-     * @param response {@link HttpServletResponse}
+     * @param request             {@link HttpServletRequest}
+     * @param response            {@link HttpServletResponse}
      */
     @Operation(summary = "소셜 연동해제 (탈퇴)")
     @PostMapping("/{provider}")

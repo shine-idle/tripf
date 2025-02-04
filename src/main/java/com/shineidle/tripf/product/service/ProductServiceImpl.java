@@ -21,8 +21,9 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * 상품 생성
+     *
      * @param dto {@link ProductRequestDto} </br>
-     * category(카테고리), name(상품명), price(가격), description(상품 설명), stock(재고), status(상품 상태)
+     *            category(카테고리), name(상품명), price(가격), description(상품 설명), stock(재고), status(상품 상태)
      * @return {@link ProductResponseDto}
      */
     @Override
@@ -73,8 +74,8 @@ public class ProductServiceImpl implements ProductService {
      * 상품 수정
      *
      * @param productId 상품Id
-     * @param dto {@link ProductRequestDto} </br>
-     * category(카테고리), name(상품명), price(가격), description(상품 설명), stock(재고), status(상품 상태)
+     * @param dto       {@link ProductRequestDto} </br>
+     *                  category(카테고리), name(상품명), price(가격), description(상품 설명), stock(재고), status(상품 상태)
      * @return {@link ProductResponseDto}
      */
     @Override
@@ -95,6 +96,7 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * 상품 삭제 (단종처리)
+     *
      * @param productId 상품Id
      * @return String - 상품 삭제 처리 문구
      */

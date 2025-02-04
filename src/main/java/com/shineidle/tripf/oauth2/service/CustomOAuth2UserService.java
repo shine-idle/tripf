@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
+// TODO : javadoc 작성
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -80,7 +81,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         oAuth2UserInfo.getName(),
                         oAuth2UserInfo.getProvider().getRegistrationId(),
                         oAuth2UserInfo.getId()
-                        );
+                );
             }
             // 새로운 유저 생성
             userRepository.save(newUser);

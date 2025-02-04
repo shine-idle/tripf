@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 
+// TODO : javadoc 작성
 public interface UserService {
     PostMessageResponseDto createUser(UserRequestDto dto);
 

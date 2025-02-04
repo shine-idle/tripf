@@ -5,6 +5,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
 
+// TODO : javadoc 작성
+// TODO : 예외처리 수정 필요, 하드코딩된 문자열 처리
 @Getter
 public enum UserAuth {
     NORMAL("normal"),
@@ -22,7 +24,6 @@ public enum UserAuth {
                 return auth;
             }
         }
-
         throw new IllegalArgumentException(userAuth + "권한은 존재하지 않습니다.");
     }
 

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+// TODO : javadoc 작성
 @Controller
 @RequiredArgsConstructor
 public class ChatViewController {

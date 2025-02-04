@@ -11,7 +11,7 @@
 
 <script>
     document.getElementById("paymentButton").addEventListener("click", async function() {
-        const response = await fetch("/paymentsTest/requestTest", {
+        const response = await fetch("/payments/request", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ amount: 5000 })
@@ -25,8 +25,8 @@
             orderId: data.orderId,
             orderName: "테스트 결제",
             customerEmail: "user@example.com",
-            successUrl: window.location.origin + "/paymentsTest/successTest",
-            failUrl: window.location.origin + "/paymentsTest/failTest"
+            successUrl: window.location.origin + "/payments/success",
+            failUrl: window.location.origin + "/payments/fail"
         });
     });
 </script>

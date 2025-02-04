@@ -7,6 +7,7 @@ import com.shineidle.tripf.oauth2.user.naver.NaverOAuth2UserInfo;
 
 import java.util.Map;
 
+// TODO : javadoc 작성
 public class OAuth2UserInfoFactory {
 
     public static OAuth2UserInfo getOAuth2UserInfo(String registrationId, String accessToken, Map<String, Object> attributes) {

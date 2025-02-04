@@ -8,6 +8,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+// TODO : javadoc 작성
 @Component
 @RequiredArgsConstructor
 public class GoogleOAuth2UserUnlink implements OAuth2UserUnlink {

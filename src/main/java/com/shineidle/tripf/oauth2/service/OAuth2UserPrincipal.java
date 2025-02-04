@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+// TODO : javadoc 작성
 @Getter
 public class OAuth2UserPrincipal implements OAuth2User, UserDetails {
     private final OAuth2UserInfo userInfo;

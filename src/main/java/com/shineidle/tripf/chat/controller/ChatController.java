@@ -31,8 +31,9 @@ public class ChatController {
 
     /**
      * 특정 채팅방에 메시지를 전송하는 WebSocket 엔드포인트
+     *
      * @param requestDto 전송할 메시지의 데이터
-     * @param roomId 메시지를 보낼 채팅방 Id
+     * @param roomId     메시지를 보낼 채팅방 Id
      */
     @MessageMapping("/chat/sendMessage/{roomId}")
     public void sendMessage(
@@ -57,9 +58,10 @@ public class ChatController {
 
     /**
      * 특정 채팅방의 메시지를 조회하는 HTTP 엔드포인트
-     * @param roomId 조회할 채팅방 Id
+     *
+     * @param roomId        조회할 채팅방 Id
      * @param lastTimestamp 특정 시간 이후의 메시지를 가져오기 위한 타임스탬프 (옵션)
-     * @param limit 조회할 메시지 개수 (기본값 20)
+     * @param limit         조회할 메시지 개수 (기본값 20)
      * @return 조회된 메시지 리스트
      */
     @GetMapping("/chat-room/{roomId}/messages")
@@ -71,9 +73,9 @@ public class ChatController {
         List<ChatMessage> messages = chatMessageService.getMessages(roomId, lastTimestamp, limit);
         List<ChatMessageResponseDto> responseDtos = messages.stream()
                 .map(message -> new ChatMessageResponseDto(
-                                        message.getContent(),
-                                        message.getSender(),
-                                        message.getTimestamp().toString()
+                        message.getContent(),
+                        message.getSender(),
+                        message.getTimestamp().toString()
                 ))
                 .collect(Collectors.toList());
         return new ResponseEntity<>(responseDtos, HttpStatus.OK);

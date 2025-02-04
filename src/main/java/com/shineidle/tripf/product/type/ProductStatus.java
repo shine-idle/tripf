@@ -1,8 +1,8 @@
 package com.shineidle.tripf.product.type;
 
 public enum ProductStatus {
-    IN_STOCK, // 판매중
-    ON_SALE, // 세일
-    SOLD_OUT, // 품절
-    DISCONTINUED // 단종
+    IN_STOCK,
+    ON_SALE,
+    SOLD_OUT,
+    DISCONTINUED
 }

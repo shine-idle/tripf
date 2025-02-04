@@ -6,6 +6,7 @@ import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
 
 import java.util.List;
 
+// TODO : javadoc 작성
 public interface ChatRoomService {
     ChatRoomResponseDto createOrGetRoom(ChatRoomRequestDto chatRoomRequestDto);
 

@@ -19,7 +19,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentService {
     private final RestTemplate restTemplate = new RestTemplate();
-    private final PaymentRepository paymentRepository;// Toss 시크릿 키
+    private final PaymentRepository paymentRepository;
 
     @Value("${toss.secret-key}")
     private String secretKey;

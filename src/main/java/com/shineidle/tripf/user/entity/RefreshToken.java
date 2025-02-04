@@ -24,6 +24,9 @@ public class RefreshToken extends BaseEntity {
     @Column(nullable = false)
     private Instant expiryDate;
 
+    /**
+     * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
+     */
     public RefreshToken(User user, String token, Instant expiryDate) {
         this.user = user;
         this.token = token;

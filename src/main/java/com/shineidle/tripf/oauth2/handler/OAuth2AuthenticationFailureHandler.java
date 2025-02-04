@@ -15,6 +15,7 @@ import java.io.IOException;
 
 import static com.shineidle.tripf.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME;
 
+// TODO : javadoc 작성
 @Component
 @RequiredArgsConstructor
 public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
