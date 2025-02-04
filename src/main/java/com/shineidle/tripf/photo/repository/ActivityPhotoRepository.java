@@ -9,7 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface ActivityPhotoRepository extends JpaRepository<ActivityPhoto, Long> {
-
     /**
      * 활동Id와 사진Id에 해당하는 활동사진 반환
      *

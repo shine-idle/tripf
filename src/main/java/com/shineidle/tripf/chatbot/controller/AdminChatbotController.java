@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin/chatbots")
 @RequiredArgsConstructor
 public class AdminChatbotController {
-
     private final RedisChatbotService redisChatbotService;
 
     /**

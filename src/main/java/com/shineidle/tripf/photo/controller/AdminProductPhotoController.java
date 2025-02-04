@@ -19,7 +19,6 @@ import java.io.IOException;
 @RequestMapping("/api/admin/products/{productId}/photos")
 @RequiredArgsConstructor
 public class AdminProductPhotoController {
-
     private final PhotoService photoService;
 
     /**
@@ -69,7 +68,6 @@ public class AdminProductPhotoController {
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
-
     /**
      * 상품 사진 삭제
      *
@@ -88,5 +86,4 @@ public class AdminProductPhotoController {
         PostMessageResponseDto responseDto = new PostMessageResponseDto(PostMessage.PHOTO_DELETED);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
-
 }

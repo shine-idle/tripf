@@ -20,7 +20,6 @@ import java.util.List;
 @RequestMapping("/api/activities/{activityId}/photos")
 @RequiredArgsConstructor
 public class ActivityPhotoController {
-
     private final PhotoService photoService;
 
     /**

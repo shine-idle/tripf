@@ -19,7 +19,6 @@ import java.util.List;
 @RequestMapping("/api/carts")
 @RequiredArgsConstructor
 public class CartController {
-
     private final CartService cartService;
 
     /**
@@ -35,7 +34,6 @@ public class CartController {
             @PathVariable Long productId,
             @Valid @RequestBody CartRequestDto cartRequestDto
     ) {
-
         CartResponseDto responseDto = cartService.createCart(productId, cartRequestDto);
 
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
@@ -49,7 +47,6 @@ public class CartController {
     @Operation(summary = "장바구니 조회")
     @GetMapping
     public ResponseEntity<List<CartResponseDto>> findCart() {
-
         List<CartResponseDto> responseDtos = cartService.findCart();
 
         return new ResponseEntity<>(responseDtos, HttpStatus.OK);
@@ -68,7 +65,6 @@ public class CartController {
             @PathVariable Long productId,
             @Valid @RequestBody CartRequestDto cartRequestDto
     ) {
-
         CartResponseDto responseDto = cartService.updateCart(productId, cartRequestDto);
 
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
@@ -85,7 +81,6 @@ public class CartController {
     public ResponseEntity<PostMessageResponseDto> deleteCart(
             @PathVariable Long productId
     ) {
-
         cartService.deleteCart(productId);
         PostMessageResponseDto responseDto = new PostMessageResponseDto(PostMessage.PRODUCT_DELETED);
 

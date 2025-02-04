@@ -13,7 +13,6 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class RedisChatbotService {
-
     private final RedisTemplate<String, Object> redisTemplate;
 
     /**

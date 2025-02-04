@@ -26,5 +26,4 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
      * @return {@link Cart}
      */
     List<Cart> findAllByUserId(Long userId);
-
 }

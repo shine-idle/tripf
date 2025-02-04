@@ -21,7 +21,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
-
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
 
@@ -126,7 +125,5 @@ public class CartServiceImpl implements CartService {
 
         return cartRepository.findByUserIdAndProductId(userId, productId)
                 .orElseThrow(()-> new GlobalException(CartErrorCode.CART_NOT_FOUND));
-
     }
-
 }

@@ -21,7 +21,6 @@ import java.util.List;
 @RequestMapping("/api/chatbots")
 @RequiredArgsConstructor
 public class ChatbotController {
-
     private final ChatbotService chatbotService;
 
     /**
@@ -50,6 +49,7 @@ public class ChatbotController {
     public ResponseEntity<List<ChatbotResponseDto>> findConversationLogs() {
 
         List<ChatbotResponseDto> responseDtos = chatbotService.findConversationLogs();
+
         return new ResponseEntity<>(responseDtos, HttpStatus.OK);
     }
 
@@ -63,6 +63,7 @@ public class ChatbotController {
     public ResponseEntity<List<ChatbotQuestionsResponseDto>> findAllChatbotQuestion() {
 
         List<ChatbotQuestionsResponseDto> responseDtos = chatbotService.findAllChatbotQuestion();
+
         return new ResponseEntity<>(responseDtos, HttpStatus.OK);
     }
 }

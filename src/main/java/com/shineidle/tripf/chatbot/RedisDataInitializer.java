@@ -9,7 +9,6 @@ import java.util.Arrays;
 @Component
 @RequiredArgsConstructor
 public class RedisDataInitializer implements CommandLineRunner {
-
     private final RedisChatbotService redisChatbotService;
 
     @Override

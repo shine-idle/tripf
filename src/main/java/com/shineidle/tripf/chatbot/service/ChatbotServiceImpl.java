@@ -39,7 +39,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class ChatbotServiceImpl implements ChatbotService {
-
     private final RedisUtils redisUtils;
     private final RedissonClient redissonClient;
     private final RedisChatbotService redisChatbotService;
@@ -141,7 +140,6 @@ public class ChatbotServiceImpl implements ChatbotService {
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
-                ;
             }
         }
     }
@@ -172,7 +170,6 @@ public class ChatbotServiceImpl implements ChatbotService {
                 },
                 Duration.ofHours(1) // TTL 1시간
         );
-
     }
 
     /**

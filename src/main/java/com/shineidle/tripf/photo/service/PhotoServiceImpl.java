@@ -34,7 +34,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class PhotoServiceImpl implements PhotoService {
-
     private final PhotoRepository photoRepository;
     private final ActivityRepository activityRepository;
     private final ProductRepository productRepository;
@@ -258,7 +257,6 @@ public class PhotoServiceImpl implements PhotoService {
         return photos.stream().map(PhotoResponseDto::toDto).toList();
     }
 
-
     /**
      * 사진 수정
      *
@@ -304,7 +302,6 @@ public class PhotoServiceImpl implements PhotoService {
 
         // 사진 엔티티 삭제
         photoRepository.delete(photo);
-
     }
 
     /**
