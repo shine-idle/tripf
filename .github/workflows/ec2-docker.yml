@@ -2,7 +2,7 @@ name: Docker Multi-Stage Build and EC2 Deployment
 
 on:
   push:
-    branches: [ refactor/jh ] # develop 브랜치에 push된 경우 트리거 -> 추후 main으로 수정 필요
+    branches: [ develop ] # develop 브랜치에 push된 경우 트리거 -> 추후 main으로 수정 필요
 
 jobs:
   docker-build-and-push:
