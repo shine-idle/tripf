@@ -24,7 +24,7 @@ public class PaymentService {
     @Value("${toss.secret-key}")
     private String secretKey;
 
-    public Map<String, String> createPaymentRequestTest(int amount) {
+    public Map<String, String> createPaymentRequest(int amount) {
         String orderId = "ORDER-" + System.currentTimeMillis();
 
         Map<String, String> response = new HashMap<>();
@@ -35,7 +35,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public void confirmPaymentTest(String paymentKey, String orderId, int amount) {
+    public void confirmPayment(String paymentKey, String orderId, int amount) {
         String url = "https://api.tosspayments.com/v1/payments/confirm";
 
         HttpHeaders headers = new HttpHeaders();

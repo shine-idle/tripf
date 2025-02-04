@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/paymentsTest")
+@RequestMapping("/payments")
 public class PaymentViewController {
 
     private final PaymentService paymentService;
@@ -23,28 +23,28 @@ public class PaymentViewController {
     private String tossClientKey;
 
     @GetMapping
-    public String showPaymentPageTest(Model model) {
+    public String showPaymentPage(Model model) {
         model.addAttribute("amount", 5000);
         model.addAttribute("tossClientKey", tossClientKey);
-        return "paymentTest/paymentTest";
+        return "payment/payment";
     }
 
-    @PostMapping("/requestTest")
+    @PostMapping("/request")
     @ResponseBody
-    public Map<String, String> requestPaymentTest(@RequestBody PaymentRequestDto request) {
-        return paymentService.createPaymentRequestTest(request.getAmount());
+    public Map<String, String> requestPayment(@RequestBody PaymentRequestDto request) {
+        return paymentService.createPaymentRequest(request.getAmount());
     }
 
-    @GetMapping("/successTest")
-    public String showSuccessPageTest(@RequestParam("paymentKey") String paymentKey,
+    @GetMapping("/success")
+    public String showSuccessPage(@RequestParam("paymentKey") String paymentKey,
                                       @RequestParam("orderId") String orderId,
                                       @RequestParam("amount") int amount) {
-        paymentService.confirmPaymentTest(paymentKey, orderId, amount);
-        return "paymentTest/successTest";
+        paymentService.confirmPayment(paymentKey, orderId, amount);
+        return "payment/success";
     }
 
-    @GetMapping("/failTest")
-    public String showFailPageTest() {
-        return "paymentTest/failTest";
+    @GetMapping("/fail")
+    public String showFailPage() {
+        return "payment/fail";
     }
 }
