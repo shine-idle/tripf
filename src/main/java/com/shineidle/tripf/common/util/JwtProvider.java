@@ -54,6 +54,7 @@ public class JwtProvider {
     /**
      * 토큰 생성 후 리턴 </br>
      * 입력받은 {@link Authentication}에서 추출한 {@code username}으로 토큰 생성
+     *
      * @param authentication 인증 완료된 후 세부 정보
      * @return 토큰
      * @throws EntityNotFoundException 입력받은 이메일에 해당하는 사용자를 찾지 못했을 경우
@@ -74,6 +75,7 @@ public class JwtProvider {
 
     /**
      * 입력받은 토큰에서 {@link Authentication}의 {@code username}을 리턴
+     *
      * @param token 토큰
      * @return username
      */
@@ -84,6 +86,7 @@ public class JwtProvider {
 
     /**
      * 토큰이 유효한지 체크
+     *
      * @param token 토큰
      * @return 유효 여부 </br> true 유효, false 유효하지 않음
      */
@@ -103,6 +106,7 @@ public class JwtProvider {
 
     /**
      * (일반 로그인) 이메일을 이용해 토큰을 생성 (HS256 알고리즘 이용)
+     *
      * @param email 이메일
      * @return 생성된 토큰
      * @throws EntityNotFoundException 입력받은 이메일에 해당하는 유저를 찾지 못한 경우 예외 발생
@@ -116,6 +120,7 @@ public class JwtProvider {
 
     /**
      * (소셜 로그인) 이메일을 이용해 토큰을 생성 (HS256 알고리즘 이용)
+     *
      * @param email 이메일
      * @return 생성된 토큰
      */
@@ -145,6 +150,7 @@ public class JwtProvider {
 
     /**
      * JWT claim 부분 가져오기
+     *
      * @param token 토큰
      * @return {@link Claims}
      * @see <a href="https://ko.wikipedia.org/wiki/JSON_%EC%9B%B9_%ED%86%A0%ED%81%B0">JSON 웹 토큰</a>
@@ -163,6 +169,7 @@ public class JwtProvider {
 
     /**
      * 토큰의 만료 여부 확인
+     *
      * @param token 토큰
      * @return 만료 true, 만료되지 않음 false
      */
@@ -173,6 +180,7 @@ public class JwtProvider {
 
     /**
      * 토큰의 만료일을 리턴
+     *
      * @param token 토큰
      * @return 만료일
      */
@@ -182,9 +190,10 @@ public class JwtProvider {
 
     /**
      * 토큰에 입력 받은 로직을 적용하고 그 결과를 리턴
-     * @param token 토큰
+     *
+     * @param token          토큰
      * @param claimsResolver 토큰에 적용할 로직
-     * @param <T> {@code claimsResolver}의 리턴 타입
+     * @param <T>            {@code claimsResolver}의 리턴 타입
      * @return {@code T}
      */
     private <T> T resolveClaims(String token, Function<Claims, T> claimsResolver) {
@@ -200,7 +209,12 @@ public class JwtProvider {
         }
     }
 
-    //TODO : javadoc
+    /**
+     * JWT 토큰을 기반으로 사용자 인증 정보를 생성
+     *
+     * @param token JWT 토큰
+     * @return Authentication 객체 (사용자 이름과 권한 포함)
+     */
     public Authentication getAuthentication(String token) {
         Claims claims = getClaims(token);
 

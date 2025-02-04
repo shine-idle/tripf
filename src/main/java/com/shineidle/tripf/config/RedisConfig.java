@@ -3,7 +3,6 @@ package com.shineidle.tripf.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.shineidle.tripf.feed.dto.FeedResponseDto;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -17,17 +16,24 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 
-// TODO: javadoc
+/**
+ * Redis 설정을 담당하는 클래스
+ */
 @Configuration
 @EnableCaching
 public class RedisConfig {
 
+    /**
+     * Redis 캐시 관리를 위한 CacheManager 빈을 생성
+     *
+     * @param redisConnectionFactory Redis 연결 팩토리
+     * @return 설정된 CacheManager 객체
+     */
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -44,6 +50,12 @@ public class RedisConfig {
                 .build();
     }
 
+    /**
+     * 일반적인 Redis 데이터 저장을 위한 RedisTemplate 설정
+     *
+     * @param connectionFactory Redis 연결 팩토리
+     * @return 설정된 RedisTemplate 객체
+     */
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
@@ -64,6 +76,12 @@ public class RedisConfig {
         return template;
     }
 
+    /**
+     * Feed 데이터를 저장하기 위한 RedisTemplate 설정
+     *
+     * @param connectionFactory Redis 연결 팩토리
+     * @return 설정된 RedisTemplate 객체
+     */
     @Bean
     public RedisTemplate<String, Object> feedRedisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
@@ -96,6 +114,11 @@ public class RedisConfig {
     private String password;
     private static final String REDISSON_PREFIX = "redis://";
 
+    /**
+     * Redisson 클라이언트를 설정하고 반환
+     *
+     * @return 설정된 RedissonClient 객체
+     */
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();

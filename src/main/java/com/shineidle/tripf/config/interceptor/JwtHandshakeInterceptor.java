@@ -16,7 +16,6 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
-
     private final JwtProvider jwtProvider;
 
     @Override

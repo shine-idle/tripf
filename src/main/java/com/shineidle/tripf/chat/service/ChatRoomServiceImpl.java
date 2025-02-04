@@ -16,13 +16,21 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-// TODO : javadoc 작성
+/**
+ * 채팅방을 관리하는 서비스 구현체
+ */
 @Service
 @RequiredArgsConstructor
 public class ChatRoomServiceImpl implements ChatRoomService {
     private final RedisUtils redisUtils;
     private final ChatRoomRepository chatRoomRepository;
 
+    /**
+     * 새로운 채팅방을 생성하거나 기존 채팅방을 조회
+     *
+     * @param chatRoomRequestDto 채팅방 생성 요청 데이터
+     * @return 생성된 채팅방 정보
+     */
     @Override
     public ChatRoomResponseDto createOrGetRoom(ChatRoomRequestDto chatRoomRequestDto) {
         ChatRoom room = chatRoomRepository.findByUsers(chatRoomRequestDto.getUsers());
@@ -40,6 +48,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         return new ChatRoomResponseDto(room.getId(), room.getName(), room.getUsers());
     }
 
+    /**
+     * 특정 채팅방을 조회
+     *
+     * @param roomId 조회할 채팅방 Id
+     * @return 조회된 채팅방 정보
+     */
     @Override
     public ChatRoomResponseDto findRoom(String roomId) {
         ChatRoom room = (ChatRoom) redisUtils.getFromRedis("chatRoom:" + roomId);
@@ -52,6 +66,11 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         return new ChatRoomResponseDto(room.getId(), room.getName(), room.getUsers());
     }
 
+    /**
+     * 모든 채팅방을 조회
+     *
+     * @return 채팅방 리스트
+     */
     @Override
     public List<ChatRoomResponseDto> findRooms() {
         List<ChatRoom> all = chatRoomRepository.findAll();
@@ -64,6 +83,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .toList();
     }
 
+    /**
+     * 특정 채팅방을 삭제
+     *
+     * @param roomId 삭제할 채팅방 Id
+     * @return 삭제 결과 메시지
+     */
     @Override
     public PostMessageResponseDto deleteRoom(String roomId) {
         ChatRoom room = chatRoomRepository.findById(roomId).orElseThrow(() -> new GlobalException(ChatErrorCode.CHATROOM_NOT_FOUND));
