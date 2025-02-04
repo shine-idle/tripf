@@ -8,9 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+// TODO: javadoc
 @Repository
 public interface FollowRepository extends JpaRepository<Follow, FollowPk> {
-
     /**
      *  팔로워 조회
      */

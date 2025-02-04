@@ -42,6 +42,9 @@ public class Order extends BaseEntity {
 
     private LocalDateTime createdAt;
 
+    /**
+     * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
+     */
     public Order() {
     }
 
@@ -54,12 +57,18 @@ public class Order extends BaseEntity {
         this.createdAt = createdAt;
     }
 
+    /**
+     * 연관관계 편의 메소드 - 반대쪽에는 연관관계 편의 메소드가 없도록 주의합니다.
+     */
     public void addOrderProduct(OrderProduct orderProduct) {
         this.orderProducts.add(orderProduct);
-        orderProduct.setOrder(this);
+        orderProduct.updateOrder(this);
         updateTotalPrice();
     }
 
+    /**
+     * 서비스 메소드 - 외부에서 엔티티를 수정할 메소드를 정의합니다. (단일 책임을 가지도록 주의합니다.)
+     */
     private void updateTotalPrice() {
         this.totalPrice = this.orderProducts.stream()
                 .mapToLong(OrderProduct::getTotalPrice)

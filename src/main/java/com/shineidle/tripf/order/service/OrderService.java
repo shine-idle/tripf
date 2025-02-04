@@ -7,9 +7,18 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 public interface OrderService {
-    OrderResponseDto createOrder (@Valid OrderRequestDto dto);
+    /**
+     * 주문 생성
+     */
+    OrderResponseDto createOrder(@Valid OrderRequestDto dto);
 
+    /**
+     * 주문 조회(다건)
+     */
     List<OrderResponseDto> findAllOrder();
 
+    /**
+     * 주문 조회(단건)
+     */
     OrderResponseDto findOrder(Long orderId);
 }

@@ -9,8 +9,8 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
+// TODO: javadoc
 public interface LikeRepository extends JpaRepository<Like, LikePk> {
-
     /**
      * 이미 좋아요 했는지 확인
      */

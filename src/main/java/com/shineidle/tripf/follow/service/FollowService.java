@@ -5,14 +5,13 @@ import com.shineidle.tripf.follow.dto.FollowResponseDto;
 import java.util.List;
 
 public interface FollowService {
-
     /**
      * 팔로우 추가
      */
     void createFollow(Long followingId);
 
     /**
-     *  팔로워 조회
+     * 팔로워 조회
      */
     List<FollowResponseDto> findFollowers();
 
@@ -27,7 +26,7 @@ public interface FollowService {
     void deleteFollowByFollowingId(Long followingId);
 
     /**
-     *  팔로워 삭제
+     * 팔로워 삭제
      */
     void deleteFollowByFollowerId(Long followerId);
 }
