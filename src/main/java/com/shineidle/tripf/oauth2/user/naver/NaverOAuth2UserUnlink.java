@@ -23,6 +23,12 @@ public class NaverOAuth2UserUnlink implements OAuth2UserUnlink {
     @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
     private String clientSecret;
 
+    /**
+     * Naver OAuth2 계정 연결을 해제합니다.
+     *
+     * @param accessToken 해제할 OAuth2 액세스 토큰
+     * @throws RuntimeException Naver 계정 해제 실패 시 예외 발생
+     */
     @Override
     public void unlink(String accessToken) {
         String url = URL +
@@ -43,6 +49,9 @@ public class NaverOAuth2UserUnlink implements OAuth2UserUnlink {
         }
     }
 
+    /**
+     * Naver 계정 연결 해제 응답을 저장하는 내부 클래스입니다.
+     */
     @Getter
     @RequiredArgsConstructor
     public static class UnlinkResponse {

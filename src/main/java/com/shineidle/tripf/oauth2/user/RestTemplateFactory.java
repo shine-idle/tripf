@@ -4,16 +4,24 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-// TODO : javadoc 작성
 @Component
 public class RestTemplateFactory {
     private final RestTemplateBuilder restTemplateBuilder;
 
+    /**
+     * RestTemplateFactory 생성자.
+     *
+     * @param restTemplateBuilder RestTemplate 생성을 위한 빌더 객체
+     */
     public RestTemplateFactory(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplateBuilder = restTemplateBuilder;
     }
 
-    //RestTemplate / OAuth2 연결 끊기 기능 구현시 HTTP API 요청을 위해 사용
+    /**
+     * 새로운 RestTemplate 객체를 생성하여 반환합니다.
+     *
+     * @return 생성된 RestTemplate 객체
+     */
     public RestTemplate create() {
         return restTemplateBuilder.build();
     }
