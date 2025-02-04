@@ -117,6 +117,9 @@ spring:
     hidden-method:
       filter:
         enabled: true
+  config:
+    activate:
+      on-profile: develop
 
 jwt:
   secret: ${JWT_SECRET}

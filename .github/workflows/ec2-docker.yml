@@ -2,7 +2,7 @@ name: Docker Multi-Stage Build and EC2 Deployment
 
 on:
   push:
-    branches: [ develop ] # develop 브랜치에 push된 경우 트리거 -> 추후 main으로 수정 필요
+    branches: [ refactor/jh ] # develop 브랜치에 push된 경우 트리거 -> 추후 main으로 수정 필요
 
 jobs:
   docker-build-and-push:
@@ -51,6 +51,7 @@ jobs:
             fi
             sudo docker pull ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_IMAGE_TAG_NAME }}:latest
             sudo docker run -d -p 8080:8080 \
+                -e SPRING_PROFILES_ACTIVE=deploy \
                 -e DB_USER=${{ secrets.DB_USER }} \
                 -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
                 -e DB_URL=${{ secrets.DB_URL }} \
@@ -91,6 +92,7 @@ jobs:
             fi
             sudo docker pull ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_IMAGE_TAG_NAME }}:latest
             sudo docker run -d -p 8080:8080 \
+                -e SPRING_PROFILES_ACTIVE=deploy \
                 -e DB_USER=${{ secrets.DB_USER }} \
                 -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
                 -e DB_URL=${{ secrets.DB_URL }} \
