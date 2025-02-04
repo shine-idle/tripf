@@ -1,7 +1,7 @@
 package com.shineidle.tripf.oauth2.handler;
 
 import com.shineidle.tripf.common.util.JwtProvider;
-import com.shineidle.tripf.common.util.TokenType;
+import com.shineidle.tripf.user.type.TokenType;
 import com.shineidle.tripf.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.shineidle.tripf.oauth2.service.OAuth2UserPrincipal;
 import com.shineidle.tripf.oauth2.user.OAuth2Provider;

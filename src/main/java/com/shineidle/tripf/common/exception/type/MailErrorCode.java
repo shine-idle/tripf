@@ -7,9 +7,11 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum LikeErrorCode implements ExceptionType {
-    ALREADY_LIKE(HttpStatus.BAD_REQUEST,"이미 좋아요를 눌렀습니다"),
-    LIKED_YET(HttpStatus.BAD_REQUEST, "좋아요를 먼저 해주세요");
+public enum MailErrorCode implements ExceptionType {
+
+    TIME_INVALID(HttpStatus.BAD_REQUEST, "메일 발송시간이 아닙니다."),
+    MAIL_EMPTY(HttpStatus.NOT_FOUND, "상위 피드가 없습니다.")
+    ;
 
     private final HttpStatus httpStatus;
     private final String message;

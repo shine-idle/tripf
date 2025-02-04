@@ -3,7 +3,7 @@ package com.shineidle.tripf.like.service;
 import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.LikeErrorCode;
 import com.shineidle.tripf.common.message.constants.NotificationMessage;
-import com.shineidle.tripf.common.util.UserAuthorizationUtil;
+import com.shineidle.tripf.common.util.auth.UserAuthorizationUtil;
 import com.shineidle.tripf.feed.entity.Feed;
 import com.shineidle.tripf.feed.service.FeedService;
 import com.shineidle.tripf.like.dto.FeedLikeDto;

@@ -1,7 +1,7 @@
 package com.shineidle.tripf.user.controller;
 
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
-import com.shineidle.tripf.common.message.enums.PostMessage;
+import com.shineidle.tripf.common.message.type.PostMessage;
 import com.shineidle.tripf.user.dto.JwtResponseDto;
 import com.shineidle.tripf.user.dto.UserRequestDto;
 import com.shineidle.tripf.user.service.UserService;

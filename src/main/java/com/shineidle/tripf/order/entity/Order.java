@@ -1,6 +1,6 @@
 package com.shineidle.tripf.order.entity;
 
-import com.shineidle.tripf.common.BaseEntity;
+import com.shineidle.tripf.common.entity.BaseEntity;
 import com.shineidle.tripf.order.type.OrderStatus;
 import com.shineidle.tripf.orderProduct.entity.OrderProduct;
 import com.shineidle.tripf.payment.entity.Payment;

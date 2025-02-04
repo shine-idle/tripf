@@ -3,7 +3,7 @@ package com.shineidle.tripf.user.service;
 import com.shineidle.tripf.common.exception.GlobalException;
 import com.shineidle.tripf.common.exception.type.UserErrorCode;
 import com.shineidle.tripf.common.util.JwtProvider;
-import com.shineidle.tripf.common.util.TokenType;
+import com.shineidle.tripf.user.type.TokenType;
 import com.shineidle.tripf.user.entity.RefreshToken;
 import com.shineidle.tripf.user.entity.User;
 import com.shineidle.tripf.user.repository.RefreshTokenRepository;

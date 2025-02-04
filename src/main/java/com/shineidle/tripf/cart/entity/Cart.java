@@ -1,7 +1,7 @@
 package com.shineidle.tripf.cart.entity;
 
 import com.shineidle.tripf.cart.dto.CartRequestDto;
-import com.shineidle.tripf.common.BaseEntity;
+import com.shineidle.tripf.common.entity.BaseEntity;
 import com.shineidle.tripf.product.entity.Product;
 import com.shineidle.tripf.user.entity.User;
 import jakarta.persistence.*;

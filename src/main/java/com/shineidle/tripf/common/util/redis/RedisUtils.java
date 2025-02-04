@@ -1,4 +1,4 @@
-package com.shineidle.tripf.common.util;
+package com.shineidle.tripf.common.util.redis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -48,7 +48,9 @@ public class RedisUtils {
         return value;
     }
 
-    // DB에서 데이터를 조회하는 메서드의 인터페이스
+    /**
+     *  레디스 조회 시 수행할 메서드
+     */
     public interface DbFetcher<T> {
         T fetch();
     }
