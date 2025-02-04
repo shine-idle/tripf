@@ -1,6 +1,6 @@
-package com.shineidle.tripf.paymentTest.dto;
+package com.shineidle.tripf.payment.dto;
 
-public class PaymentConfirmRequestDtoTest {
+public class PaymentConfirmRequestDto {
     private String paymentKey;
     private String orderId;
     private int amount;
