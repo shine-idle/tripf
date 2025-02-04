@@ -24,11 +24,13 @@ import com.shineidle.tripf.photo.dto.PhotoResponseDto;
 import com.shineidle.tripf.user.entity.User;
 import com.shineidle.tripf.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -36,12 +38,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FeedServiceImpl implements FeedService {
@@ -56,8 +58,9 @@ public class FeedServiceImpl implements FeedService {
     private final RedissonClient redissonClient;
     private final JwtProvider jwtProvider;
 
+    private final RedisFeedService redisFeedService;
+    private final RedisTemplate<String, Object> feedRedisTemplate;
 
-    private final RedisTemplate<String, Object> redisTemplate;
     private static final String FEED_CACHE_PREFIX = "feed:";
 
     /**
@@ -145,6 +148,7 @@ public class FeedServiceImpl implements FeedService {
     }
 
     @Override
+    @Transactional
     public FeedResponseDto createFeed(FeedRequestDto feedRequestDto) {
         User userId = UserAuthorizationUtil.getLoginUser();
 
@@ -169,6 +173,8 @@ public class FeedServiceImpl implements FeedService {
                 );
                 Feed savedFeed = feedRepository.save(feed);
 
+                List<DaysResponseDto> daysResponseDtos = new ArrayList<>();
+
                 if (feedRequestDto.getDays() != null) {
                     feedRequestDto.getDays().forEach(daysRequestDto -> {
                         Days days = new Days(savedFeed, daysRequestDto.getDate());
@@ -183,6 +189,7 @@ public class FeedServiceImpl implements FeedService {
                         }
 
                         Days savedDays = daysRepository.save(days);
+                        List<ActivityResponseDto> activityDtos = new ArrayList<>();
 
                         if (daysRequestDto.getActivity() != null) {
                             daysRequestDto.getActivity().forEach(activityRequestDto -> {
@@ -196,14 +203,31 @@ public class FeedServiceImpl implements FeedService {
                                         activityRequestDto.getLongitude()
                                 );
                                 activityRepository.save(activity);
+
+                                List<PhotoResponseDto> photoDtos = activity.getActivityPhotos().stream()
+                                        .map(activityPhoto -> PhotoResponseDto.toDto(activityPhoto.getPhoto()))
+                                        .toList();
+
+                                String representativePhotoUrl = activity.getRepresentativePhotoUrl();
+
+                                activityDtos.add(ActivityResponseDto.toDto(activity, photoDtos, representativePhotoUrl));
                             });
                         }
+
+                        daysResponseDtos.add(new DaysResponseDto(savedDays.getId(), savedDays.getDate(), activityDtos));
                     });
                 }
 
                 followerNewPostNotification(userId, feed.getId());
 
-                return findFeed(savedFeed.getId());
+                FeedResponseDto newFeed = FeedResponseDto.toDto(savedFeed, daysResponseDtos);
+
+                redisFeedService.updateCache(savedFeed.getId(), newFeed);
+
+                redisFeedService.deleteCache("homeCache");
+                redisFeedService.deleteCache("region:" + country);
+
+                return newFeed;
             } else {
                 throw new GlobalException(LockErrorCode.LOCK_ACQUISITION_FAILED);
             }
@@ -216,6 +240,7 @@ public class FeedServiceImpl implements FeedService {
             }
         }
     }
+
 
     /**
      * 피드 수정
@@ -243,6 +268,12 @@ public class FeedServiceImpl implements FeedService {
                 feedRequestDto.getTag()
         );
         feedRepository.save(feed);
+
+        FeedResponseDto updatedFeed = findFeed(feedId);
+
+        redisFeedService.updateCache(feedId, updatedFeed);
+        redisFeedService.deleteCache("homeCache");
+        redisFeedService.deleteCache("region:" + country);
         return findFeed(feedId);
     }
 
@@ -254,6 +285,13 @@ public class FeedServiceImpl implements FeedService {
      */
     @Override
     public FeedResponseDto findFeed(Long feedId) {
+        FeedResponseDto cachedFeed = redisFeedService.getFeed(feedId);
+        if (cachedFeed != null) {
+            log.info("Redis 캐시에서 FeedResponseDto 조회 성공: {}", feedId);
+            return cachedFeed;
+        }
+
+        log.info("Redis 캐시에 없음, DB 조회 수행: {}", feedId);
         Feed feed = checkFeed(feedId);
 
         List<Days> daysList = daysRepository.findAllByFeedId(feedId);
@@ -280,8 +318,14 @@ public class FeedServiceImpl implements FeedService {
                 .map(days -> new DaysResponseDto(days.getId(), days.getDate(), activityMap.getOrDefault(days.getId(), List.of())))
                 .toList();
 
-        return FeedResponseDto.toDto(feed, daysResponseDtos);
+        FeedResponseDto feedResponseDto = FeedResponseDto.toDto(feed, daysResponseDtos);
+
+        redisFeedService.saveFeed(feedId, feedResponseDto);
+        log.info("FeedResponseDto를 Redis에 캐싱 완료: {}", feedId);
+
+        return feedResponseDto;
     }
+
 
     /**
      * 피드 삭제
@@ -295,6 +339,9 @@ public class FeedServiceImpl implements FeedService {
         Feed feed = checkFeed(feedId);
         feed.markAsDeleted();
         feedRepository.save(feed);
+
+        feedRedisTemplate.delete("feed:" + feedId);
+
         return new PostMessageResponseDto(PostMessage.PEED_DELETED);
     }
 
@@ -310,9 +357,18 @@ public class FeedServiceImpl implements FeedService {
     public PostMessageResponseDto deleteDays(Long feedId, Long daysId) {
         checkUser(feedId);
         checkDays(feedId, daysId);
+
         daysRepository.deleteById(daysId);
+
+        FeedResponseDto updatedFeed = findFeed(feedId);
+        redisFeedService.updateCache(feedId, updatedFeed);
+
+        redisFeedService.deleteCache("homeCache");
+        redisFeedService.deleteCache("region:" + checkFeed(feedId).getCountry());
+
         return new PostMessageResponseDto(PostMessage.DAYS_DELETED);
     }
+
 
     /**
      * 활동 삭제
@@ -327,7 +383,15 @@ public class FeedServiceImpl implements FeedService {
     public PostMessageResponseDto deleteActivity(Long feedId, Long daysId, Long activityId) {
         checkUser(feedId);
         checkActivity(feedId, daysId, activityId);
+
         activityRepository.deleteById(activityId);
+
+        FeedResponseDto updatedFeed = findFeed(feedId);
+        redisFeedService.updateCache(feedId, updatedFeed);
+
+        redisFeedService.deleteCache("homeCache");
+        redisFeedService.deleteCache("region:" + checkFeed(feedId).getCountry());
+
         return new PostMessageResponseDto(PostMessage.ACTIVITY_DELETED);
     }
 
@@ -372,7 +436,14 @@ public class FeedServiceImpl implements FeedService {
                         activityRepository.save(activity);
                     });
         }
-        return findFeed(feedId);
+
+        FeedResponseDto updatedFeed = findFeed(feedId);
+        redisFeedService.updateCache(feedId, updatedFeed);
+
+        redisFeedService.deleteCache("homeCache");
+        redisFeedService.deleteCache("region:" + checkFeed(feedId).getCountry());
+
+        return updatedFeed;
     }
 
     /**
@@ -400,7 +471,13 @@ public class FeedServiceImpl implements FeedService {
         );
         activityRepository.save(activity);
 
-        return findFeed(feedId);
+        FeedResponseDto updatedFeed = findFeed(feedId);
+        redisFeedService.updateCache(feedId, updatedFeed);
+
+        redisFeedService.deleteCache("homeCache");
+        redisFeedService.deleteCache("region:" + checkFeed(feedId).getCountry());
+
+        return updatedFeed;
     }
 
     /**
@@ -428,7 +505,13 @@ public class FeedServiceImpl implements FeedService {
         );
         activityRepository.save(activity);
 
-        return findFeed(feedId);
+        FeedResponseDto updatedFeed = findFeed(feedId);
+        redisFeedService.updateCache(feedId, updatedFeed);
+
+        redisFeedService.deleteCache("homeCache");
+        redisFeedService.deleteCache("region:" + checkFeed(feedId).getCountry());
+
+        return updatedFeed;
     }
 
     /**
@@ -438,21 +521,41 @@ public class FeedServiceImpl implements FeedService {
      * @return {@link RegionResponseDto} 지역 응답 Dto
      */
     @Override
-//    @Cacheable(value = "regionCache", key = "'country:' + #country")
     public List<RegionResponseDto> findRegion(String country) {
+        String cacheKey = "region:" + country;
+
+        List<RegionResponseDto> cachedRegionFeeds = redisFeedService.getRegionCache(cacheKey);
+        if (cachedRegionFeeds != null) {
+            return cachedRegionFeeds;
+        }
 
         List<Feed> feeds = feedRepository.findByCountryAndDeletedAtIsNull(country);
-
-        return feeds.stream()
+        List<RegionResponseDto> regionFeeds = feeds.stream()
                 .map(feed -> {
                     String representativePhotoUrl = getRepresentativePhotoUrl(feed.getId());
                     return RegionResponseDto.toDto(feed, representativePhotoUrl);
                 })
-                .collect(Collectors.toList());
+                .toList();
+
+        redisFeedService.saveRegionCache(cacheKey, regionFeeds);
+
+        return regionFeeds;
     }
 
+    /**
+     * 로그인한 사용자에 대한 홈페이지
+     *
+     * @return HomeResponseDto
+     */
     @Override
     public HomeResponseDto findHomeData() {
+        String cacheKey = "homeCache";
+
+        HomeResponseDto cachedHomeData = redisFeedService.getHomeCache(cacheKey);
+        if (cachedHomeData != null) {
+            return cachedHomeData;
+        }
+
         List<RegionResponseDto> korea = feedRepository.findByCountry("대한민국")
                 .stream()
                 .map(feed -> {
@@ -472,28 +575,26 @@ public class FeedServiceImpl implements FeedService {
         List<FollowResponseDto> followers = followService.findFollowers();
         List<FollowResponseDto> followings = followService.findFollowings();
 
-        return new HomeResponseDto(korea, global, followers, followings);
-    }
+        HomeResponseDto homeData = new HomeResponseDto(korea, global, followers, followings);
 
-    @Override
-    public Page<MyFeedResponseDto> findMyFeeds(Pageable pageable) {
-        // 로그인한 사용자 가져오기
-        User loginUser = UserAuthorizationUtil.getLoginUser();
+        redisFeedService.saveHomeCache(cacheKey, homeData);
 
-        // 본인 피드 조회
-        return feedRepository.findByUserIdAndDeletedAtIsNull(loginUser.getId(), pageable)
-                .map(feed -> {
-                    String representativePhotoUrl = getRepresentativePhotoUrl(feed.getId());
-                    return MyFeedResponseDto.toDto(feed, representativePhotoUrl);
-                });
+        return homeData;
     }
 
     /**
-     * 홈페이지
-     * @return
+     * 비로그인자에 대한 홈페이지
+     *
+     * @return HomeResponseDto
      */
     @Override
     public HomeResponseDto findPublicHomeData() {
+        String cacheKey = "publicHomeCache";
+
+        HomeResponseDto cachedHomeData = redisFeedService.getPublicHomeCache(cacheKey);
+        if (cachedHomeData != null) {
+            return cachedHomeData;
+        }
 
         List<RegionResponseDto> korea = feedRepository.findByCountry("대한민국")
                 .stream()
@@ -511,13 +612,39 @@ public class FeedServiceImpl implements FeedService {
                 })
                 .toList();
 
-        return new HomeResponseDto(korea, global, List.of(), List.of());
+        HomeResponseDto homeData = new HomeResponseDto(korea, global, List.of(), List.of());
+
+        redisFeedService.savePublicHomeCache(cacheKey, homeData);
+
+        return homeData;
     }
 
-
     /**
-     * repository Service method
+     * 본인 소유 피드 조회
+     *
+     * @param pageable
+     * @return
      */
+    @Override
+    public Page<MyFeedResponseDto> findMyFeeds(Pageable pageable) {
+        User loginUser = UserAuthorizationUtil.getLoginUser();
+        String cacheKey = "myFeeds:" + loginUser.getId() + ":" + pageable.getPageNumber() + ":" + pageable.getPageSize();
+
+        Page<MyFeedResponseDto> cachedMyFeeds = redisFeedService.getMyFeedsCache(cacheKey, pageable);
+        if (cachedMyFeeds != null) {
+            return cachedMyFeeds;
+        }
+
+        Page<MyFeedResponseDto> myFeeds = feedRepository.findByUserIdAndDeletedAtIsNull(loginUser.getId(), pageable)
+                .map(feed -> {
+                    String representativePhotoUrl = getRepresentativePhotoUrl(feed.getId());
+                    return MyFeedResponseDto.toDto(feed, representativePhotoUrl);
+                });
+
+        redisFeedService.saveMyFeedsCache(cacheKey, myFeeds);
+
+        return myFeeds;
+    }
 
     /**
      * 피드 Id로 피드 확인
