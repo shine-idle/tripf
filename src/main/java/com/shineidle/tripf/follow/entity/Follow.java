@@ -26,7 +26,11 @@ public class Follow extends BaseEntity {
     @JoinColumn(name = "following_id")
     private User followingId;
 
-    public Follow() {}
+    /**
+     * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
+     */
+    public Follow() {
+    }
 
     public Follow(User followerId, User followingId) {
         this.followerId = followerId;

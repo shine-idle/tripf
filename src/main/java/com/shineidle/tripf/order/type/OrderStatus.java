@@ -1,8 +1,24 @@
 package com.shineidle.tripf.order.type;
 
+// TODO: 사용되지 않는 변수 삭제 유무
 public enum OrderStatus {
-    ORDER_RECEIVED, // 주문 접수
-    PREPARING_SHIPPING, // 배송 준비중
-    SHIPPED, // 배송중
-    DELIVERED // 배송 완료
+    /**
+     * 주문 접수
+     */
+    ORDER_RECEIVED,
+
+    /**
+     * 배송 준비중
+     */
+    PREPARING_SHIPPING,
+
+    /**
+     * 배송중
+     */
+    SHIPPED,
+
+    /**
+     * 배송 완료
+     */
+    DELIVERED
 }

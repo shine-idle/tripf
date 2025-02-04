@@ -7,7 +7,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrderProductDto {
     private final String productName;
+
     private final Long quantity;
+
     private final Long purchasePrice;
+
     private final Long totalPrice;
 }

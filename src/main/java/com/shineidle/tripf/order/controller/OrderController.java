@@ -9,13 +9,13 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/orders")
 public class OrderController {
-
     private final OrderService orderService;
 
     /**
@@ -27,10 +27,10 @@ public class OrderController {
     @Operation(summary = "주문 생성")
     @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(
-        @Valid @RequestBody OrderRequestDto dto
+            @Valid @RequestBody OrderRequestDto dto
     ) {
         OrderResponseDto orderResponseDto = orderService.createOrder(dto);
-        return new ResponseEntity<>(orderResponseDto,  HttpStatus.CREATED);
+        return new ResponseEntity<>(orderResponseDto, HttpStatus.CREATED);
     }
 
     /**
@@ -59,5 +59,4 @@ public class OrderController {
         OrderResponseDto orderResponseDto = orderService.findOrder(orderId);
         return new ResponseEntity<>(orderResponseDto, HttpStatus.OK);
     }
-
 }

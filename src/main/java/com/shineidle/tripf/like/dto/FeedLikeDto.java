@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: 사용되지 않는 메서드 삭제 유무
 @Getter
 @RequiredArgsConstructor
 public class FeedLikeDto {
-
     private final Long activityId;
 
     private final String title;
@@ -17,7 +17,6 @@ public class FeedLikeDto {
     private final Long likeCount;
 
     private final List<String> photoUrls;
-
 
     public FeedLikeDto(Long activityId, String title, Long likeCount) {
         this.activityId = activityId;
@@ -30,7 +29,6 @@ public class FeedLikeDto {
         if (photoUrls != null && !photoUrls.isEmpty()) {
             return photoUrls.get(0);
         }
-        return "cid:defaultImage"; // 기본 이미지를 제공
+        return "cid:defaultImage";
     }
-
 }

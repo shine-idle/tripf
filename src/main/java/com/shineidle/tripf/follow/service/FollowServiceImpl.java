@@ -16,10 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// TODO: 사용되지 않는 변수 삭제 유무
 @Service
 @RequiredArgsConstructor
 public class FollowServiceImpl implements FollowService {
-
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
 
@@ -37,9 +37,8 @@ public class FollowServiceImpl implements FollowService {
             throw new GlobalException(FollowErrorCode.NOT_SELF_FOLLOW);
         }
 
-       User followingUser = userRepository.findById(followingId)
+        User followingUser = userRepository.findById(followingId)
                 .orElseThrow(() -> new GlobalException(FollowErrorCode.NOT_FOUND_FOLLOW));
-
 
         FollowPk followPk = new FollowPk(loginUser, followingUser);
         if (followRepository.existsById(followPk)) {
@@ -80,7 +79,6 @@ public class FollowServiceImpl implements FollowService {
      */
     @Override
     public List<FollowResponseDto> findFollowings() {
-
         User loginUser = UserAuthorizationUtil.getLoginUser();
         Long followerId = loginUser.getId();
 
@@ -94,7 +92,7 @@ public class FollowServiceImpl implements FollowService {
     /**
      * 팔로잉 취소
      *
-     * @param followingId  팔로잉 식별자(내가 팔로우한 사람의 식별자)
+     * @param followingId 팔로잉 식별자(내가 팔로우한 사람의 식별자)
      */
     @Override
     @Transactional

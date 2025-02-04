@@ -79,7 +79,6 @@ public class FollowController {
             @PathVariable Long followingId
     ) {
         try {
-            // 내가 팔로우한 사람을 언팔로우
             followService.deleteFollowByFollowingId(followingId);
             return new ResponseEntity<>("팔로우가 취소 되었습니다", HttpStatus.OK);
         } catch (IllegalArgumentException e) {
