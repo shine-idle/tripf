@@ -1,6 +1,6 @@
 package com.shineidle.tripf.chatbot.service;
 
-import com.shineidle.tripf.chatbot.RedisService;
+import com.shineidle.tripf.chatbot.RedisChatbotService;
 import com.shineidle.tripf.chatbot.dto.ChatbotQuestionsResponseDto;
 import com.shineidle.tripf.chatbot.dto.ChatbotRequestDto;
 import com.shineidle.tripf.chatbot.dto.ChatbotResponseDto;
@@ -42,7 +42,7 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     private final RedisUtils redisUtils;
     private final RedissonClient redissonClient;
-    private final RedisService redisService;
+    private final RedisChatbotService redisChatbotService;
     private DocumentCategorizerME categorizer;  // NLP 모델을 통한 분류기
     private final ChatbotRepository chatbotRepository;
 
@@ -102,7 +102,7 @@ public class ChatbotServiceImpl implements ChatbotService {
                 }
 
                 // Redis에서 해당 카테고리의 답변 조회
-                String answer = redisService.getAnswer(category);
+                String answer = redisChatbotService.getAnswer(category);
                 if (answer == null) {
                     answer = "알아듣지 못했어요.";
                 }
@@ -184,7 +184,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     public List<ChatbotQuestionsResponseDto> findAllChatbotQuestion() {
 
         // Redis에서 모든 질문 조회
-        Map<String, List<String>> allQuestions = redisService.getAllQuestions();
+        Map<String, List<String>> allQuestions = redisChatbotService.getAllQuestions();
 
         return allQuestions.entrySet().stream()
                 .map(entry -> new ChatbotQuestionsResponseDto(entry.getKey(), entry.getValue()))

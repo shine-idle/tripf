@@ -1,6 +1,6 @@
 package com.shineidle.tripf.chatbot.controller;
 
-import com.shineidle.tripf.chatbot.RedisService;
+import com.shineidle.tripf.chatbot.RedisChatbotService;
 import com.shineidle.tripf.chatbot.dto.AdminChatbotAnswersResponseDto;
 import com.shineidle.tripf.chatbot.dto.AdminChatbotQuestionsRequestDto;
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AdminChatbotController {
 
-    private final RedisService redisService;
+    private final RedisChatbotService redisChatbotService;
 
     /**
      * 챗봇 질문 생성
@@ -30,7 +30,7 @@ public class AdminChatbotController {
     public ResponseEntity<PostMessageResponseDto> saveQuestions(
             @Valid @RequestBody AdminChatbotQuestionsRequestDto adminChatbotQuestionsRequestDto
     ) {
-        redisService.saveQuestions(adminChatbotQuestionsRequestDto.getCategory(), adminChatbotQuestionsRequestDto.getQuestions());
+        redisChatbotService.saveQuestions(adminChatbotQuestionsRequestDto.getCategory(), adminChatbotQuestionsRequestDto.getQuestions());
 
         PostMessageResponseDto responseDto = new PostMessageResponseDto(PostMessage.CHATBOT_QUESTION_SUCCESS);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
@@ -47,7 +47,7 @@ public class AdminChatbotController {
     public ResponseEntity<PostMessageResponseDto> saveAnswers(
             @Valid @RequestBody AdminChatbotAnswersResponseDto adminChatbotAnswersResponseDto
     ) {
-        redisService.saveAnswers(adminChatbotAnswersResponseDto.getCategory(), adminChatbotAnswersResponseDto.getAnswer());
+        redisChatbotService.saveAnswers(adminChatbotAnswersResponseDto.getCategory(), adminChatbotAnswersResponseDto.getAnswer());
 
         PostMessageResponseDto responseDto = new PostMessageResponseDto(PostMessage.CHATBOT_ANSWER_SUCCESS);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
