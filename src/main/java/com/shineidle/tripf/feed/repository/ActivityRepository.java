@@ -2,6 +2,7 @@ package com.shineidle.tripf.feed.repository;
 
 import com.shineidle.tripf.feed.entity.Activity;
 import com.shineidle.tripf.feed.entity.Days;
+import com.shineidle.tripf.photo.entity.Photo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -36,5 +37,13 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
             @Param("daysId") Long daysId,
             @Param("feedId") Long feedId
     );
+
+    @Query("""
+    SELECT a FROM Activity a
+    JOIN FETCH a.days d
+    LEFT JOIN FETCH a.activityPhotos ap
+    WHERE d.id IN :daysIds
+""")
+    List<Activity> findAllWithPhotosByDaysIds(@Param("daysIds") List<Long> daysIds);
 
 }
