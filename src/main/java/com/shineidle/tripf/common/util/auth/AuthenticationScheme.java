@@ -1,4 +1,4 @@
-package com.shineidle.tripf.common.util;
+package com.shineidle.tripf.common.util.auth;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

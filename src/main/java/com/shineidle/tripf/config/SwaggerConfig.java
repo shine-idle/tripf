@@ -9,6 +9,10 @@ import io.swagger.v3.oas.models.info.Info;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Swagger 설정
+ */
+
 // http://localhost:8080/swagger-ui/index.html
 @Configuration
 @OpenAPIDefinition(

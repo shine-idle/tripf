@@ -4,7 +4,7 @@ import com.shineidle.tripf.cart.dto.CartRequestDto;
 import com.shineidle.tripf.cart.dto.CartResponseDto;
 import com.shineidle.tripf.cart.service.CartService;
 import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
-import com.shineidle.tripf.common.message.enums.PostMessage;
+import com.shineidle.tripf.common.message.type.PostMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

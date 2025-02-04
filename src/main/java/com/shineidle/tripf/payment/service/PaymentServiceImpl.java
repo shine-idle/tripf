@@ -1,6 +1,6 @@
 package com.shineidle.tripf.payment.service;
 
-import com.shineidle.tripf.common.util.UserAuthorizationUtil;
+import com.shineidle.tripf.common.util.auth.UserAuthorizationUtil;
 import com.shineidle.tripf.order.entity.Order;
 import com.shineidle.tripf.order.repository.OrderRepository;
 import com.shineidle.tripf.payment.config.PaymentConfig;

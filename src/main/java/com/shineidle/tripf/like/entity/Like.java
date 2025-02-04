@@ -1,6 +1,6 @@
 package com.shineidle.tripf.like.entity;
 
-import com.shineidle.tripf.common.BaseEntity;
+import com.shineidle.tripf.common.entity.BaseEntity;
 import com.shineidle.tripf.feed.entity.Feed;
 import com.shineidle.tripf.user.entity.User;
 import jakarta.persistence.*;

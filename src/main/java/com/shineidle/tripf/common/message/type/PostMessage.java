@@ -1,8 +1,7 @@
-package com.shineidle.tripf.common.message.enums;
+package com.shineidle.tripf.common.message.type;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @RequiredArgsConstructor
@@ -21,9 +20,7 @@ public enum PostMessage {
     PASSWORD_UPDATED("비밀번호가 변경되었습니다. 다시 로그인해주세요."),
     USERNAME_UPDATED("이름이 변경되었습니다."),
     USER_DEACTIVATED("회원 탈퇴가 완료되었습니다."),
-    CHATROOM_DELETED("채팅방이 삭제 되었습니다.")
-    ;
-
+    CHATROOM_DELETED("채팅방이 삭제 되었습니다.");
 
     private final String message;
 }

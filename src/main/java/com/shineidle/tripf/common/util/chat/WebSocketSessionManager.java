@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+//TODO : javadoc
 @Service
 public class WebSocketSessionManager {
     private final Map<String, String> sessionStore = new ConcurrentHashMap<>();

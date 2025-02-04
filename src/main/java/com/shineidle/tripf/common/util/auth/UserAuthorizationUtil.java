@@ -1,5 +1,6 @@
-package com.shineidle.tripf.common.util;
+package com.shineidle.tripf.common.util.auth;
 
+import com.shineidle.tripf.common.util.ApplicationContextProvider;
 import com.shineidle.tripf.config.auth.UserDetailsImpl;
 import com.shineidle.tripf.user.entity.User;
 import com.shineidle.tripf.user.repository.UserRepository;
