@@ -1,5 +1,6 @@
 package com.shineidle.tripf.feed.controller;
 
+import com.shineidle.tripf.comment.dto.CommentResponseDto;
 import com.shineidle.tripf.common.util.JwtProvider;
 import com.shineidle.tripf.feed.dto.HomeResponseDto;
 import com.shineidle.tripf.feed.service.FeedService;
@@ -55,6 +56,13 @@ public class HomeViewController {
 //        return "/home/home-guest"; // home.html로 이동
 //    }
 
+    /**
+     * 홈페이지 View를 반환합니다
+     *
+     * @param token 토큰
+     * @param model 모델
+     * @return {@link /home/home-guest}
+     */
     @GetMapping("/")
     public String home(
             @CookieValue(value = "Authorization", required = false) String token, // JWT 토큰 쿠키에서 가져오기

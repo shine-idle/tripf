@@ -47,7 +47,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class FeedServiceImpl implements FeedService {
-
     private final FeedRepository feedRepository;
     private final DaysRepository daysRepository;
     private final ActivityRepository activityRepository;
@@ -57,16 +56,14 @@ public class FeedServiceImpl implements FeedService {
     private final NotificationService notificationService;
     private final RedissonClient redissonClient;
     private final JwtProvider jwtProvider;
-
     private final RedisFeedService redisFeedService;
     private final RedisTemplate<String, Object> feedRedisTemplate;
-
-    private static final String FEED_CACHE_PREFIX = "feed:";
 
     /**
      * 피드 생성
      * Redis 분산락 사용
      *
+     * @param token 토큰
      * @param feedRequestDto {@link FeedRequestDto} 피드 요청 Dto
      * @return {@link FeedResponseDto} 피드 응답 Dto
      */
@@ -147,6 +144,13 @@ public class FeedServiceImpl implements FeedService {
         }
     }
 
+    /**
+     * 피드 생성
+     * Redis 분산락 사용
+     *
+     * @param feedRequestDto {@link FeedRequestDto} 피드 요청 Dto
+     * @return {@link FeedResponseDto} 피드 응답 Dto
+     */
     @Override
     @Transactional
     public FeedResponseDto createFeed(FeedRequestDto feedRequestDto) {
@@ -241,7 +245,6 @@ public class FeedServiceImpl implements FeedService {
         }
     }
 
-
     /**
      * 피드 수정
      *
@@ -325,7 +328,6 @@ public class FeedServiceImpl implements FeedService {
 
         return feedResponseDto;
     }
-
 
     /**
      * 피드 삭제

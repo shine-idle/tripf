@@ -10,7 +10,6 @@ import lombok.Getter;
 @Getter
 @Table(name = "`notification`")
 public class Notification extends BaseEntity {
-    // TODO : entity 주석 필요
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
@@ -30,6 +29,9 @@ public class Notification extends BaseEntity {
 
     private Long feedId;
 
+    /**
+     * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
+     */
     protected Notification() {}
 
     public static Notification create(User user, User actor, NotifyType notifyType, String notifyContext, Long feedId) {

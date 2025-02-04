@@ -1,6 +1,8 @@
 package com.shineidle.tripf.geo.service;
 
 public interface GeoService {
-    //TODO : 주석 필요
+    /**
+     * Google지도 API - 도시값으로 국가 조회
+     */
     String getCountryByCity(String city);
 }
