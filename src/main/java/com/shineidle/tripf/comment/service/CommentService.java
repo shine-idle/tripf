@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 public interface CommentService {
-
     /**
      * 댓글 작성
      */

@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @Getter
 @RequiredArgsConstructor
 public class CommentResponseDto {
-
     private final Long id;
 
     private final String name;
@@ -30,5 +29,4 @@ public class CommentResponseDto {
                 comment.getModifiedAt()
         );
     }
-
 }

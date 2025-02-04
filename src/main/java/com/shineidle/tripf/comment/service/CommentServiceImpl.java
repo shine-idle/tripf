@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
-
     private final CommentRepository commentRepository;
     private final FeedService feedService;
     private final NotificationService notificationService;
@@ -124,10 +123,6 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteById(commentId);
         return new PostMessageResponseDto(PostMessage.COMMENT_DELETED);
     }
-
-    /**
-     * repository Service method
-     */
 
     /**
      * 피드 Id로 피드 확인

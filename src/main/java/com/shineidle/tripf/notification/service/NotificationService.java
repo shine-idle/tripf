@@ -7,7 +7,6 @@ import com.shineidle.tripf.user.entity.User;
 import java.util.List;
 
 public interface NotificationService {
-
     /**
      * 알림 조회
      */

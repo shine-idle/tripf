@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @Getter
 @RequiredArgsConstructor
 public class NotificationResponseDto {
-
     private final String actorName;
 
     private final String notifyContext;

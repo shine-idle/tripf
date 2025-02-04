@@ -14,7 +14,6 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class GeoServiceImpl implements GeoService {
-
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${google.api.key}")

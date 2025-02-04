@@ -26,11 +26,11 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+//TODO : javadoc
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MailServiceImpl implements MailService{
-
+public class MailServiceImpl implements MailService {
     private final JavaMailSender mailSender;
     private final LikeService likeService;
     private final UserService userService;
@@ -93,7 +93,6 @@ public class MailServiceImpl implements MailService{
 
     @Override
     public void sendTopFeedsMailNow() {
-
         RLock lock = redissonClient.getLock(MAIL_LOCK_KEY);
         boolean acquired = false;
 
@@ -158,9 +157,9 @@ public class MailServiceImpl implements MailService{
     /**
      * 테스트 메일 발송
      *
-     * @param to 수신자 메일 주소
+     * @param to      수신자 메일 주소
      * @param subject 메일 제목
-     * @param text 메일 내용
+     * @param text    메일 내용
      */
     @Override
     public void sendSimpleMail(String to, String subject, String text) {
