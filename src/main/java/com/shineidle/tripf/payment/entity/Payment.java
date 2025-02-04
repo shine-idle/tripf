@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table(name = "payments")
+@Table(name = "`payments`")
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
