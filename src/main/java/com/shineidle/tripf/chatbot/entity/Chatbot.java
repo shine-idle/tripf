@@ -46,5 +46,4 @@ public class Chatbot {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = true)
     private User user;
-
 }
