@@ -18,14 +18,13 @@ import java.util.List;
 @RequestMapping("/api/products/{productId}/photos")
 @RequiredArgsConstructor
 public class ProductPhotoController {
-
     private final PhotoService photoService;
 
     /**
      * 상품 사진 단건 조회
      *
      * @param productId 상품 식별자
-     * @param photoId 사진 식별자
+     * @param photoId   사진 식별자
      * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @Operation(summary = "상품 사진 단건 조회")

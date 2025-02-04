@@ -24,6 +24,6 @@ public class CartViewController {
     public String viewCart(Model model) {
         List<CartResponseDto> cartItems = cartService.findCart();
         model.addAttribute("cartItems", cartItems);
-        return "cart/cartList"; // cartList.html로 연결
+        return "cart/cartList";
     }
 }

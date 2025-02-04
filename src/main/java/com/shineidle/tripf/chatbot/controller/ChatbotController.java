@@ -47,7 +47,6 @@ public class ChatbotController {
     @Operation(summary = "사용자 대화 기록 조회")
     @GetMapping("/log")
     public ResponseEntity<List<ChatbotResponseDto>> findConversationLogs() {
-
         List<ChatbotResponseDto> responseDtos = chatbotService.findConversationLogs();
 
         return new ResponseEntity<>(responseDtos, HttpStatus.OK);
@@ -61,7 +60,6 @@ public class ChatbotController {
     @Operation(summary = "질문 목록 조회")
     @GetMapping("/questions")
     public ResponseEntity<List<ChatbotQuestionsResponseDto>> findAllChatbotQuestion() {
-
         List<ChatbotQuestionsResponseDto> responseDtos = chatbotService.findAllChatbotQuestion();
 
         return new ResponseEntity<>(responseDtos, HttpStatus.OK);

@@ -27,18 +27,17 @@ public class CartServiceImpl implements CartService {
     /**
      * 장바구니 생성
      *
-     * @param productId 상품 식별자
+     * @param productId      상품 식별자
      * @param cartRequestDto {@link CartRequestDto} 장바구니 요청 Dto
      * @return {@link CartResponseDto} 장바구니 응답 Dto
      */
     @Override
     @Transactional
     public CartResponseDto createCart(Long productId, CartRequestDto cartRequestDto) {
-
         User loginedUser = UserAuthorizationUtil.getLoginUser();
         Product foundProduct = findByIdOrElseThrow(productId);
 
-        Cart cart = new Cart(cartRequestDto.getQuantity() , loginedUser, foundProduct);
+        Cart cart = new Cart(cartRequestDto.getQuantity(), loginedUser, foundProduct);
         Cart savedCart = cartRepository.save(cart);
 
         return CartResponseDto.toDto(savedCart);
@@ -52,7 +51,6 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public List<CartResponseDto> findCart() {
-
         Long userId = UserAuthorizationUtil.getLoginUserId();
 
         List<Cart> carts = cartRepository.findAllByUserId(userId);
@@ -63,18 +61,16 @@ public class CartServiceImpl implements CartService {
     /**
      * 장바구니 수정
      *
-     * @param productId 상품 식별자
+     * @param productId      상품 식별자
      * @param cartRequestDto {@link CartRequestDto} 장바구니 요청 Dto
      * @return {@link CartResponseDto} 장바구니 응답 Dto
      */
     @Override
     @Transactional
     public CartResponseDto updateCart(Long productId, CartRequestDto cartRequestDto) {
-
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Product foundProduct = findByIdOrElseThrow(productId);
 
-        // 로그인한 유저 장바구니에서 특정 상품 찾기
         Cart foundCart = findByUserIdAndProductId(userId, foundProduct.getId());
 
         foundCart.updateCart(cartRequestDto);
@@ -92,7 +88,6 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public void deleteCart(Long productId) {
-
         Long userId = UserAuthorizationUtil.getLoginUserId();
 
         Product foundProduct = findByIdOrElseThrow(productId);
@@ -109,7 +104,6 @@ public class CartServiceImpl implements CartService {
      * @return Product {@link Product}
      */
     public Product findByIdOrElseThrow(Long productId) {
-
         return productRepository.findById(productId)
                 .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
     }
@@ -117,13 +111,12 @@ public class CartServiceImpl implements CartService {
     /**
      * 유저Id와 상품Id에 해당하는 장바구니 조회
      *
-     * @param userId 유저 식별자
+     * @param userId    유저 식별자
      * @param productId 상품 식별자
      * @return Cart {@link Cart}
      */
     public Cart findByUserIdAndProductId(Long userId, Long productId) {
-
         return cartRepository.findByUserIdAndProductId(userId, productId)
-                .orElseThrow(()-> new GlobalException(CartErrorCode.CART_NOT_FOUND));
+                .orElseThrow(() -> new GlobalException(CartErrorCode.CART_NOT_FOUND));
     }
 }

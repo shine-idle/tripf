@@ -10,9 +10,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Getter
+@DynamicUpdate
 @Table(name = "product_photo")
 public class ProductPhoto {
     @Id
@@ -22,7 +24,8 @@ public class ProductPhoto {
     /**
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
      */
-    protected ProductPhoto() {}
+    protected ProductPhoto() {
+    }
 
     public ProductPhoto(Product product, Photo photo) {
         this.product = product;

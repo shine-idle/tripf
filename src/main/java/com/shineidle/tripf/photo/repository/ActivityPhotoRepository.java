@@ -13,7 +13,7 @@ public interface ActivityPhotoRepository extends JpaRepository<ActivityPhoto, Lo
      * 활동Id와 사진Id에 해당하는 활동사진 반환
      *
      * @param activityId 활동 식별자
-     * @param photoId 사진 식별자
+     * @param photoId    사진 식별자
      * @return {@link ActivityPhoto} 활동 사진
      */
     Optional<ActivityPhoto> findByActivityIdAndPhotoId(Long activityId, Long photoId);

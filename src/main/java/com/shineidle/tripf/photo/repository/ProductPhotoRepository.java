@@ -9,12 +9,11 @@ import java.util.Optional;
 
 @Repository
 public interface ProductPhotoRepository extends JpaRepository<ProductPhoto, Long> {
-
     /**
      * 상품Id와 사진Id에 해당하는 상품사진 반환
      *
      * @param productId 상품 식별자
-     * @param photoId 사진 식별자
+     * @param photoId   사진 식별자
      * @return {@link ProductPhoto} 상품 사진
      */
     Optional<ProductPhoto> findByProductIdAndPhotoId(Long productId, Long photoId);
