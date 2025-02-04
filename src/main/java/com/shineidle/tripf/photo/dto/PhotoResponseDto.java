@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Getter
 @RequiredArgsConstructor
 public class PhotoResponseDto {
-
     private final Long id;
 
     private final String originalImageName;

@@ -42,7 +42,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     private final RedisUtils redisUtils;
     private final RedissonClient redissonClient;
     private final RedisChatbotService redisChatbotService;
-    private DocumentCategorizerME categorizer;  // NLP 모델을 통한 분류기
+    private DocumentCategorizerME categorizer;
     private final ChatbotRepository chatbotRepository;
 
     /**
@@ -71,7 +71,6 @@ public class ChatbotServiceImpl implements ChatbotService {
      */
     @Override
     public ChatbotResponseDto createChatbotResponse(ChatbotRequestDto chatbotRequestDto) {
-
         Long userId = UserAuthorizationUtil.getLoginUserId();
         User loginedUser = UserAuthorizationUtil.getLoginUser();
 
@@ -81,38 +80,33 @@ public class ChatbotServiceImpl implements ChatbotService {
         try {
             if (lock.tryLock(10, 30, TimeUnit.SECONDS)) {
 
-                // 질문 분석 및 분류
                 String[] tokens = tokenizeKorean(chatbotRequestDto.getQuestion());
-                log.info("Tokens: " + Arrays.toString(tokens));   // 토큰화된 질문 출력
+                log.info("Tokens: " + Arrays.toString(tokens));
 
                 double[] outcomes = categorizer.categorize(tokens);
-                log.info("Outcomes: " + Arrays.toString(outcomes));   // 분류 결과 출력
+                log.info("Outcomes: " + Arrays.toString(outcomes));
 
                 String category = categorizer.getBestCategory(outcomes);
-                log.info("Categorized Question: " + category);    // 분류된 카테고리 출력 (디버그용)
+                log.info("Categorized Question: " + category);
 
                 double maxScore = Arrays.stream(outcomes).max().orElse(0.0);
-                log.info("Max Score: " + maxScore); // 최대 확률 값 출력
+                log.info("Max Score: " + maxScore);
 
-                // 신뢰도 낮으면 UNKNOWN 처리
                 boolean isUnknown = maxScore < 0.5;
                 if (isUnknown) {
                     category = "UNKNOWN";
                 }
 
-                // Redis에서 해당 카테고리의 답변 조회
                 String answer = redisChatbotService.getAnswer(category);
                 if (answer == null) {
                     answer = "알아듣지 못했어요.";
                 }
-                log.info("Answer from Redis: " + answer);  // 답변 확인용 로그
+                log.info("Answer from Redis: " + answer);
 
-                // 응답 상태 결정
                 ResponseStatus responseStatus = isUnknown || "알아듣지 못했어요.".equals(answer)
                         ? ResponseStatus.FAILURE
                         : ResponseStatus.SUCCESS;
 
-                // 대화 기록 저장
                 Chatbot log = new Chatbot(
                         chatbotRequestDto.getQuestion(),
                         answer,
@@ -123,13 +117,11 @@ public class ChatbotServiceImpl implements ChatbotService {
 
                 Chatbot savedChatbot = chatbotRepository.save(log);
 
-                // 생성된 대화 기록을 Redis에 저장
                 String redisKey = "conversation_log:" + userId;
                 List<ChatbotResponseDto> logs = findConversationLogs();
                 logs.add(ChatbotResponseDto.toDto(savedChatbot));
                 redisUtils.saveToRedis(redisKey, logs, Duration.ofHours(1));
 
-                // 응답 반환
                 return ChatbotResponseDto.toDto(savedChatbot);
             } else {
                 throw new GlobalException(LockErrorCode.LOCK_ACQUISITION_FAILED);
@@ -151,15 +143,12 @@ public class ChatbotServiceImpl implements ChatbotService {
      */
     @Override
     public List<ChatbotResponseDto> findConversationLogs() {
-
         Long loginUserId = UserAuthorizationUtil.getLoginUserId();
 
         String redisKey = "conversation_log:" + loginUserId;
 
-        // Redis에서 대화 기록 조회, 없으면 DB에서 조회하고 Redis에 저장
         return redisUtils.getOrFetchFromDB(redisKey,
                 () -> {
-                    // DB에서 대화 기록 조회
                     List<Chatbot> logs = chatbotRepository.findByUserId(loginUserId);
                     List<ChatbotResponseDto> responseLogs = new ArrayList<>();
 
@@ -168,7 +157,7 @@ public class ChatbotServiceImpl implements ChatbotService {
                     }
                     return responseLogs;
                 },
-                Duration.ofHours(1) // TTL 1시간
+                Duration.ofHours(1)
         );
     }
 
@@ -179,14 +168,12 @@ public class ChatbotServiceImpl implements ChatbotService {
      */
     @Override
     public List<ChatbotQuestionsResponseDto> findAllChatbotQuestion() {
-
-        // Redis에서 모든 질문 조회
         Map<String, List<String>> allQuestions = redisChatbotService.getAllQuestions();
 
         return allQuestions.entrySet().stream()
                 .map(entry -> new ChatbotQuestionsResponseDto(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
-   }
+    }
 
     /**
      * 한국어 텍스트를 분석하여 토큰화하는 메서드
@@ -194,7 +181,7 @@ public class ChatbotServiceImpl implements ChatbotService {
      * @param text 토큰화할 입력 문자열
      * @return 입력 문자열을 토큰화한 결과를 문자열 배열로 반환
      */
-    private String[] tokenizeKorean (String text){
+    private String[] tokenizeKorean(String text) {
         List<String> tokens = new ArrayList<>();
         try (Analyzer analyzer = new KoreanAnalyzer();
              var tokenStream = analyzer.tokenStream(null, new StringReader(text))) {

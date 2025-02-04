@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ChatbotRepository extends JpaRepository<Chatbot, Long> {
-
     /**
      * 유저Id에 해당하는 챗봇 대화 기록 반환
      *

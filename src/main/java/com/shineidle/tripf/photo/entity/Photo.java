@@ -3,12 +3,14 @@ package com.shineidle.tripf.photo.entity;
 import com.shineidle.tripf.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
+@DynamicUpdate
 @Table(name = "`photo`")
 public class Photo extends BaseEntity {
     @Id
@@ -42,7 +44,8 @@ public class Photo extends BaseEntity {
     /**
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
      */
-    protected Photo() {}
+    protected Photo() {
+    }
 
     public Photo(String originalFileName, String storedFileName, String description, String url, Long size, String ext) {
         this.originalFileName = originalFileName;

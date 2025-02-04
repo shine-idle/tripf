@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Getter
 @Table(name = "`chatbot`")
 public class Chatbot {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
@@ -30,7 +29,8 @@ public class Chatbot {
     /**
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
      */
-    protected Chatbot() {}
+    protected Chatbot() {
+    }
 
     public Chatbot(String question, String answer, ResponseStatus responseStatus, LocalDateTime createdAt, User user) {
         this.question = question;

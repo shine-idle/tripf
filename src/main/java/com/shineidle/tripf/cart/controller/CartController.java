@@ -24,7 +24,7 @@ public class CartController {
     /**
      * 장바구니 상품 생성
      *
-     * @param productId 상품 식별자
+     * @param productId      상품 식별자
      * @param cartRequestDto {@link CartRequestDto} 장바구니 요청 Dto
      * @return {@link CartResponseDto} 장바구니 응답 Dto
      */
@@ -55,7 +55,7 @@ public class CartController {
     /**
      * 장바구니 상품 수량 수정
      *
-     * @param productId 상품 식별자
+     * @param productId      상품 식별자
      * @param cartRequestDto {@link CartRequestDto} 장바구니 요청 Dto
      * @return {@link CartResponseDto} 장바구니 응답 Dto
      */

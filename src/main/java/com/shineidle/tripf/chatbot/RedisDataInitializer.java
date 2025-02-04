@@ -13,7 +13,6 @@ public class RedisDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
         redisChatbotService.saveQuestions("Q001", Arrays.asList("안녕하세요", "안녕!", "안녕~", "안녕", "안녕?", "안녕하세요. 도움이 필요해요.", "안녕하세요. 도와주세요."));
         redisChatbotService.saveQuestions("Q002", Arrays.asList("결제가 안돼요", "결제 문제", "결제 오류", "결제 불가", "결제 안됨", "결제가 안됩니다"));
         redisChatbotService.saveQuestions("Q003", Arrays.asList("해결할 수 없습니다", "해결되지 않아요", "문제 해결 안됨", "문제 해결", "문제 발생", "문제를 해결하고 싶어요"));

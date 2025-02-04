@@ -24,9 +24,9 @@ public class AdminProductPhotoController {
     /**
      * 상품 사진 업로드
      *
-     * @param productId 상품 식별자
+     * @param productId       상품 식별자
      * @param photoRequestDto {@link PhotoRequestDto} 사진 요청 Dto
-     * @param file {@link MultipartFile} 첨부할 사진
+     * @param file            {@link MultipartFile} 첨부할 사진
      * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @Operation(summary = "상품 사진 업로드")
@@ -36,7 +36,6 @@ public class AdminProductPhotoController {
             @ModelAttribute PhotoRequestDto photoRequestDto,
             @RequestPart MultipartFile file
     ) throws IOException {
-
         PhotoResponseDto responseDto = photoService.uploadPhoto(productId, photoRequestDto, file, PhotoDomain.PRODUCT);
 
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
@@ -45,10 +44,10 @@ public class AdminProductPhotoController {
     /**
      * 상품 사진 수정
      *
-     * @param productId 상품 식별자
-     * @param photoId 사진 식별자
+     * @param productId       상품 식별자
+     * @param photoId         사진 식별자
      * @param photoRequestDto {@link PhotoRequestDto} 사진 요청 Dto
-     * @param file {@link MultipartFile} 첨부할 사진
+     * @param file            {@link MultipartFile} 첨부할 사진
      * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @Operation(summary = "상품 사진 수정")
@@ -72,7 +71,7 @@ public class AdminProductPhotoController {
      * 상품 사진 삭제
      *
      * @param productId 상품 식별자
-     * @param photoId 사진 식별자
+     * @param photoId   사진 식별자
      * @return {@link PostMessageResponseDto} 사진 삭제 문구
      */
     @Operation(summary = "상품 사진 삭제")
