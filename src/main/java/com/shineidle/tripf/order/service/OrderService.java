@@ -12,6 +12,4 @@ public interface OrderService {
     List<OrderResponseDto> findAllOrder();
 
     OrderResponseDto findOrder(Long orderId);
-
-
 }

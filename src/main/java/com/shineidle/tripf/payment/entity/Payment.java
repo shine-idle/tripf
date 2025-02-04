@@ -1,11 +1,5 @@
 package com.shineidle.tripf.payment.entity;
 
-import com.shineidle.tripf.common.entity.BaseEntity;
-import com.shineidle.tripf.order.entity.Order;
-import com.shineidle.tripf.payment.dto.PaymentRequestDto;
-import com.shineidle.tripf.payment.type.CancelStatus;
-import com.shineidle.tripf.payment.type.PaymentStatus;
-import com.shineidle.tripf.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -13,72 +7,54 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table(name = "`payment`")
-public class Payment extends BaseEntity {
+@Table(name = "`payments`")
+public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    private String paymentKey;  // 토스페이 결제 키
-    private String paymentUrl;  // 토스페이 결제 URL
+    @Column(nullable = false, unique = true)
+    private String orderId; // 주문 ID (Toss에서 사용)
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private Order order;
+    @Column(nullable = false, unique = true)
+    private String paymentKey; // Toss 결제 키
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(nullable = false)
+    private int amount; // 결제 금액
 
-    @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+    @Column(nullable = false)
+    private String orderName; // 주문명
 
-    @Enumerated(EnumType.STRING)
-    private CancelStatus cancelStatus  = CancelStatus.PENDING;
+    @Column(nullable = false)
+    private String status; // 결제 상태 (SUCCESS, FAIL, PENDING 등)
 
-    private LocalDateTime createAt;
-    private LocalDateTime approvedAt;
-    private LocalDateTime canceledAt;
+    @Column(nullable = false)
+    private String method; // 결제 수단 (카드, 계좌이체 등)
 
-    public Payment() {
+    @Column(nullable = false)
+    private LocalDateTime createdAt; // 결제 요청 시간
+
+    private LocalDateTime approvedAt; // 결제 승인 시간
+
+    protected Payment() {}
+
+    public Payment(String orderId, String paymentKey, int amount, String orderName,
+                   String status, String method, LocalDateTime createdAt) {
+        this.orderId = orderId;
+        this.paymentKey = paymentKey;
+        this.amount = amount;
+        this.orderName = orderName;
+        this.status = status;
+        this.method = method;
+        this.createdAt = createdAt;
     }
 
-    public Long getAmount() {
-        return this.order.getTotalPrice();
+    public void approve(LocalDateTime approvedAt) {
+        this.status = "SUCCESS";
+        this.approvedAt = approvedAt;
     }
 
-    // 결제 상태 변경 메서드 추가
-    public void setPaymentStatus(PaymentStatus paymentStatus) {
-        this.paymentStatus = paymentStatus;
-    }
-
-    //결제 승인처리
-    public void approvedPayment(LocalDateTime approvedAt) {
-        if (this.cancelStatus != CancelStatus.CANCELLED) {
-            this.approvedAt = approvedAt;
-        }
-    }
-
-    //결제 취소처리
-    public void canceledPayment(LocalDateTime canceledAt) {
-        if (this.cancelStatus != CancelStatus.CANCELLED) {
-            this.cancelStatus = CancelStatus.CANCELLED;
-            this.canceledAt = canceledAt;
-        }
-    }
-
-    public Payment(PaymentRequestDto paymentRequestDto, Order order, User user) {
-        if (paymentRequestDto != null) {
-            this.paymentKey = paymentRequestDto.getPaymentKey();
-            this.paymentStatus = paymentRequestDto.getPaymentStatus() != null ? paymentRequestDto.getPaymentStatus() : PaymentStatus.PENDING;
-        } else {
-            this.paymentKey = null;
-            this.paymentStatus = PaymentStatus.PENDING;
-        }
-        this.paymentUrl = null;
-        this.order = order;
-        this.user = user;
-        this.cancelStatus = CancelStatus.PENDING;
-        this.createAt = LocalDateTime.now();
+    public void fail() {
+        this.status = "FAIL";
     }
 }

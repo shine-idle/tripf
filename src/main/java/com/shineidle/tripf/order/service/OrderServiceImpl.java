@@ -7,8 +7,6 @@ import com.shineidle.tripf.order.dto.OrderRequestDto;
 import com.shineidle.tripf.order.dto.OrderResponseDto;
 import com.shineidle.tripf.order.entity.Order;
 import com.shineidle.tripf.order.repository.OrderRepository;
-import com.shineidle.tripf.payment.repository.PaymentRepository;
-import com.shineidle.tripf.payment.service.PaymentService;
 import com.shineidle.tripf.product.entity.Product;
 import com.shineidle.tripf.product.service.ProductService;
 import com.shineidle.tripf.user.entity.User;
@@ -25,8 +23,6 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ProductService productService;
-    private final PaymentService paymentService;
-    private final PaymentRepository paymentRepository;
 
     /**
      * 주문 생성
@@ -45,6 +41,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Order order = dto.toEntity(product, user);
+
         orderRepository.save(order);
         return OrderResponseDto.toDto(order);
     }
@@ -86,5 +83,3 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new GlobalException(OrderErrorCode.ORDER_NOT_FOUND));
     }
 }
-
-
