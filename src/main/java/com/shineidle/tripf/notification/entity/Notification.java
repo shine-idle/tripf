@@ -10,7 +10,7 @@ import lombok.Getter;
 @Getter
 @Table(name = "`notification`")
 public class Notification extends BaseEntity {
-
+    // TODO : entity 주석 필요
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;

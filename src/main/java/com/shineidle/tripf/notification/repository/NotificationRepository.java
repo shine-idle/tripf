@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-
+    // TODO : 주석필요
     List<Notification> findByUserId(Long userId);
 }

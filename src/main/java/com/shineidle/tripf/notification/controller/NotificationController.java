@@ -18,7 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/notification")
 public class NotificationController {
-
     private final NotificationService notificationService;
 
     /**
@@ -29,7 +28,9 @@ public class NotificationController {
      */
     @Operation(summary = "알림 목록 조회")
     @GetMapping
-    public ResponseEntity<List<NotificationResponseDto>> findNotification(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<List<NotificationResponseDto>> findNotification(
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
         Long userId = userDetails.getUserId();
         List<NotificationResponseDto> notificationResponseDto = notificationService.findNotification(userId);
         return new ResponseEntity<>(notificationResponseDto, HttpStatus.OK);

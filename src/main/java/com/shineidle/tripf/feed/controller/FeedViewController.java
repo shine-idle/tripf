@@ -90,6 +90,7 @@ public class FeedViewController {
         model.addAttribute("feed", feedResponseDto);
         model.addAttribute("comments", comments); // 댓글 리스트 추가
 
+        // 수정필요
         return "feed/detail";
     }
 

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/mail")
 public class MailController {
-
     private final MailService mailService;
 
     /**
