@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CartService {
     /**
-     *장바구니 상품 추가
+     * 장바구니 상품 추가
      */
     CartResponseDto createCart(Long productId, CartRequestDto cartRequestDto);
 

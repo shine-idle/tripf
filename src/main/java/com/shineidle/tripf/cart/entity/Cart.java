@@ -23,7 +23,8 @@ public class Cart extends BaseEntity {
     /**
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
      */
-    protected Cart() {}
+    protected Cart() {
+    }
 
     public Cart(Long quantity, User user, Product product) {
         this.quantity = quantity;

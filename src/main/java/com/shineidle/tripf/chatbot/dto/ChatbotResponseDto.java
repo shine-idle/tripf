@@ -18,7 +18,6 @@ public class ChatbotResponseDto {
 
     private final LocalDateTime createdAt;
 
-    // 기본 생성자 추가
     public ChatbotResponseDto() {
         this.question = null;
         this.answer = null;

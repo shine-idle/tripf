@@ -25,9 +25,9 @@ public class ActivityPhotoController {
     /**
      * 활동 사진 업로드
      *
-     * @param activityId 활동 식별자
+     * @param activityId      활동 식별자
      * @param photoRequestDto {@link PhotoRequestDto} 사진 요청 Dto
-     * @param file {@link MultipartFile} 첨부할 사진
+     * @param file            {@link MultipartFile} 첨부할 사진
      * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @Operation(summary = "활동 사진 업로드")
@@ -35,7 +35,7 @@ public class ActivityPhotoController {
     public ResponseEntity<PhotoResponseDto> uploadPhotoToActivity(
             @PathVariable Long activityId,
             @ModelAttribute PhotoRequestDto photoRequestDto,
-            @RequestParam(value = "file",required = false) MultipartFile file
+            @RequestParam(value = "file", required = false) MultipartFile file
     ) throws IOException {
         PhotoResponseDto responseDto = photoService.uploadPhoto(activityId, photoRequestDto, file, PhotoDomain.ACTIVITY);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
@@ -45,7 +45,7 @@ public class ActivityPhotoController {
      * 활동 사진 단건 조회
      *
      * @param activityId 활동 식별자
-     * @param photoId 사진 식별자
+     * @param photoId    사진 식별자
      * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @Operation(summary = "활동 사진 단건 조회")
@@ -66,7 +66,7 @@ public class ActivityPhotoController {
      * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @Operation(summary = "활동 사진 다건 조회")
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<PhotoResponseDto>> findAllActivityPhoto(
             @PathVariable Long activityId
     ) {
@@ -75,14 +75,13 @@ public class ActivityPhotoController {
         return new ResponseEntity<>(responseDtos, HttpStatus.OK);
     }
 
-
     /**
      * 활동 사진 수정
      *
-     * @param activityId 활동 식별자
-     * @param photoId 사진 식별자
+     * @param activityId      활동 식별자
+     * @param photoId         사진 식별자
      * @param photoRequestDto {@link PhotoRequestDto}
-     * @param file {@link MultipartFile} 첨부할 사진
+     * @param file            {@link MultipartFile} 첨부할 사진
      * @return {@link PhotoResponseDto} 사진 응답 Dto
      */
     @Operation(summary = "활동 사진 수정")
@@ -105,7 +104,7 @@ public class ActivityPhotoController {
      * 활동 사진 삭제
      *
      * @param activityId 활동 식별자
-     * @param photoId 사진 식별자
+     * @param photoId    사진 식별자
      * @return {@link PostMessageResponseDto} 사진 삭제 문구
      */
     @Operation(summary = "활동 사진 삭제")
