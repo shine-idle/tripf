@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @Getter
 @RequiredArgsConstructor
 public class ChatbotResponseDto {
-
     private final String question;
 
     private final String answer;

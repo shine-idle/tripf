@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Getter
 @RequiredArgsConstructor
 public class CartResponseDto {
-
     private final Long cartId;
     private final Long userId;
     private final Long productId;

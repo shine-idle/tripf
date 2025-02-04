@@ -8,7 +8,6 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 public class ChatbotQuestionsResponseDto {
-
     private final String category;
     private List<String> question;
 
