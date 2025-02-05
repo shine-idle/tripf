@@ -4,6 +4,8 @@ import com.shineidle.tripf.domain.cart.dto.CartRequestDto;
 import com.shineidle.tripf.domain.cart.dto.CartResponseDto;
 import com.shineidle.tripf.domain.cart.entity.Cart;
 import com.shineidle.tripf.domain.cart.repository.CartRepository;
+import com.shineidle.tripf.domain.product.service.ProductService;
+import com.shineidle.tripf.domain.product.service.ProductServiceImpl;
 import com.shineidle.tripf.global.common.exception.GlobalException;
 import com.shineidle.tripf.global.common.exception.type.CartErrorCode;
 import com.shineidle.tripf.global.common.exception.type.ProductErrorCode;
@@ -34,15 +36,14 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CartServiceImplTest {
-
     @Mock
     private CartRepository cartRepository;
 
-    @Mock
-    private ProductRepository productRepository;
-
     @InjectMocks
     private CartServiceImpl cartService;
+
+    @Mock
+    private ProductServiceImpl productService;
 
     private User user;
     private Product product;
@@ -72,7 +73,7 @@ class CartServiceImplTest {
 
         try (MockedStatic<UserAuthorizationUtil> mockedUserAuth = mockStatic(UserAuthorizationUtil.class)) {
             mockedUserAuth.when(UserAuthorizationUtil::getLoginUser).thenReturn(user);
-            when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+            when(productService.getProductById(1L)).thenReturn(product);
             when(cartRepository.save(any(Cart.class))).thenReturn(cart);
 
             // When
@@ -92,12 +93,15 @@ class CartServiceImplTest {
 
         try (MockedStatic<UserAuthorizationUtil> mockedUserAuth = mockStatic(UserAuthorizationUtil.class)) {
             mockedUserAuth.when(UserAuthorizationUtil::getLoginUser).thenReturn(user);
-            when(productRepository.findById(1L)).thenReturn(Optional.empty());
+            when(productService.getProductById(1L)).thenThrow(new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
-            // When & Then
-            assertThatThrownBy(() -> cartService.createCart(1L, requestDto))
-                    .isInstanceOf(GlobalException.class)
-                    .hasMessage(ProductErrorCode.PRODUCT_NOT_FOUND.getMessage());
+            // When
+            GlobalException exception = Assertions.assertThrows(GlobalException.class,
+                    () -> cartService.createCart(1L, requestDto));
+
+            // Then
+            assertThat(exception.getErrCode()).isEqualTo(ProductErrorCode.PRODUCT_NOT_FOUND.getErrCode());
+            assertThat(exception.getMessage()).isEqualTo(ProductErrorCode.PRODUCT_NOT_FOUND.getMessage());
         }
     }
 
@@ -125,7 +129,7 @@ class CartServiceImplTest {
 
         try (MockedStatic<UserAuthorizationUtil> mockedUserAuth = mockStatic(UserAuthorizationUtil.class)) {
             mockedUserAuth.when(UserAuthorizationUtil::getLoginUserId).thenReturn(1L);
-            when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+            when(productService.getProductById(1L)).thenReturn(product);
             when(cartRepository.findByUserIdAndProductId(1L, product.getId())).thenReturn(Optional.of(cart));
 
             // When
@@ -144,7 +148,7 @@ class CartServiceImplTest {
 
         try (MockedStatic<UserAuthorizationUtil> mockedUserAuth = mockStatic(UserAuthorizationUtil.class)) {
             mockedUserAuth.when(UserAuthorizationUtil::getLoginUserId).thenReturn(1L);
-            when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+            when(productService.getProductById(1L)).thenReturn(product);
             when(cartRepository.findByUserIdAndProductId(1L, 1L)).thenReturn(Optional.empty());
 
             // When & Then
@@ -159,7 +163,7 @@ class CartServiceImplTest {
         // Given
         try (MockedStatic<UserAuthorizationUtil> mockedUserAuth = mockStatic(UserAuthorizationUtil.class)) {
             mockedUserAuth.when(UserAuthorizationUtil::getLoginUserId).thenReturn(1L);
-            when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+            when(productService.getProductById(1L)).thenReturn(product);
             when(cartRepository.findByUserIdAndProductId(1L, 1L)).thenReturn(Optional.of(cart));
 
             // When
