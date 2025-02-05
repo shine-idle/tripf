@@ -20,7 +20,7 @@ function connect() {
     }
 
     stompClient = new StompJs.Client({
-        brokerURL: `ws://trip-f.com/gs-guide-websocket`,
+        brokerURL: `wss://trip-f.com/gs-guide-websocket`,
         onConnect: (frame) => {
             setConnected(true);
             console.log("Connected: " + frame);

@@ -1,11 +1,12 @@
 package com.shineidle.tripf.domain.user.type;
 
+import com.shineidle.tripf.global.common.exception.GlobalException;
+import com.shineidle.tripf.global.common.exception.type.UserErrorCode;
 import lombok.Getter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
 
-// TODO : 예외처리 수정 필요, 하드코딩된 문자열 처리
 @Getter
 public enum UserAuth {
     NORMAL("normal"),
@@ -29,7 +30,7 @@ public enum UserAuth {
                 return auth;
             }
         }
-        throw new IllegalArgumentException(userAuth + "권한은 존재하지 않습니다.");
+        throw new GlobalException(UserErrorCode.INVALID_AUTH);
     }
 
     /**

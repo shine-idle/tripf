@@ -1,5 +1,7 @@
 package com.shineidle.tripf.global.security.oauth2.util;
 
+import com.shineidle.tripf.global.common.exception.GlobalException;
+import com.shineidle.tripf.global.common.exception.type.CommonErrorCode;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,7 +11,6 @@ import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
 
-// TODO : 예외처리 수정 필요
 public class CookieUtils {
 
     /**
@@ -85,15 +86,17 @@ public class CookieUtils {
      * @param tClass 변환할 클래스 타입
      * @param <T>    클래스 타입 제네릭
      * @return 역직렬화된 객체
-     * @throws IllegalArgumentException 쿠키 값이 null이거나 비어있을 경우 예외 발생
-     * @throws NullPointerException     쿠키가 null일 경우 예외 발생
+     * @throws GlobalException      쿠키 값이 null이거나 비어있을 경우 예외 발생
+     * @throws NullPointerException 쿠키가 null일 경우 예외 발생
      */
     public static <T> T deserialize(Cookie cookie, Class<T> tClass) {
-        Objects.requireNonNull(cookie, "Cookie must not be null");
+        Objects.requireNonNull(cookie, CommonErrorCode.COOKIE_NOT_FOUND.getMessage());
         String cookieValue = cookie.getValue();
+
         if (cookieValue == null || cookieValue.isEmpty()) {
-            throw new IllegalArgumentException("Cookie value must not be null or empty");
+            throw new GlobalException(CommonErrorCode.COOKIE_NOT_FOUND);
         }
+
         byte[] decodedBytes = Base64.getUrlDecoder().decode(cookieValue);
         return tClass.cast(org.apache.commons.lang3.SerializationUtils.deserialize(decodedBytes));
     }
