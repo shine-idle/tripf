@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-// TODO : javadoc 작성
 @Component
 @RequiredArgsConstructor
 public class NaverOAuth2UserUnlink implements OAuth2UserUnlink {
