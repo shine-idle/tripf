@@ -1,18 +1,15 @@
-package com.shineidle.tripf.cart.service;
+package com.shineidle.tripf.domain.cart.service;
 
 import com.shineidle.tripf.domain.cart.dto.CartRequestDto;
 import com.shineidle.tripf.domain.cart.dto.CartResponseDto;
 import com.shineidle.tripf.domain.cart.entity.Cart;
 import com.shineidle.tripf.domain.cart.repository.CartRepository;
-import com.shineidle.tripf.domain.product.service.ProductService;
 import com.shineidle.tripf.domain.product.service.ProductServiceImpl;
 import com.shineidle.tripf.global.common.exception.GlobalException;
 import com.shineidle.tripf.global.common.exception.type.CartErrorCode;
 import com.shineidle.tripf.global.common.exception.type.ProductErrorCode;
 import com.shineidle.tripf.global.common.util.auth.UserAuthorizationUtil;
-import com.shineidle.tripf.domain.cart.service.CartServiceImpl;
 import com.shineidle.tripf.domain.product.entity.Product;
-import com.shineidle.tripf.domain.product.repository.ProductRepository;
 import com.shineidle.tripf.domain.product.type.ProductCategory;
 import com.shineidle.tripf.domain.product.type.ProductStatus;
 import com.shineidle.tripf.domain.user.entity.User;
