@@ -1,5 +1,6 @@
 package com.shineidle.tripf.domain.payment.entity;
 
+import com.shineidle.tripf.domain.order.entity.Order;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -14,7 +15,11 @@ public class Payment {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String orderId;
+    private String orderNumber;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = true)
+    private Order order;
 
     @Column(nullable = false, unique = true)
     private String paymentKey;
@@ -41,9 +46,9 @@ public class Payment {
      */
     protected Payment() {}
 
-    public Payment(String orderId, String paymentKey, int amount, String orderName,
+    public Payment(String orderNumber, String paymentKey, int amount, String orderName,
                    String status, String method, LocalDateTime createdAt) {
-        this.orderId = orderId;
+        this.orderNumber = orderNumber;
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.orderName = orderName;

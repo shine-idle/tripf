@@ -38,21 +38,4 @@ public class MailController {
         mailService.sendTopFeedsMailNow();
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-
-    /**
-     * simple 테스트 메일 발송 API
-     *
-     * @param email 수신자 이메일
-     * @return 성공 메시지
-     */
-    @Operation(summary = "테스트 메일 발송")
-    @GetMapping("/send")
-    public ResponseEntity<Void> sendTestMail(
-            @RequestParam String email) {
-        String subject = "테스트 메일";
-        String text = "이것은 테스트 메일입니다. SMTP 설정이 성공적으로 완료되었습니다.";
-
-        mailService.sendSimpleMail(email, subject, text);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
 }
