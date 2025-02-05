@@ -23,15 +23,19 @@ public class OrderProduct extends BaseEntity {
     @NotNull(message = "총 가격을 입력해주세요")
     private Long purchasePrice;
 
-   @ManyToOne(fetch = FetchType.LAZY)
-   @JoinColumn(name = "product_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private Product product;
 
-   @ManyToOne(fetch = FetchType.LAZY)
-   @JoinColumn(name = "order_id")
-   private Order order;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
 
-   public OrderProduct() {}
+    /**
+     * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
+     */
+    public OrderProduct() {
+    }
 
     public OrderProduct(Long quantity, Product product) {
         if (quantity <= 0) {

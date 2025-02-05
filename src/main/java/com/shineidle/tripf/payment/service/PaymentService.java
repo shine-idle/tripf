@@ -24,6 +24,12 @@ public class PaymentService {
     @Value("${toss.secret-key}")
     private String secretKey;
 
+    /**
+     * 결제 요청 생성
+     *
+     * @param amount 결제 금액
+     * @return 결제 요청 정보를 가진 {@link Map}
+     */
     public Map<String, String> createPaymentRequest(int amount) {
         String orderId = "ORDER-" + System.currentTimeMillis();
 
@@ -34,6 +40,13 @@ public class PaymentService {
         return response;
     }
 
+    /**
+     * 결제 승인 및 정보 저장
+     *
+     * @param paymentKey 결제키
+     * @param orderId 주문ID
+     * @param amount 결제 금액
+     */
     @Transactional
     public void confirmPayment(String paymentKey, String orderId, int amount) {
         String url = "https://api.tosspayments.com/v1/payments/confirm";
