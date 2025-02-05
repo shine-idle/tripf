@@ -83,8 +83,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public CommentResponseDto updateComment(Long feedId, Long commentId, CommentRequestDto commentRequestDto) {
-        Comment comment = checkComment(feedId, commentId);
-        checkUser(feedId, commentId);
+        Comment comment = validateCommentOwnership(feedId, commentId);
 
         comment.update(commentRequestDto.getComment());
 
@@ -118,8 +117,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public PostMessageResponseDto deleteComment(Long feedId, Long commentId) {
-        checkUser(feedId, commentId);
-        checkComment(feedId, commentId);
+        validateCommentOwnership(feedId, commentId);
         commentRepository.deleteById(commentId);
         return new PostMessageResponseDto(PostMessage.COMMENT_DELETED);
     }
@@ -135,32 +133,22 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * 피드Id에 속한 댓글인지 확인
+     * 댓글 검증 메서드 (피드에 속하는지 확인 + 작성자 검증)
      *
      * @param feedId    피드 식별자
      * @param commentId 댓글 식별자
      * @return {@link Comment}
      */
-    public Comment checkComment(Long feedId, Long commentId) {
+    public Comment validateCommentOwnership(Long feedId, Long commentId) {
         Comment comment = commentRepository.findByIdAndFeedId(commentId, feedId)
                 .orElseThrow(() -> new GlobalException(CommentErrorCode.COMMENT_NOT_FOUND));
 
-        return comment;
-    }
-
-    /**
-     * 작성자 검증 method
-     * 로그인한 유저와 작성자가 다를 경우 exception
-     *
-     * @param commentId 댓글 식별자
-     */
-    public void checkUser(Long feedId, Long commentId) {
-        Comment checkComment = checkComment(feedId, commentId);
-        Long checkUser = UserAuthorizationUtil.getLoginUserId();
-
-        if (!checkComment.getUser().getId().equals(checkUser)) {
+        Long loginUserId = UserAuthorizationUtil.getLoginUserId();
+        if (!comment.getUser().getId().equals(loginUserId)) {
             throw new GlobalException(CommentErrorCode.COMMENT_CANNOT_ACCESS);
         }
+
+        return comment;
     }
 
     /**

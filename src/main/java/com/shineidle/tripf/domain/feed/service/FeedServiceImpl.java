@@ -62,7 +62,7 @@ public class FeedServiceImpl implements FeedService {
      * 피드 생성
      * Redis 분산락 사용
      *
-     * @param token 토큰
+     * @param token          토큰
      * @param feedRequestDto {@link FeedRequestDto} 피드 요청 Dto
      * @return {@link FeedResponseDto} 피드 응답 Dto
      */
@@ -254,8 +254,7 @@ public class FeedServiceImpl implements FeedService {
     @Override
     @Transactional
     public FeedResponseDto updateFeed(Long feedId, FeedRequestDto feedRequestDto) {
-        checkUser(feedId);
-        Feed feed = checkFeed(feedId);
+        Feed feed = validateFeedOwnership(feedId);
 
         String country = geoService.getCountryByCity(feedRequestDto.getCity());
 
@@ -336,8 +335,7 @@ public class FeedServiceImpl implements FeedService {
      */
     @Override
     public PostMessageResponseDto deleteFeed(Long feedId) {
-        checkUser(feedId);
-        Feed feed = checkFeed(feedId);
+        Feed feed = validateFeedOwnership(feedId);
         feed.markAsDeleted();
         feedRepository.save(feed);
 
@@ -356,8 +354,7 @@ public class FeedServiceImpl implements FeedService {
     @Override
     @Transactional
     public PostMessageResponseDto deleteDays(Long feedId, Long daysId) {
-        checkUser(feedId);
-        checkDays(feedId, daysId);
+        Feed feed = validateFeedOwnership(feedId);
 
         daysRepository.deleteById(daysId);
 
@@ -382,8 +379,7 @@ public class FeedServiceImpl implements FeedService {
     @Override
     @Transactional
     public PostMessageResponseDto deleteActivity(Long feedId, Long daysId, Long activityId) {
-        checkUser(feedId);
-        checkActivity(feedId, daysId, activityId);
+        Feed feed = validateFeedOwnership(feedId);
 
         activityRepository.deleteById(activityId);
 
@@ -407,8 +403,7 @@ public class FeedServiceImpl implements FeedService {
     @Override
     @Transactional
     public FeedResponseDto createDay(Long feedId, DaysRequestDto daysRequestDto) {
-        checkUser(feedId);
-        Feed feed = checkFeed(feedId);
+        Feed feed = validateFeedOwnership(feedId);
         Days days = new Days(feed, daysRequestDto.getDate());
 
         LocalDate date = daysRequestDto.getDate();
@@ -458,7 +453,7 @@ public class FeedServiceImpl implements FeedService {
     @Override
     @Transactional
     public FeedResponseDto createActivity(Long feedId, Long daysId, ActivityRequestDto activityRequestDto) {
-        checkUser(feedId);
+        Feed feed = validateFeedOwnership(feedId);
         Days days = checkDays(feedId, daysId);
 
         Activity activity = new Activity(
@@ -493,7 +488,7 @@ public class FeedServiceImpl implements FeedService {
     @Override
     @Transactional
     public FeedResponseDto updateActivity(Long feedId, Long daysId, Long activityId, ActivityRequestDto activityRequestDto) {
-        checkUser(feedId);
+        Feed feed = validateFeedOwnership(feedId);
         Activity activity = checkActivity(feedId, daysId, activityId);
 
         activity.update(
@@ -690,18 +685,24 @@ public class FeedServiceImpl implements FeedService {
     }
 
     /**
-     * 작성자 검증 method
-     * 로그인한 유저와 작성자가 다를 경우 exception
+     * 피드 검증 메서드 (존재 여부 확인 + 삭제 여부 확인 + 작성자 검증)
      *
      * @param feedId 피드 식별자
+     * @return {@link Feed}
      */
-    public void checkUser(Long feedId) {
-        Feed checkFeed = checkFeed(feedId);
-        Long checkUser = UserAuthorizationUtil.getLoginUserId();
+    public Feed validateFeedOwnership(Long feedId) {
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new GlobalException(FeedErrorCode.FEED_NOT_FOUND));
 
-        if (!checkFeed.getUser().getId().equals(checkUser)) {
+        if (feed.isDeleted()) {
+            throw new GlobalException(FeedErrorCode.FEED_ALREADY_DELETED);
+        }
+
+        Long loginUserId = UserAuthorizationUtil.getLoginUserId();
+        if (!feed.getUser().getId().equals(loginUserId)) {
             throw new GlobalException(FeedErrorCode.FEED_CANNOT_ACCESS);
         }
+        return feed;
     }
 
     /**
@@ -711,23 +712,21 @@ public class FeedServiceImpl implements FeedService {
      * @param feedId 알림 발생 피드
      */
     private void followerNewPostNotification(User actor, Long feedId) {
-        List<FollowResponseDto> followers = followService.findFollowers();
-        for (FollowResponseDto follower : followers) {
-            User targetUser = userService.getUserById(follower.getUserId());
-            String context = String.format(NotificationMessage.FOLLOW_FEED_NOTIFICATION, actor.getName());
-            notificationService.createNotification(targetUser, actor, NotifyType.NEW_FEED, context, feedId);
-        }
+        followService.findFollowers().stream()
+                .map(follower -> userService.getUserById(follower.getUserId()))
+                .forEach(targetUser -> {
+                    String context = String.format(NotificationMessage.FOLLOW_FEED_NOTIFICATION, actor.getName());
+                    notificationService.createNotification(targetUser, actor, NotifyType.NEW_FEED, context, feedId);
+                });
     }
 
     public String getRepresentativePhotoUrl(Long feedId) {
-        // Feed에 속한 Days 리스트 조회
         List<Days> daysList = daysRepository.findByFeedId(feedId);
 
-        // Days에 속한 Activity 리스트 조회 및 대표 사진 URL 추출
         return daysList.stream()
-                .flatMap(day -> activityRepository.findByDays(day).stream()) // Activity 조회
-                .flatMap(activity -> activity.getActivityPhotos().stream()) // ActivityPhoto 조회
-                .map(activityPhoto -> activityPhoto.getPhoto().getUrl()) // URL 추출
+                .flatMap(day -> activityRepository.findByDays(day).stream())
+                .flatMap(activity -> activity.getActivityPhotos().stream())
+                .map(activityPhoto -> activityPhoto.getPhoto().getUrl())
                 .findFirst()
                 .orElse(null); // 대표 사진이 없으면 null 반환
     }

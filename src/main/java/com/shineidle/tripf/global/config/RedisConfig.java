@@ -27,6 +27,28 @@ import java.time.Duration;
 @Configuration
 @EnableCaching
 public class RedisConfig {
+    @Value("${spring.data.redis.host}")
+    private String host;
+    @Value("${spring.data.redis.port}")
+    private int port;
+    @Value("${spring.data.redis.password}")
+    private String password;
+    private static final String REDISSON_PREFIX = "redis://";
+
+    /**
+     * Redisson 클라이언트를 설정하고 반환
+     *
+     * @return 설정된 RedissonClient 객체
+     */
+    @Bean
+    public RedissonClient redissonClient() {
+        Config config = new Config();
+        config.useSingleServer()
+                .setAddress(REDISSON_PREFIX + host + ":" + port)
+                .setPassword(password);
+
+        return Redisson.create(config);
+    }
 
     /**
      * Redis 캐시 관리를 위한 CacheManager 빈을 생성
@@ -104,28 +126,5 @@ public class RedisConfig {
         template.setHashValueSerializer(serializer);
 
         return template;
-    }
-
-    @Value("${spring.data.redis.host}")
-    private String host;
-    @Value("${spring.data.redis.port}")
-    private int port;
-    @Value("${spring.data.redis.password}")
-    private String password;
-    private static final String REDISSON_PREFIX = "redis://";
-
-    /**
-     * Redisson 클라이언트를 설정하고 반환
-     *
-     * @return 설정된 RedissonClient 객체
-     */
-    @Bean
-    public RedissonClient redissonClient() {
-        Config config = new Config();
-        config.useSingleServer()
-                .setAddress(REDISSON_PREFIX + host + ":" + port)
-                .setPassword(password);
-
-        return Redisson.create(config);
     }
 }

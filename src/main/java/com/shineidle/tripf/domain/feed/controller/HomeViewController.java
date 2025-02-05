@@ -17,43 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequiredArgsConstructor
 //@RequestMapping("/home")
 public class HomeViewController {
-
     private final FeedService feedService;
     private final JwtProvider jwtProvider;
-
-    /**
-     * 홈페이지 View 반환
-     */
-//    @GetMapping
-//    public String home(Model model) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//        if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
-//            HomeResponseDto homeResponseDto = feedService.findHomeData();
-//            model.addAttribute("homeData", homeResponseDto);
-//            return "home/home-logged-in"; // 로그인 사용자용 뷰
-//        } else {
-//            HomeResponseDto publicHomeResponseDto = feedService.findPublicHomeData();
-//            model.addAttribute("homeData", publicHomeResponseDto);
-//            return "home/home-guest"; // 비로그인 사용자용 뷰
-//        }
-//    }
-
-//    @GetMapping("/")
-//    public String home(Model model) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        log.info(authentication.getName());
-//
-//        if (authentication.getName() != null && !authentication.getName().equals("anonymousUser")) { // 로그인된 사용자라면
-//            HomeResponseDto homeResponseDto = feedService.findHomeData();
-//            model.addAttribute("username", authentication.getName());
-//            model.addAttribute("homeData", homeResponseDto);
-//            return "/home/home-logged-in"; // home-logged-in.html로 이동
-//        }
-//        HomeResponseDto publicHomeResponseDto = feedService.findPublicHomeData();
-//        model.addAttribute("homeData", publicHomeResponseDto);
-//        return "/home/home-guest"; // home.html로 이동
-//    }
 
     /**
      * 홈페이지 View를 반환합니다

@@ -1,9 +1,9 @@
 package com.shineidle.tripf.domain.photo.service;
 
+import com.shineidle.tripf.domain.product.service.ProductService;
 import com.shineidle.tripf.global.common.exception.GlobalException;
 import com.shineidle.tripf.global.common.exception.type.FeedErrorCode;
 import com.shineidle.tripf.global.common.exception.type.PhotoErrorCode;
-import com.shineidle.tripf.global.common.exception.type.ProductErrorCode;
 import com.shineidle.tripf.domain.feed.entity.Activity;
 import com.shineidle.tripf.domain.feed.repository.ActivityRepository;
 import com.shineidle.tripf.domain.photo.dto.PhotoRequestDto;
@@ -16,7 +16,6 @@ import com.shineidle.tripf.domain.photo.repository.PhotoRepository;
 import com.shineidle.tripf.domain.photo.repository.ProductPhotoRepository;
 import com.shineidle.tripf.domain.photo.type.PhotoDomain;
 import com.shineidle.tripf.domain.product.entity.Product;
-import com.shineidle.tripf.domain.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,7 +35,7 @@ import java.util.UUID;
 public class PhotoServiceImpl implements PhotoService {
     private final PhotoRepository photoRepository;
     private final ActivityRepository activityRepository;
-    private final ProductRepository productRepository;
+    private final ProductService productService;
     private final ActivityPhotoRepository activityPhotoRepository;
     private final ProductPhotoRepository productPhotoRepository;
     private final S3Client s3Client;
@@ -58,7 +57,12 @@ public class PhotoServiceImpl implements PhotoService {
      */
     @Override
     @Transactional
-    public PhotoResponseDto uploadPhoto(Long domainId, PhotoRequestDto photoRequestDto, MultipartFile multipartFile, PhotoDomain domainType) throws IOException {
+    public PhotoResponseDto uploadPhoto(
+            Long domainId,
+            PhotoRequestDto photoRequestDto,
+            MultipartFile multipartFile,
+            PhotoDomain domainType
+    ) throws IOException {
         validateMultipartFile(multipartFile);
 
         String storedFileName = generateUniqueFileName(multipartFile.getOriginalFilename());
@@ -76,35 +80,39 @@ public class PhotoServiceImpl implements PhotoService {
                 activityPhotoRepository.save(activityPhoto);
             }
             case PRODUCT -> {
-                Product product = productRepository.findById(domainId)
-                        .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
-                ProductPhoto productPhoto = new ProductPhoto(product, photo);
+                Product foundProduct = productService.getProductById(domainId);
+                ProductPhoto productPhoto = new ProductPhoto(foundProduct, photo);
                 productPhotoRepository.save(productPhoto);
             }
             default -> throw new GlobalException(PhotoErrorCode.DOMAIN_NOT_FOUND);
         }
 
-        return new PhotoResponseDto(domainId, photo.getOriginalFileName(), photo.getDescription(), fileUrl, photo.getSize(), photo.getExt(), photo.getCreatedAt(), photo.getModifiedAt());
+        return PhotoResponseDto.toDto2(domainId, photo);
     }
 
     /**
-     * 사진 정보를 Photo DB에 저장
+     * 사진 유효성 검증
      *
-     * @param multipartFile   {@link MultipartFile} 첨부할 사진
-     * @param photoRequestDto {@link PhotoRequestDto} 사진 요청 Dto
-     * @param fileUrl         사진 경로
-     * @return {@link Photo}
+     * @param multipartFile {@link MultipartFile} 첨부한 사진
      */
-    private Photo saveImage(MultipartFile multipartFile, PhotoRequestDto photoRequestDto, String fileUrl) {
+    private void validateMultipartFile(MultipartFile multipartFile) {
+        if (multipartFile == null) {
+            throw new GlobalException(PhotoErrorCode.PHOTO_EMPTY);
+        }
+        if (multipartFile.isEmpty()) {
+            throw new GlobalException(PhotoErrorCode.PHOTO_EMPTY);
+        }
+
         String originalFileName = multipartFile.getOriginalFilename();
-
-        String storedFileName = generateUniqueFileName(originalFileName);
-
         String ext = getExtension(originalFileName);
-        Long size = multipartFile.getSize();
+        if (!ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
+            throw new GlobalException(PhotoErrorCode.INVALID_FILE_EXTENSION);
+        }
 
-        Photo photo = new Photo(multipartFile.getOriginalFilename(), storedFileName, photoRequestDto.getDescription(), fileUrl, size, ext);
-        return photoRepository.save(photo);
+        long fileSize = multipartFile.getSize();
+        if (fileSize > MAX_FILE_SIZE) {
+            throw new GlobalException(PhotoErrorCode.INVALID_FILE_SIZE);
+        }
     }
 
     /**
@@ -152,28 +160,29 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     /**
-     * 사진 유효성 검증
+     * 사진 정보를 Photo DB에 저장
      *
-     * @param multipartFile {@link MultipartFile} 첨부한 사진
+     * @param multipartFile   {@link MultipartFile} 첨부할 사진
+     * @param photoRequestDto {@link PhotoRequestDto} 사진 요청 Dto
+     * @param fileUrl         사진 경로
+     * @return {@link Photo}
      */
-    private void validateMultipartFile(MultipartFile multipartFile) {
-        if (multipartFile == null) {
-            throw new GlobalException(PhotoErrorCode.PHOTO_EMPTY);
-        }
-        if (multipartFile.isEmpty()) {
-            throw new GlobalException(PhotoErrorCode.PHOTO_EMPTY);
-        }
-
+    private Photo saveImage(MultipartFile multipartFile, PhotoRequestDto photoRequestDto, String fileUrl) {
         String originalFileName = multipartFile.getOriginalFilename();
-        String ext = getExtension(originalFileName);
-        if (!ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
-            throw new GlobalException(PhotoErrorCode.INVALID_FILE_EXTENSION);
-        }
 
-        long fileSize = multipartFile.getSize();
-        if (fileSize > MAX_FILE_SIZE) {
-            throw new GlobalException(PhotoErrorCode.INVALID_FILE_SIZE);
-        }
+        String storedFileName = generateUniqueFileName(originalFileName);
+
+        String ext = getExtension(originalFileName);
+        Long size = multipartFile.getSize();
+
+        Photo photo = new Photo(
+                multipartFile.getOriginalFilename(),
+                storedFileName,
+                photoRequestDto.getDescription(),
+                fileUrl,
+                size,
+                ext);
+        return photoRepository.save(photo);
     }
 
     /**
@@ -213,6 +222,7 @@ public class PhotoServiceImpl implements PhotoService {
 
     /**
      * 사진 다건 조회
+     * x
      *
      * @param domainId   상품 식별자 또는 활동 식별자
      * @param domainType {@link PhotoDomain} 상품 또는 활동
@@ -247,7 +257,13 @@ public class PhotoServiceImpl implements PhotoService {
      */
     @Override
     @Transactional
-    public PhotoResponseDto updatePhoto(Long domainId, Long photoId, PhotoRequestDto photoRequestDto, MultipartFile multipartFile, PhotoDomain domainType) {
+    public PhotoResponseDto updatePhoto(
+            Long domainId,
+            Long photoId,
+            PhotoRequestDto photoRequestDto,
+            MultipartFile multipartFile,
+            PhotoDomain domainType
+    ) {
         validateMultipartFile(multipartFile);
 
         Photo photo = findByPhotoId(photoId);
