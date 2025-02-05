@@ -11,8 +11,4 @@ public interface MailService {
      */
     void sendTopFeedsMailNow();
 
-    /**
-     * 테스트 메일 발송
-     */
-    void sendSimpleMail(String to, String subject, String text);
 }
