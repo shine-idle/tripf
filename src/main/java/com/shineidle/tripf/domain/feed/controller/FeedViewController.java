@@ -5,7 +5,6 @@ import com.shineidle.tripf.domain.comment.service.CommentService;
 import com.shineidle.tripf.global.common.exception.GlobalException;
 import com.shineidle.tripf.global.common.exception.type.FeedErrorCode;
 import com.shineidle.tripf.domain.feed.dto.*;
-import com.shineidle.tripf.feed.dto.*;
 import com.shineidle.tripf.domain.feed.service.FeedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

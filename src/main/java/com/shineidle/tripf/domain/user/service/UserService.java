@@ -2,7 +2,6 @@ package com.shineidle.tripf.domain.user.service;
 
 import com.shineidle.tripf.global.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.domain.user.dto.*;
-import com.shineidle.tripf.user.dto.*;
 import com.shineidle.tripf.domain.user.entity.User;
 import jakarta.servlet.http.HttpServletResponse;
 
