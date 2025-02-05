@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// TODO: 사용되지 않는 변수 삭제 유무
 @Service
 @RequiredArgsConstructor
 public class FollowServiceImpl implements FollowService {

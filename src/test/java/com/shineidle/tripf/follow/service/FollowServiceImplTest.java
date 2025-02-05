@@ -1,14 +1,14 @@
 package com.shineidle.tripf.follow.service;
 
-import com.shineidle.tripf.global.security.auth.UserDetailsImpl;
-import com.shineidle.tripf.domain.follow.dto.FollowResponseDto;
 import com.shineidle.tripf.domain.follow.entity.Follow;
 import com.shineidle.tripf.domain.follow.entity.FollowPk;
 import com.shineidle.tripf.domain.follow.repository.FollowRepository;
 import com.shineidle.tripf.domain.follow.service.FollowServiceImpl;
 import com.shineidle.tripf.domain.user.entity.User;
-import com.shineidle.tripf.domain.user.repository.UserRepository;
+import com.shineidle.tripf.domain.user.service.UserService;
 import com.shineidle.tripf.domain.user.type.UserAuth;
+import com.shineidle.tripf.global.common.exception.GlobalException;
+import com.shineidle.tripf.global.security.auth.UserDetailsImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,13 +20,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,7 +34,7 @@ class FollowServiceImplTest {
     private FollowRepository followRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private UserService userService;
 
     private User loginUser;
     private User otherUser;
@@ -50,21 +45,20 @@ class FollowServiceImplTest {
                 "Develop!1234",
                 "loginUser",
                 UserAuth.ADMIN,
-                "Seoul"
-        );
+                "Seoul");
+
         ReflectionTestUtils.setField(loginUser, "id", 1L);
 
         otherUser = new User("otherUser@gmail.com",
                 "Develop!1234",
                 "otherUser",
                 UserAuth.ADMIN,
-                "Osaka"
-        );
+                "Osaka");
+
         ReflectionTestUtils.setField(otherUser, "id", 2L);
 
         UserDetailsImpl userDetails = new UserDetailsImpl(loginUser);
-        UsernamePasswordAuthenticationToken auth =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(auth);
@@ -73,8 +67,8 @@ class FollowServiceImplTest {
 
     @Test
     void createFollow() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(loginUser));
-        when(userRepository.findById(2L)).thenReturn(Optional.of(otherUser));
+        when(userService.getUserById(1L)).thenReturn(loginUser);
+        when(userService.getUserById(2L)).thenReturn(otherUser);
         when(followRepository.existsById(any(FollowPk.class))).thenReturn(false);
 
         assertDoesNotThrow(() -> followService.createFollow(2L));
@@ -82,28 +76,18 @@ class FollowServiceImplTest {
     }
 
     @Test
-    void findFollowers() {
-        Follow follow = new Follow(otherUser, loginUser);
-        when(followRepository.findByFollowingId(loginUser)).thenReturn(Collections.singletonList(follow));
+    void createFollow_AlreadyFollowed() {
+        when(userService.getUserById(1L)).thenReturn(loginUser);
+        when(userService.getUserById(2L)).thenReturn(otherUser);
+        when(followRepository.existsById(any(FollowPk.class))).thenReturn(true);
 
-        List<FollowResponseDto> followers = followService.findFollowers();
-        assertEquals(1, followers.size());
-        assertEquals(2L, followers.get(0).getUserId());
-    }
-
-    @Test
-    void findFollowings() {
-        Follow follow = new Follow(loginUser, otherUser);
-        when(followRepository.findByFollowerId(loginUser)).thenReturn(Collections.singletonList(follow));
-
-        List<FollowResponseDto> followings = followService.findFollowings();
-        assertEquals(1, followings.size());
-        assertEquals(2L, followings.get(0).getUserId());
+        assertThrows(GlobalException.class, () -> followService.createFollow(2L));
     }
 
     @Test
     void deleteFollowByFollowingId() {
-        when(userRepository.findById(2L)).thenReturn(Optional.of(otherUser));
+        when(userService.getUserById(1L)).thenReturn(loginUser);
+        when(userService.getUserById(2L)).thenReturn(otherUser);
         when(followRepository.existsById(any(FollowPk.class))).thenReturn(true);
 
         assertDoesNotThrow(() -> followService.deleteFollowByFollowingId(2L));
@@ -111,11 +95,30 @@ class FollowServiceImplTest {
     }
 
     @Test
+    void deleteFollowByFollowingId_NotExist() {
+        when(userService.getUserById(1L)).thenReturn(loginUser);
+        when(userService.getUserById(2L)).thenReturn(otherUser);
+        when(followRepository.existsById(any(FollowPk.class))).thenReturn(false);
+
+        assertThrows(GlobalException.class, () -> followService.deleteFollowByFollowingId(2L));
+    }
+
+    @Test
     void deleteFollowByFollowerId() {
-        when(userRepository.findById(2L)).thenReturn(Optional.of(otherUser));
+        when(userService.getUserById(1L)).thenReturn(loginUser);
+        when(userService.getUserById(2L)).thenReturn(otherUser);
         when(followRepository.existsById(any(FollowPk.class))).thenReturn(true);
 
         assertDoesNotThrow(() -> followService.deleteFollowByFollowerId(2L));
         verify(followRepository, times(1)).deleteById(any(FollowPk.class));
+    }
+
+    @Test
+    void deleteFollowByFollowerId_NotExist() {
+        when(userService.getUserById(1L)).thenReturn(loginUser);
+        when(userService.getUserById(2L)).thenReturn(otherUser);
+        when(followRepository.existsById(any(FollowPk.class))).thenReturn(false);
+
+        assertThrows(GlobalException.class, () -> followService.deleteFollowByFollowerId(2L));
     }
 }
