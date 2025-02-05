@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-// TODO : javadoc 작성
 // TODO : 예외처리 컨트롤러로 처리 필요
+
+/**
+ * 계정 관련 뷰 컨트롤러
+ */
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -23,11 +26,23 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AccountViewController {
     private final UserService userService;
 
+    /**
+     * 회원가입 페이지 이동
+     *
+     * @return 회원가입 페이지 (user/signup.html)
+     */
     @GetMapping("/signup")
     public String signUpPage() {
         return "user/signup";
     }
 
+    /**
+     * 회원가입 처리
+     *
+     * @param dto   회원가입 요청 데이터
+     * @param model 뷰 모델 객체
+     * @return 회원가입 성공 시 성공 페이지, 실패 시 회원가입 페이지 반환
+     */
     @PostMapping("/signup")
     public String signUp(
             @ModelAttribute UserRequestDto dto,
@@ -43,11 +58,24 @@ public class AccountViewController {
         }
     }
 
+    /**
+     * 로그인 페이지 이동
+     *
+     * @return 로그인 페이지 (user/login.html)
+     */
     @GetMapping("/login")
     public String loginPage() {
         return "user/login";
     }
 
+    /**
+     * 로그인 처리
+     *
+     * @param dto                로그인 요청 데이터
+     * @param response           HTTP 응답 객체
+     * @param redirectAttributes 리다이렉트 시 메시지 전달
+     * @return 로그인 성공 시 메인 페이지로 리다이렉트, 실패 시 로그인 페이지로 리다이렉트
+     */
     @PostMapping("/login")
     public String login(
             @ModelAttribute UserRequestDto dto,
@@ -64,9 +92,13 @@ public class AccountViewController {
         }
     }
 
+    /**
+     * 로그아웃 페이지 이동
+     *
+     * @return 로그아웃 페이지 (user/logout.html)
+     */
     @GetMapping("/logout")
     public String logoutPage() {
-
         return "user/logout";
     }
 }

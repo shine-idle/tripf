@@ -5,7 +5,12 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-// TODO : javadoc 작성
 public interface ChatRoomRepository extends MongoRepository<ChatRoom, String> {
-    ChatRoom findByUsers(List<String> userA);
+    /**
+     * 특정 유저가 포함된 채팅방 조회
+     *
+     * @param users 유저 목록
+     * @return 채팅방
+     */
+    ChatRoom findByUsers(List<String> users);
 }

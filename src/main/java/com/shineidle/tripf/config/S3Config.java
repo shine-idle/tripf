@@ -8,30 +8,41 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
+/**
+ * AWS S3 클라이언트를 설정하는 구성 클래스
+ */
 @Configuration
 public class S3Config {
-
+    /**
+     * AWS 액세스 키
+     */
     @Value("${cloud.aws.credentials.accessKey}")
     private String accessKey;
 
+    /**
+     * AWS 시크릿 키
+     */
     @Value("${cloud.aws.credentials.secretKey}")
     private String secretKey;
 
+    /**
+     * AWS S3 서비스가 위치한 리전 정보
+     */
     @Value("${cloud.aws.region.static}")
     private String region;
 
-    //TODO : javadoc
+    /**
+     * AWS S3 클라이언트를 생성하는 빈
+     *
+     * @return S3Client 객체
+     */
     @Bean
     public S3Client s3Client() {
-
-        // AWS 자격 증명 객체 생성
         AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
 
         return S3Client.builder()
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(credentials))
-                // 만약 실행중인 환경에서 AWS의 자격 증명을 가져오려면 위 코드 대신 아래 아래 코드를 사용하면 된다.
-//                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();
     }
 }
