@@ -2,6 +2,7 @@ package com.shineidle.tripf.domain.payment.controller;
 
 import com.shineidle.tripf.domain.payment.dto.PaymentRequestDto;
 import com.shineidle.tripf.domain.payment.service.PaymentService;
+import com.shineidle.tripf.domain.payment.service.PaymentServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,7 +15,7 @@ import java.util.Map;
 public class PaymentViewController {
     private final PaymentService paymentService;
 
-    public PaymentViewController(PaymentService paymentService) {
+    public PaymentViewController(PaymentServiceImpl paymentService) {
         this.paymentService = paymentService;
     }
 

@@ -36,7 +36,11 @@ public class AdminProductPhotoController {
             @ModelAttribute PhotoRequestDto photoRequestDto,
             @RequestPart MultipartFile file
     ) throws IOException {
-        PhotoResponseDto responseDto = photoService.uploadPhoto(productId, photoRequestDto, file, PhotoDomain.PRODUCT);
+        PhotoResponseDto responseDto = photoService.uploadPhoto(
+                productId,
+                photoRequestDto,
+                file,
+                PhotoDomain.PRODUCT);
 
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
@@ -62,7 +66,12 @@ public class AdminProductPhotoController {
             @ModelAttribute PhotoRequestDto photoRequestDto,
             @RequestParam MultipartFile file
     ) {
-        PhotoResponseDto responseDto = photoService.updatePhoto(productId, photoId, photoRequestDto, file, PhotoDomain.PRODUCT);
+        PhotoResponseDto responseDto = photoService.updatePhoto(
+                productId,
+                photoId,
+                photoRequestDto,
+                file,
+                PhotoDomain.PRODUCT);
 
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
