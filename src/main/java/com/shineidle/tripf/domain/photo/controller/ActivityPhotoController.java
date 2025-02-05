@@ -37,7 +37,11 @@ public class ActivityPhotoController {
             @ModelAttribute PhotoRequestDto photoRequestDto,
             @RequestParam(value = "file", required = false) MultipartFile file
     ) throws IOException {
-        PhotoResponseDto responseDto = photoService.uploadPhoto(activityId, photoRequestDto, file, PhotoDomain.ACTIVITY);
+        PhotoResponseDto responseDto = photoService.uploadPhoto(
+                activityId,
+                photoRequestDto,
+                file,
+                PhotoDomain.ACTIVITY);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
@@ -96,7 +100,12 @@ public class ActivityPhotoController {
             @ModelAttribute PhotoRequestDto photoRequestDto,
             @RequestParam MultipartFile file
     ) {
-        PhotoResponseDto responseDto = photoService.updatePhoto(activityId, photoId, photoRequestDto, file, PhotoDomain.ACTIVITY);
+        PhotoResponseDto responseDto = photoService.updatePhoto(
+                activityId,
+                photoId,
+                photoRequestDto,
+                file,
+                PhotoDomain.ACTIVITY);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 

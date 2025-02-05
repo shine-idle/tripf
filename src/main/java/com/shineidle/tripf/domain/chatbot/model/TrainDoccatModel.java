@@ -41,7 +41,7 @@ public class TrainDoccatModel {
             log.info("OpenNLP 문서 분류 모델이 생성되었습니다: {}", modelFile.getAbsolutePath());
 
         } catch (Exception e) {
-            log.info("모델 학습 중 오류 발생: {}", e.getMessage(), e);
+            log.info("모델 학습 중 오류가 발생했습니다: {}", e.getMessage(), e);
         }
     }
 }

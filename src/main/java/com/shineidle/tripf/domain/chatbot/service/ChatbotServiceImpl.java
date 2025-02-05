@@ -136,6 +136,30 @@ public class ChatbotServiceImpl implements ChatbotService {
     }
 
     /**
+     * 한국어 텍스트를 분석하여 토큰화하는 메서드
+     *
+     * @param text 토큰화할 입력 문자열
+     * @return 입력 문자열을 토큰화한 결과를 문자열 배열로 반환
+     */
+    private String[] tokenizeKorean(String text) {
+        List<String> tokens = new ArrayList<>();
+
+        try (Analyzer analyzer = new KoreanAnalyzer();
+             var tokenStream = analyzer.tokenStream(null, new StringReader(text))) {
+            tokenStream.reset();
+            CharTermAttribute termAtt = tokenStream.addAttribute(CharTermAttribute.class);
+
+            while (tokenStream.incrementToken()) {
+                tokens.add(termAtt.toString());
+            }
+            tokenStream.end();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tokens.toArray(new String[0]);
+    }
+
+    /**
      * 사용자 대화 기록 조회
      *
      * @return {@link ChatbotResponseDto} 챗봇 응답 Dto
@@ -172,27 +196,5 @@ public class ChatbotServiceImpl implements ChatbotService {
         return allQuestions.entrySet().stream()
                 .map(entry -> new ChatbotQuestionsResponseDto(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * 한국어 텍스트를 분석하여 토큰화하는 메서드
-     *
-     * @param text 토큰화할 입력 문자열
-     * @return 입력 문자열을 토큰화한 결과를 문자열 배열로 반환
-     */
-    private String[] tokenizeKorean(String text) {
-        List<String> tokens = new ArrayList<>();
-        try (Analyzer analyzer = new KoreanAnalyzer();
-             var tokenStream = analyzer.tokenStream(null, new StringReader(text))) {
-            tokenStream.reset();
-            CharTermAttribute termAtt = tokenStream.addAttribute(CharTermAttribute.class);
-            while (tokenStream.incrementToken()) {
-                tokens.add(termAtt.toString());
-            }
-            tokenStream.end();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return tokens.toArray(new String[0]);
     }
 }
