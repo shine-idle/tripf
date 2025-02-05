@@ -9,7 +9,6 @@ import com.shineidle.tripf.global.common.message.type.PostMessage;
 import com.shineidle.tripf.global.common.util.provider.JwtProvider;
 import com.shineidle.tripf.global.common.util.auth.UserAuthorizationUtil;
 import com.shineidle.tripf.domain.feed.dto.*;
-import com.shineidle.tripf.feed.dto.*;
 import com.shineidle.tripf.domain.feed.entity.Activity;
 import com.shineidle.tripf.domain.feed.entity.Days;
 import com.shineidle.tripf.domain.feed.entity.Feed;

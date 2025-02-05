@@ -4,7 +4,6 @@ import com.shineidle.tripf.global.common.exception.GlobalException;
 import com.shineidle.tripf.global.common.exception.type.FeedErrorCode;
 import com.shineidle.tripf.global.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.domain.feed.dto.*;
-import com.shineidle.tripf.feed.dto.*;
 import com.shineidle.tripf.domain.feed.service.FeedService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;

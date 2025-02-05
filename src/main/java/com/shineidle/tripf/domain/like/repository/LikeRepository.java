@@ -31,7 +31,7 @@ public interface LikeRepository extends JpaRepository<Like, LikePk> {
      * @param pageable 페이징 정보, 상위 5개의 피드 가져 옴
      * @return {@Link FeedLikeDto}
      */
-    @Query("SELECT new com.shineidle.tripf.like.dto.FeedLikeDto(" +
+    @Query("SELECT new com.shineidle.tripf.domain.like.dto.FeedLikeDto(" +
             "l.feed.id, f.title, COUNT(l)) " +
             "FROM Like l " +
             "JOIN l.feed f " +

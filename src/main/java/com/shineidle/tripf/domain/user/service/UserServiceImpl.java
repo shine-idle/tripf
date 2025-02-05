@@ -10,7 +10,6 @@ import com.shineidle.tripf.global.common.util.auth.UserAuthorizationUtil;
 import com.shineidle.tripf.global.common.util.redis.RedisUtils;
 import com.shineidle.tripf.domain.user.dto.*;
 import com.shineidle.tripf.global.security.oauth2.util.CookieUtils;
-import com.shineidle.tripf.user.dto.*;
 import com.shineidle.tripf.domain.user.entity.RefreshToken;
 import com.shineidle.tripf.domain.user.entity.User;
 import com.shineidle.tripf.domain.user.repository.UserRepository;

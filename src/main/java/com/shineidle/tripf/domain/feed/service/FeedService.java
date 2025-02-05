@@ -2,7 +2,6 @@ package com.shineidle.tripf.domain.feed.service;
 
 import com.shineidle.tripf.global.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.domain.feed.dto.*;
-import com.shineidle.tripf.feed.dto.*;
 import com.shineidle.tripf.domain.feed.entity.Feed;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
