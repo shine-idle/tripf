@@ -37,4 +37,17 @@ public class PhotoResponseDto {
                 photo.getModifiedAt()
         );
     }
+
+    public static PhotoResponseDto toDto2(Long domainId, Photo photo) {
+        return new PhotoResponseDto(
+                domainId,
+                photo.getOriginalFileName(),
+                photo.getDescription(),
+                photo.getUrl(),
+                photo.getSize(),
+                photo.getExt(),
+                photo.getCreatedAt(),
+                photo.getModifiedAt()
+        );
+    }
 }

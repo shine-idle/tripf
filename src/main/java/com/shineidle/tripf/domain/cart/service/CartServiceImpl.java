@@ -4,12 +4,11 @@ import com.shineidle.tripf.domain.cart.dto.CartRequestDto;
 import com.shineidle.tripf.domain.cart.dto.CartResponseDto;
 import com.shineidle.tripf.domain.cart.entity.Cart;
 import com.shineidle.tripf.domain.cart.repository.CartRepository;
+import com.shineidle.tripf.domain.product.service.ProductService;
 import com.shineidle.tripf.global.common.exception.GlobalException;
 import com.shineidle.tripf.global.common.exception.type.CartErrorCode;
-import com.shineidle.tripf.global.common.exception.type.ProductErrorCode;
 import com.shineidle.tripf.global.common.util.auth.UserAuthorizationUtil;
 import com.shineidle.tripf.domain.product.entity.Product;
-import com.shineidle.tripf.domain.product.repository.ProductRepository;
 import com.shineidle.tripf.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
-    private final ProductRepository productRepository;
+    private final ProductService productService;
 
     /**
      * 장바구니 생성
@@ -35,7 +34,7 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public CartResponseDto createCart(Long productId, CartRequestDto cartRequestDto) {
         User loginedUser = UserAuthorizationUtil.getLoginUser();
-        Product foundProduct = findByIdOrElseThrow(productId);
+        Product foundProduct = productService.getProductById(productId);
 
         Cart cart = new Cart(cartRequestDto.getQuantity(), loginedUser, foundProduct);
         Cart savedCart = cartRepository.save(cart);
@@ -44,7 +43,7 @@ public class CartServiceImpl implements CartService {
     }
 
     /**
-     * 장바구니 조회
+     * 장바구니 목록 조회
      *
      * @return {@link CartResponseDto} 장바구니 응답 Dto
      */
@@ -59,7 +58,7 @@ public class CartServiceImpl implements CartService {
     }
 
     /**
-     * 장바구니 수정
+     * 장바구니에 담긴 상품 수량 수정
      *
      * @param productId      상품 식별자
      * @param cartRequestDto {@link CartRequestDto} 장바구니 요청 Dto
@@ -69,10 +68,9 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public CartResponseDto updateCart(Long productId, CartRequestDto cartRequestDto) {
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        Product foundProduct = findByIdOrElseThrow(productId);
 
+        Product foundProduct = productService.getProductById(productId);
         Cart foundCart = findByUserIdAndProductId(userId, foundProduct.getId());
-
         foundCart.updateCart(cartRequestDto);
 
         cartRepository.save(foundCart);
@@ -81,7 +79,7 @@ public class CartServiceImpl implements CartService {
     }
 
     /**
-     * 장바구니 삭제
+     * 장바구니 상품 삭제
      *
      * @param productId 상품 식별자
      */
@@ -90,22 +88,10 @@ public class CartServiceImpl implements CartService {
     public void deleteCart(Long productId) {
         Long userId = UserAuthorizationUtil.getLoginUserId();
 
-        Product foundProduct = findByIdOrElseThrow(productId);
-
+        Product foundProduct = productService.getProductById(productId);
         Cart foundCart = findByUserIdAndProductId(userId, foundProduct.getId());
 
         cartRepository.delete(foundCart);
-    }
-
-    /**
-     * 상품Id로 상품 조회
-     *
-     * @param productId 상품 식별자
-     * @return Product {@link Product}
-     */
-    public Product findByIdOrElseThrow(Long productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
     }
 
     /**
