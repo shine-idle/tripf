@@ -2,7 +2,6 @@ package com.shineidle.tripf.global.security.oauth2.user;
 
 import java.util.Map;
 
-// TODO : javadoc 작성
 public interface OAuth2UserInfo {
     /**
      * OAuth2 제공자를 반환합니다.

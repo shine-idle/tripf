@@ -1,8 +1,8 @@
 package com.shineidle.tripf.domain.user.controller;
 
-import com.shineidle.tripf.global.common.exception.GlobalException;
 import com.shineidle.tripf.domain.user.dto.UserRequestDto;
 import com.shineidle.tripf.domain.user.service.UserService;
+import com.shineidle.tripf.global.common.exception.GlobalException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-// TODO : 예외처리 컨트롤러로 처리 필요
 
 /**
  * 계정 관련 뷰 컨트롤러
