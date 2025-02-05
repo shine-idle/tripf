@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO: 사용되지 않는 메서드 삭제 유무
 @Getter
 @RequiredArgsConstructor
 public class FeedLikeDto {
