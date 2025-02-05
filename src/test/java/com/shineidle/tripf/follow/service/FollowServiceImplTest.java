@@ -1,13 +1,14 @@
 package com.shineidle.tripf.follow.service;
 
-import com.shineidle.tripf.config.auth.UserDetailsImpl;
-import com.shineidle.tripf.follow.dto.FollowResponseDto;
-import com.shineidle.tripf.follow.entity.Follow;
-import com.shineidle.tripf.follow.entity.FollowPk;
-import com.shineidle.tripf.follow.repository.FollowRepository;
-import com.shineidle.tripf.user.entity.User;
-import com.shineidle.tripf.user.repository.UserRepository;
-import com.shineidle.tripf.user.type.UserAuth;
+import com.shineidle.tripf.global.security.auth.UserDetailsImpl;
+import com.shineidle.tripf.domain.follow.dto.FollowResponseDto;
+import com.shineidle.tripf.domain.follow.entity.Follow;
+import com.shineidle.tripf.domain.follow.entity.FollowPk;
+import com.shineidle.tripf.domain.follow.repository.FollowRepository;
+import com.shineidle.tripf.domain.follow.service.FollowServiceImpl;
+import com.shineidle.tripf.domain.user.entity.User;
+import com.shineidle.tripf.domain.user.repository.UserRepository;
+import com.shineidle.tripf.domain.user.type.UserAuth;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,13 +1,14 @@
 package com.shineidle.tripf.notification.service;
 
-import com.shineidle.tripf.config.auth.UserDetailsImpl;
-import com.shineidle.tripf.notification.dto.NotificationResponseDto;
-import com.shineidle.tripf.notification.entity.Notification;
-import com.shineidle.tripf.notification.repository.NotificationRepository;
-import com.shineidle.tripf.notification.type.NotifyType;
-import com.shineidle.tripf.user.entity.User;
-import com.shineidle.tripf.user.service.UserService;
-import com.shineidle.tripf.user.type.UserAuth;
+import com.shineidle.tripf.global.security.auth.UserDetailsImpl;
+import com.shineidle.tripf.domain.notification.dto.NotificationResponseDto;
+import com.shineidle.tripf.domain.notification.entity.Notification;
+import com.shineidle.tripf.domain.notification.repository.NotificationRepository;
+import com.shineidle.tripf.domain.notification.service.NotificationServiceImpl;
+import com.shineidle.tripf.domain.notification.type.NotifyType;
+import com.shineidle.tripf.domain.user.entity.User;
+import com.shineidle.tripf.domain.user.service.UserService;
+import com.shineidle.tripf.domain.user.type.UserAuth;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

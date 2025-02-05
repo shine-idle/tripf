@@ -1,14 +1,15 @@
 package com.shineidle.tripf.product.service;
 
-import com.shineidle.tripf.common.exception.GlobalException;
-import com.shineidle.tripf.common.message.dto.PostMessageResponseDto;
-import com.shineidle.tripf.common.message.type.PostMessage;
-import com.shineidle.tripf.product.dto.ProductRequestDto;
-import com.shineidle.tripf.product.dto.ProductResponseDto;
-import com.shineidle.tripf.product.entity.Product;
-import com.shineidle.tripf.product.repository.ProductRepository;
-import com.shineidle.tripf.product.type.ProductCategory;
-import com.shineidle.tripf.product.type.ProductStatus;
+import com.shineidle.tripf.global.common.exception.GlobalException;
+import com.shineidle.tripf.global.common.message.dto.PostMessageResponseDto;
+import com.shineidle.tripf.global.common.message.type.PostMessage;
+import com.shineidle.tripf.domain.product.dto.ProductRequestDto;
+import com.shineidle.tripf.domain.product.dto.ProductResponseDto;
+import com.shineidle.tripf.domain.product.entity.Product;
+import com.shineidle.tripf.domain.product.repository.ProductRepository;
+import com.shineidle.tripf.domain.product.service.ProductServiceImpl;
+import com.shineidle.tripf.domain.product.type.ProductCategory;
+import com.shineidle.tripf.domain.product.type.ProductStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
