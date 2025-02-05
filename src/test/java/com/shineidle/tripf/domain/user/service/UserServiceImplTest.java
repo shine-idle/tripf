@@ -1,4 +1,4 @@
-package com.shineidle.tripf.user.service;
+package com.shineidle.tripf.domain.user.service;
 
 import com.shineidle.tripf.global.common.exception.GlobalException;
 import com.shineidle.tripf.global.common.exception.type.UserErrorCode;
@@ -7,7 +7,6 @@ import com.shineidle.tripf.global.common.message.type.PostMessage;
 import com.shineidle.tripf.domain.user.dto.UserRequestDto;
 import com.shineidle.tripf.domain.user.entity.User;
 import com.shineidle.tripf.domain.user.repository.UserRepository;
-import com.shineidle.tripf.domain.user.service.UserServiceImpl;
 import com.shineidle.tripf.domain.user.type.UserAuth;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
