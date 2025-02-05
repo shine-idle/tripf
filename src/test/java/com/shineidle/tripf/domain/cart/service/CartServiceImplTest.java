@@ -1,4 +1,4 @@
-package com.shineidle.tripf.cart.service;
+package com.shineidle.tripf.domain.cart.service;
 
 import com.shineidle.tripf.domain.cart.dto.CartRequestDto;
 import com.shineidle.tripf.domain.cart.dto.CartResponseDto;
@@ -8,9 +8,9 @@ import com.shineidle.tripf.global.common.exception.GlobalException;
 import com.shineidle.tripf.global.common.exception.type.CartErrorCode;
 import com.shineidle.tripf.global.common.exception.type.ProductErrorCode;
 import com.shineidle.tripf.global.common.util.auth.UserAuthorizationUtil;
-import com.shineidle.tripf.domain.cart.service.CartServiceImpl;
 import com.shineidle.tripf.domain.product.entity.Product;
 import com.shineidle.tripf.domain.product.repository.ProductRepository;
+import com.shineidle.tripf.domain.product.service.ProductService;
 import com.shineidle.tripf.domain.product.type.ProductCategory;
 import com.shineidle.tripf.domain.product.type.ProductStatus;
 import com.shineidle.tripf.domain.user.entity.User;
@@ -40,6 +40,9 @@ class CartServiceImplTest {
 
     @Mock
     private ProductRepository productRepository;
+
+    @Mock
+    private ProductService productService;
 
     @InjectMocks
     private CartServiceImpl cartService;
@@ -72,7 +75,6 @@ class CartServiceImplTest {
 
         try (MockedStatic<UserAuthorizationUtil> mockedUserAuth = mockStatic(UserAuthorizationUtil.class)) {
             mockedUserAuth.when(UserAuthorizationUtil::getLoginUser).thenReturn(user);
-            when(productRepository.findById(1L)).thenReturn(Optional.of(product));
             when(cartRepository.save(any(Cart.class))).thenReturn(cart);
 
             // When
@@ -92,12 +94,13 @@ class CartServiceImplTest {
 
         try (MockedStatic<UserAuthorizationUtil> mockedUserAuth = mockStatic(UserAuthorizationUtil.class)) {
             mockedUserAuth.when(UserAuthorizationUtil::getLoginUser).thenReturn(user);
-            when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
             // When & Then
             assertThatThrownBy(() -> cartService.createCart(1L, requestDto))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage(ProductErrorCode.PRODUCT_NOT_FOUND.getMessage());
+
+            verify(cartRepository, times(0)).save(any(Cart.class));
         }
     }
 
@@ -125,7 +128,7 @@ class CartServiceImplTest {
 
         try (MockedStatic<UserAuthorizationUtil> mockedUserAuth = mockStatic(UserAuthorizationUtil.class)) {
             mockedUserAuth.when(UserAuthorizationUtil::getLoginUserId).thenReturn(1L);
-            when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+            when(productService.getProductById(1L)).thenReturn(product);
             when(cartRepository.findByUserIdAndProductId(1L, product.getId())).thenReturn(Optional.of(cart));
 
             // When
@@ -134,6 +137,7 @@ class CartServiceImplTest {
             // Then
             assertThat(responseDto).isNotNull();
             assertThat(responseDto.getQuantity()).isEqualTo(5);
+            verify(cartRepository, times(1)).save(cart);
         }
     }
 
@@ -144,7 +148,7 @@ class CartServiceImplTest {
 
         try (MockedStatic<UserAuthorizationUtil> mockedUserAuth = mockStatic(UserAuthorizationUtil.class)) {
             mockedUserAuth.when(UserAuthorizationUtil::getLoginUserId).thenReturn(1L);
-            when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+            when(productService.getProductById(1L)).thenReturn(product);
             when(cartRepository.findByUserIdAndProductId(1L, 1L)).thenReturn(Optional.empty());
 
             // When & Then
@@ -156,17 +160,17 @@ class CartServiceImplTest {
 
     @Test
     void deleteCartSuccessTest() {
-        // Given
         try (MockedStatic<UserAuthorizationUtil> mockedUserAuth = mockStatic(UserAuthorizationUtil.class)) {
             mockedUserAuth.when(UserAuthorizationUtil::getLoginUserId).thenReturn(1L);
-            when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-            when(cartRepository.findByUserIdAndProductId(1L, 1L)).thenReturn(Optional.of(cart));
+            when(productService.getProductById(1L)).thenReturn(product);
+            when(cartRepository.findByUserIdAndProductId(1L, 1L)).thenReturn(Optional.of(cart));  // 카트도 존재하는지 확인
 
             // When
-            cartService.deleteCart(1L);
+            cartService.deleteCart(1L);  // deleteCart 호출
 
             // Then
             verify(cartRepository, times(1)).delete(cart);
+            verify(productService, times(1)).getProductById(1L);
         }
     }
 }

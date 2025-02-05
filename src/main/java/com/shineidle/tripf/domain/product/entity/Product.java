@@ -52,7 +52,7 @@ public class Product extends BaseEntity {
         this.stock = stock;
     }
 
-    protected Product() {
+    public Product() {
     }
 
     public void update(ProductRequestDto dto) {

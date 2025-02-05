@@ -67,7 +67,7 @@ public class User extends BaseEntity {
         this.auth = UserAuth.NORMAL;
     }
 
-    protected User() {
+    public User() {
     }
 
     public User(Long userId) {
