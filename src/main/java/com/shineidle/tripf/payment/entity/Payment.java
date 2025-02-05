@@ -14,28 +14,31 @@ public class Payment {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String orderId; // 주문 ID (Toss에서 사용)
+    private String orderId;
 
     @Column(nullable = false, unique = true)
-    private String paymentKey; // Toss 결제 키
+    private String paymentKey;
 
     @Column(nullable = false)
-    private int amount; // 결제 금액
+    private int amount;
 
     @Column(nullable = false)
-    private String orderName; // 주문명
+    private String orderName;
 
     @Column(nullable = false)
-    private String status; // 결제 상태 (SUCCESS, FAIL, PENDING 등)
+    private String status;
 
     @Column(nullable = false)
-    private String method; // 결제 수단 (카드, 계좌이체 등)
+    private String method;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt; // 결제 요청 시간
+    private LocalDateTime createdAt;
 
-    private LocalDateTime approvedAt; // 결제 승인 시간
+    private LocalDateTime approvedAt;
 
+    /**
+     * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
+     */
     protected Payment() {}
 
     public Payment(String orderId, String paymentKey, int amount, String orderName,
