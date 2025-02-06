@@ -46,7 +46,7 @@ class CartRepositoryTest {
 
     @Test
     void findByUserIdAndProductIdSuccessTest() {
-        Optional<Cart> foundCart = cartRepository.findByUserIdAndProductId(1L, 1L);
+        Optional<Cart> foundCart = cartRepository.findByUserIdAndProductId(cart.getUser().getId(), cart.getProduct().getId());
 
         assertTrue(foundCart.isPresent());
         assertEquals(cart.getUser().getId(), foundCart.get().getUser().getId());
@@ -71,6 +71,8 @@ class CartRepositoryTest {
 
     @Test
     void findAllByUserIdNotFoundTest() {
+        cartRepository.deleteAll();
+
         List<Cart> cartList = cartRepository.findAllByUserId(2L);
 
         assertTrue(cartList.isEmpty());
