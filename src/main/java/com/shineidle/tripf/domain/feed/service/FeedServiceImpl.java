@@ -146,7 +146,7 @@ public class FeedServiceImpl implements FeedService {
 
                 redisFeedService.updateCache(savedFeed.getId(), newFeed);
 
-                redisFeedService.deleteCache("homeCache");
+                redisFeedService.deleteCache("publicHomeCache");
                 redisFeedService.deleteCache("region:" + country);
 
                 return newFeed;
