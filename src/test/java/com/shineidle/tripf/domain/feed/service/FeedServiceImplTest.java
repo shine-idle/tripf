@@ -139,24 +139,6 @@ class FeedServiceImplTest {
             return savedFeed;
         });
 
-        when(feedRepository.findById(anyLong())).thenAnswer(invocation -> {
-            Feed savedFeed = new Feed(
-                    loginUser,
-                    "Korea",
-                    "Seoul",
-                    requestDto.getStartedAt(),
-                    requestDto.getEndedAt(),
-                    requestDto.getTitle(),
-                    requestDto.getContent(),
-                    requestDto.getCost(),
-                    requestDto.getTag()
-            );
-            ReflectionTestUtils.setField(savedFeed, "id", 1L);
-            return Optional.of(savedFeed);
-        });
-
-        when(redisFeedService.getFeed(anyLong())).thenReturn(null);
-
         // When
         FeedResponseDto response = feedService.createFeed(requestDto, "token");
 
@@ -171,7 +153,6 @@ class FeedServiceImplTest {
         assertThat(response.getEndedAt()).isEqualTo(requestDto.getEndedAt());
         verify(feedRepository, times(1)).save(any(Feed.class));
     }
-
 
     @Test
     void findFeedSuccessTest() {
