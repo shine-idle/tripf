@@ -2,12 +2,14 @@ package com.shineidle.tripf.domain.cart.dto;
 
 import com.shineidle.tripf.domain.cart.entity.Cart;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
 @RequiredArgsConstructor
+@NoArgsConstructor(force = true)
 public class CartResponseDto {
     private final Long cartId;
     private final Long userId;

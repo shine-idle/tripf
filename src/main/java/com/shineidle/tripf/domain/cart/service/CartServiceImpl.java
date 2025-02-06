@@ -7,6 +7,7 @@ import com.shineidle.tripf.domain.cart.repository.CartRepository;
 import com.shineidle.tripf.domain.product.service.ProductService;
 import com.shineidle.tripf.global.common.exception.GlobalException;
 import com.shineidle.tripf.global.common.exception.type.CartErrorCode;
+import com.shineidle.tripf.global.common.exception.type.ProductErrorCode;
 import com.shineidle.tripf.global.common.util.auth.UserAuthorizationUtil;
 import com.shineidle.tripf.domain.product.entity.Product;
 import com.shineidle.tripf.domain.user.entity.User;
@@ -35,6 +36,10 @@ public class CartServiceImpl implements CartService {
     public CartResponseDto createCart(Long productId, CartRequestDto cartRequestDto) {
         User loginedUser = UserAuthorizationUtil.getLoginUser();
         Product foundProduct = productService.getProductById(productId);
+
+        if (foundProduct == null) {
+            throw new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND);
+        }
 
         Cart cart = new Cart(cartRequestDto.getQuantity(), loginedUser, foundProduct);
         Cart savedCart = cartRepository.save(cart);
