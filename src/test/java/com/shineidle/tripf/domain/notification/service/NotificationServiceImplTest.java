@@ -1,4 +1,4 @@
-package com.shineidle.tripf.notification.service;
+package com.shineidle.tripf.domain.notification.service;
 
 import com.shineidle.tripf.global.security.auth.UserDetailsImpl;
 import com.shineidle.tripf.domain.notification.dto.NotificationResponseDto;
