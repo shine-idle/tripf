@@ -95,6 +95,8 @@ public class FeedServiceImpl implements FeedService {
                 );
                 Feed savedFeed = feedRepository.save(feed);
 
+                List<DaysResponseDto> daysResponseDtos = new ArrayList<>();
+
                 if (feedRequestDto.getDays() != null) {
                     feedRequestDto.getDays().forEach(daysRequestDto -> {
                         Days days = new Days(savedFeed, daysRequestDto.getDate());
@@ -109,6 +111,7 @@ public class FeedServiceImpl implements FeedService {
                         }
 
                         Days savedDays = daysRepository.save(days);
+                        List<ActivityResponseDto> activityDtos = new ArrayList<>();
 
                         if (daysRequestDto.getActivity() != null) {
                             daysRequestDto.getActivity().forEach(activityRequestDto -> {
@@ -122,14 +125,31 @@ public class FeedServiceImpl implements FeedService {
                                         activityRequestDto.getLongitude()
                                 );
                                 activityRepository.save(activity);
+
+                                List<PhotoResponseDto> photoDtos = activity.getActivityPhotos().stream()
+                                        .map(activityPhoto -> PhotoResponseDto.toDto(activityPhoto.getPhoto()))
+                                        .toList();
+
+                                String representativePhotoUrl = activity.getRepresentativePhotoUrl();
+
+                                activityDtos.add(ActivityResponseDto.toDto(activity, photoDtos, representativePhotoUrl));
                             });
                         }
+
+                        daysResponseDtos.add(new DaysResponseDto(savedDays.getId(), savedDays.getDate(), activityDtos));
                     });
                 }
 
                 followerNewPostNotification(userId, feed.getId());
 
-                return findFeed(savedFeed.getId());
+                FeedResponseDto newFeed = FeedResponseDto.toDto(savedFeed, daysResponseDtos);
+
+                redisFeedService.updateCache(savedFeed.getId(), newFeed);
+
+                redisFeedService.deleteCache("homeCache");
+                redisFeedService.deleteCache("region:" + country);
+
+                return newFeed;
             } else {
                 throw new GlobalException(LockErrorCode.LOCK_ACQUISITION_FAILED);
             }
@@ -227,7 +247,7 @@ public class FeedServiceImpl implements FeedService {
 
                 redisFeedService.updateCache(savedFeed.getId(), newFeed);
 
-                redisFeedService.deleteCache("homeCache");
+                redisFeedService.deleteCache("publicHomeCache");
                 redisFeedService.deleteCache("region:" + country);
 
                 return newFeed;
