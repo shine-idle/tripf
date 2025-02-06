@@ -1,4 +1,4 @@
-package com.shineidle.tripf.like.service;
+package com.shineidle.tripf.domain.like.service;
 
 import com.shineidle.tripf.global.common.exception.GlobalException;
 import com.shineidle.tripf.global.common.exception.type.LikeErrorCode;
