@@ -36,6 +36,8 @@
 #### [Tripf 와이어프레임 figma 바로가기](https://www.figma.com/board/ZHqQRbYZ3yTiv8xcdhHhgn/%ED%8A%B8%EB%A6%AC%ED%94%84-_-%EB%B9%9B%EB%82%98%EB%8A%94-%EC%95%84%EC%9D%B4%EB%93%A4?node-id=0-1&p=f&t=jljFf3A5LxhDEfqb-0)
 <img width="7866" alt="트리프 _ 빛나는 아이들 (2)" src="https://github.com/user-attachments/assets/eb89264a-c4a5-4810-953a-9379915f6ec3" />
 
+------
+
 ## 구성도
 #### [Tripf 구성도 figma 바로가기](https://www.figma.com/board/6I2NxYuh2sUicJAgSALQof/%ED%8A%B8%EB%A6%AC%ED%94%84-%EA%B5%AC%EC%84%B1%EB%8F%84?node-id=0-1&t=u9Sc4oCZAX7Dpy5n-1)
 ### 서비스 요청 흐름도
@@ -44,14 +46,18 @@
 ### CI/CD
 <img width="3072" alt="트리프 CI:CD" src="https://github.com/user-attachments/assets/eddb710f-c29d-4fef-8ee2-8b45302e1cde" />
 
+-----
 
 ## ERD
 ![Tripf](https://github.com/user-attachments/assets/5e53bef2-371f-4d36-a28c-4937e96574e6)
+
+-----
 
 ## API 명세서
 #### [Tripf API명세서 Notion 바로가기](https://shinelee26.notion.site/API-17086ea33f9480aab912df6052d9dc37?pvs=4)
 ![image](https://github.com/user-attachments/assets/ee4a9565-3329-421d-8e9c-c29fd4db915c)
 
+-------
 
-
-
+## 트러블 슈팅
+#### [Tripf 트러블 슈팅 Notion 바로가기](https://shinelee26.notion.site/19286ea33f94802099e6db11cc07b2d0?v=19286ea33f9481d19756000c3fe502c8)
