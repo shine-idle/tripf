@@ -1,5 +1,6 @@
 package com.shineidle.tripf.domain.payment.service;
 
+import com.shineidle.tripf.domain.order.entity.Order;
 import com.shineidle.tripf.domain.payment.entity.Payment;
 import com.shineidle.tripf.domain.payment.repository.PaymentRepository;
 import lombok.Getter;
@@ -64,9 +65,12 @@ public class PaymentServiceImpl implements PaymentService {
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
         if (response.getStatusCode().is2xxSuccessful()) {
+            Order order = null; // ✅ 로그인 없이 테스트할 경우 Order를 null로 설정
+
             Payment payment = new Payment(
                     orderId, paymentKey, amount, "테스트 결제",
-                    "SUCCESS", "카드", LocalDateTime.now()
+                    "SUCCESS", "카드", LocalDateTime.now(),
+                    order  // ✅ order 필드가 null이어도 저장 가능
             );
             paymentRepository.save(payment);
         }
