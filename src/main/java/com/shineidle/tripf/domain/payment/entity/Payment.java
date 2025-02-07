@@ -47,7 +47,7 @@ public class Payment {
     protected Payment() {}
 
     public Payment(String orderNumber, String paymentKey, int amount, String orderName,
-                   String status, String method, LocalDateTime createdAt) {
+                   String status, String method, LocalDateTime createdAt, Order order) {
         this.orderNumber = orderNumber;
         this.paymentKey = paymentKey;
         this.amount = amount;
@@ -55,6 +55,7 @@ public class Payment {
         this.status = status;
         this.method = method;
         this.createdAt = createdAt;
+        this.order = order;
     }
 
     public void approve(LocalDateTime approvedAt) {
@@ -65,4 +66,5 @@ public class Payment {
     public void fail() {
         this.status = "FAIL";
     }
+
 }
