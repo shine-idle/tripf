@@ -1,4 +1,4 @@
-package com.shineidle.tripf.follow.controller;
+package com.shineidle.tripf.domain.follow.controller;
 
 import com.shineidle.tripf.domain.follow.controller.FollowController;
 import com.shineidle.tripf.domain.follow.dto.FollowResponseDto;

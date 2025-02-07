@@ -1,4 +1,4 @@
-package com.shineidle.tripf.follow.repository;
+package com.shineidle.tripf.domain.follow.repository;
 //package com.shineidle.tripf.follow.repository;
 
 import com.shineidle.tripf.domain.follow.entity.Follow;

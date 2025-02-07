@@ -1,4 +1,4 @@
-package com.shineidle.tripf.follow.service;
+package com.shineidle.tripf.domain.follow.service;
 
 import com.shineidle.tripf.domain.follow.entity.Follow;
 import com.shineidle.tripf.domain.follow.entity.FollowPk;
