@@ -1,5 +1,5 @@
 # 🛄Tripf
-#### Tripf 바로가기 https://trip-f.com
+# Tripf 바로가기 https://trip-f.com
 ## 프로젝트 소개
 ![image](https://github.com/user-attachments/assets/0c0a62af-b22f-4d65-9815-465d9190972e)
 
@@ -14,6 +14,9 @@
 - 2025.01.02 ~ 2025.02.11
 
 ## 기술 스택 및 환경
+[![stackticon](https://firebasestorage.googleapis.com/v0/b/stackticon-81399.appspot.com/o/images%2F1738896195980?alt=media&token=2eac80a2-2093-4177-ac4c-f5bf868e61a5)](https://github.com/msdio/stackticon)
+[![stackticon](https://firebasestorage.googleapis.com/v0/b/stackticon-81399.appspot.com/o/images%2F1738896304312?alt=media&token=21c50c0a-a976-4b8d-b4cc-2208ed930c10)](https://github.com/msdio/stackticon)
+[![stackticon](https://firebasestorage.googleapis.com/v0/b/stackticon-81399.appspot.com/o/images%2F1738896380084?alt=media&token=2b872439-5306-4b3a-90f2-a894351d7cdb)](https://github.com/msdio/stackticon)
 - **Language** : Java 17
 - **Framework** : Spring Boot 3.4.1, Spring Security, Spring Data JPA, Redisson, STOMP, WebSocket
 - **Database** : PostgreSQL, MongoDB, AWS S3, Redis
