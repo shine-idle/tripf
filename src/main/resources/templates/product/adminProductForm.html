@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<head>
+    <title>상품 등록</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        textarea {
+            resize: none;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+<div class="container">
+    <h1>상품 등록</h1>
+    <form th:action="@{/api/admin/products}" method="post">
+        <div>
+            <label for="name">상품 이름</label>
+            <input type="text" id="name" name="name" placeholder="상품 이름을 입력하세요" required>
+        </div>
+        <div>
+            <label for="category">카테고리</label>
+            <select id="category" name="category" required>
+                <option value="" disabled selected>카테고리를 선택하세요</option>
+                <option value="CATEGORY1">카테고리1</option>
+                <option value="CATEGORY2">카테고리2</option>
+                <!-- 필요한 카테고리를 추가하세요 -->
+            </select>
+        </div>
+        <div>
+            <label for="price">가격</label>
+            <input type="number" id="price" name="price" placeholder="가격을 입력하세요" min="1" required>
+        </div>
+        <div>
+            <label for="stock">재고</label>
+            <input type="number" id="stock" name="stock" placeholder="재고를 입력하세요" min="0">
+        </div>
+        <div>
+            <label for="status">상태</label>
+            <select id="status" name="status" required>
+                <option value="" disabled selected>상태를 선택하세요</option>
+                <option value="AVAILABLE">판매중</option>
+                <option value="DISCONTINUED">단종</option>
+            </select>
+        </div>
+        <div>
+            <label for="description">설명</label>
+            <textarea id="description" name="description" rows="5" placeholder="상품 설명을 입력하세요"></textarea>
+        </div>
+        <div class="btn-container">
+            <button type="submit" class="btn">등록</button>
+        </div>
+    </form>
+</div>
+</div>
+</body>
+</html>

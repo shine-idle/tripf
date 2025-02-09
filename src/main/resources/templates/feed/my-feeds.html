@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Feeds</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        .feed-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feed-item {
+            border-bottom: 1px solid #ddd;
+            padding: 15px 0;
+        }
+
+        .feed-item:last-child {
+            border-bottom: none;
+        }
+
+        .feed-item h2 {
+            font-size: 1.2em;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .feed-item p {
+            margin: 5px 0;
+            line-height: 1.5;
+        }
+
+        .feed-item .meta {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        .feed-item a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .feed-item a:hover {
+            text-decoration: underline;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .pagination button:hover {
+            background: #0056b3;
+        }
+
+        .pagination span {
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>My Feeds</h1>
+    <div class="feed-list">
+        <ul>
+            <li th:each="feed : ${myFeeds}" class="feed-item">
+                <a th:href="@{/feeds/{id}(id=${feed.id})}">
+                    <h2 th:text="${feed.title}"></h2>
+                </a>
+                <p th:text="${feed.content}"></p>
+                <p class="meta">
+                    <span>Country: <span th:text="${feed.country}"></span></span>
+                    <span>City: <span th:text="${feed.city}"></span></span>
+                    <span>Started: <span th:text="${#dates.format(feed.startedAt, 'yyyy-MM-dd HH:mm')}"></span></span>
+                    <span>Ended: <span th:text="${#dates.format(feed.endedAt, 'yyyy-MM-dd HH:mm')}"></span></span>
+                </p>
+            </li>
+        </ul>
+    </div>
+    <div class="pagination">
+        <button th:if="${page.hasPrevious()}"
+                th:onclick="|location.href='?page=' + (${page.number} - 1) + '&size=' + ${page.size} + '&sortBy=' + '${param.sortBy}'|">Previous</button>
+        <span>Page <span th:text="${page.number + 1}"></span> of <span th:text="${page.totalPages}"></span></span>
+        <button th:if="${page.hasNext()}"
+                th:onclick="|location.href='?page=' + (${page.number} + 1) + '&size=' + ${page.size} + '&sortBy=' + '${param.sortBy}'|">Next</button>
+    </div>
+</div>
+</body>
+</html>

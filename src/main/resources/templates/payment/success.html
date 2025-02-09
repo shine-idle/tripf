@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>결제 성공 테스트</title>
+</head>
+<body>
+    <h1>결제가 성공적으로 완료되었습니다.</h1>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentKey = urlParams.get('paymentKey');
+        const orderId = urlParams.get('orderId');
+        const amount = urlParams.get('amount');
+
+        fetch("/payments/confirmTest", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ paymentKey, orderId, amount })
+        }).then(response => response.json())
+          .then(data => console.log("결제 승인 응답:", data));
+    </script>
+</body>
+</html>
