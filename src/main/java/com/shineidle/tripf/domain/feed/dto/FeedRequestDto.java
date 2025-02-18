@@ -38,5 +38,5 @@ public class FeedRequestDto {
     @Size(max = 20, message = "내용은 255자 이내로 입력해야 합니다.")
     private final String tag;
 
-    private final List<DaysResponseDto> days;
+    private final List<DaysRequestDto> days;
 }

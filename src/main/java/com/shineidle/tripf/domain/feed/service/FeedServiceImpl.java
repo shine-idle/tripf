@@ -37,11 +37,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+// todo : Lock과 @Transactional의 변경 (Lock이 우선순위가 더 커야함)
+// todo : 단일코드책임의 원칙을 지키기 위해 DTO별 메서드 분리 필요 (최우선 조치)
+// todo : Lock을 거는 시간 조정 필요 (10초보다 줄여야 함)
+// todo : 사진 변경에 따른 캐시 삭제 필요
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -70,7 +75,7 @@ public class FeedServiceImpl implements FeedService {
     @Transactional
     public FeedResponseDto createFeed(FeedRequestDto feedRequestDto, String token) {
         Authentication authentication = jwtProvider.getAuthentication(token);
-        SecurityContextHolder.getContext().setAuthentication(authentication); // 인증 객체 설정
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User userId = UserAuthorizationUtil.getLoginUser();
 
@@ -82,65 +87,11 @@ public class FeedServiceImpl implements FeedService {
 
                 String country = geoService.getCountryByCity(feedRequestDto.getCity());
 
-                Feed feed = new Feed(
-                        userId,
-                        country,
-                        feedRequestDto.getCity(),
-                        feedRequestDto.getStartedAt(),
-                        feedRequestDto.getEndedAt(),
-                        feedRequestDto.getTitle(),
-                        feedRequestDto.getContent(),
-                        feedRequestDto.getCost(),
-                        feedRequestDto.getTag()
-                );
-                Feed savedFeed = feedRepository.save(feed);
+                Feed savedFeed = saveFeed(userId, feedRequestDto, country);
 
-                List<DaysResponseDto> daysResponseDtos = new ArrayList<>();
+                List<DaysResponseDto> daysResponseDtos = saveDaysAndActivity(savedFeed, feedRequestDto.getDays());
 
-                if (feedRequestDto.getDays() != null) {
-                    feedRequestDto.getDays().forEach(daysRequestDto -> {
-                        Days days = new Days(savedFeed, daysRequestDto.getDate());
-
-                        LocalDate date = daysRequestDto.getDate();
-                        if (days.getDate().isBefore(feed.getStartedAt().toLocalDate()) || days.getDate().isAfter(feed.getEndedAt().toLocalDate())) {
-                            throw new GlobalException(FeedErrorCode.DATE_INVALID);
-                        }
-
-                        if (daysRepository.existsByFeedAndDate(feed, date)) {
-                            throw new GlobalException(FeedErrorCode.DATE_DUPLICATE);
-                        }
-
-                        Days savedDays = daysRepository.save(days);
-                        List<ActivityResponseDto> activityDtos = new ArrayList<>();
-
-                        if (daysRequestDto.getActivity() != null) {
-                            daysRequestDto.getActivity().forEach(activityRequestDto -> {
-                                Activity activity = new Activity(
-                                        savedDays,
-                                        activityRequestDto.getTitle(),
-                                        activityRequestDto.getStar(),
-                                        activityRequestDto.getMemo(),
-                                        activityRequestDto.getCity(),
-                                        activityRequestDto.getLatitude(),
-                                        activityRequestDto.getLongitude()
-                                );
-                                activityRepository.save(activity);
-
-                                List<PhotoResponseDto> photoDtos = activity.getActivityPhotos().stream()
-                                        .map(activityPhoto -> PhotoResponseDto.toDto(activityPhoto.getPhoto()))
-                                        .toList();
-
-                                String representativePhotoUrl = activity.getRepresentativePhotoUrl();
-
-                                activityDtos.add(ActivityResponseDto.toDto(activity, photoDtos, representativePhotoUrl));
-                            });
-                        }
-
-                        daysResponseDtos.add(new DaysResponseDto(savedDays.getId(), savedDays.getDate(), activityDtos));
-                    });
-                }
-
-                followerNewPostNotification(userId, feed.getId());
+                followerNewPostNotification(userId, savedFeed.getId());
 
                 FeedResponseDto newFeed = FeedResponseDto.toDto(savedFeed, daysResponseDtos);
 
@@ -183,65 +134,11 @@ public class FeedServiceImpl implements FeedService {
 
                 String country = geoService.getCountryByCity(feedRequestDto.getCity());
 
-                Feed feed = new Feed(
-                        userId,
-                        country,
-                        feedRequestDto.getCity(),
-                        feedRequestDto.getStartedAt(),
-                        feedRequestDto.getEndedAt(),
-                        feedRequestDto.getTitle(),
-                        feedRequestDto.getContent(),
-                        feedRequestDto.getCost(),
-                        feedRequestDto.getTag()
-                );
-                Feed savedFeed = feedRepository.save(feed);
+                Feed savedFeed = saveFeed(userId, feedRequestDto, country);
 
-                List<DaysResponseDto> daysResponseDtos = new ArrayList<>();
+                List<DaysResponseDto> daysResponseDtos = saveDaysAndActivity(savedFeed, feedRequestDto.getDays());
 
-                if (feedRequestDto.getDays() != null) {
-                    feedRequestDto.getDays().forEach(daysRequestDto -> {
-                        Days days = new Days(savedFeed, daysRequestDto.getDate());
-
-                        LocalDate date = daysRequestDto.getDate();
-                        if (days.getDate().isBefore(feed.getStartedAt().toLocalDate()) || days.getDate().isAfter(feed.getEndedAt().toLocalDate())) {
-                            throw new GlobalException(FeedErrorCode.DATE_INVALID);
-                        }
-
-                        if (daysRepository.existsByFeedAndDate(feed, date)) {
-                            throw new GlobalException(FeedErrorCode.DATE_DUPLICATE);
-                        }
-
-                        Days savedDays = daysRepository.save(days);
-                        List<ActivityResponseDto> activityDtos = new ArrayList<>();
-
-                        if (daysRequestDto.getActivity() != null) {
-                            daysRequestDto.getActivity().forEach(activityRequestDto -> {
-                                Activity activity = new Activity(
-                                        savedDays,
-                                        activityRequestDto.getTitle(),
-                                        activityRequestDto.getStar(),
-                                        activityRequestDto.getMemo(),
-                                        activityRequestDto.getCity(),
-                                        activityRequestDto.getLatitude(),
-                                        activityRequestDto.getLongitude()
-                                );
-                                activityRepository.save(activity);
-
-                                List<PhotoResponseDto> photoDtos = activity.getActivityPhotos().stream()
-                                        .map(activityPhoto -> PhotoResponseDto.toDto(activityPhoto.getPhoto()))
-                                        .toList();
-
-                                String representativePhotoUrl = activity.getRepresentativePhotoUrl();
-
-                                activityDtos.add(ActivityResponseDto.toDto(activity, photoDtos, representativePhotoUrl));
-                            });
-                        }
-
-                        daysResponseDtos.add(new DaysResponseDto(savedDays.getId(), savedDays.getDate(), activityDtos));
-                    });
-                }
-
-                followerNewPostNotification(userId, feed.getId());
+                followerNewPostNotification(userId, savedFeed.getId());
 
                 FeedResponseDto newFeed = FeedResponseDto.toDto(savedFeed, daysResponseDtos);
 
@@ -278,16 +175,7 @@ public class FeedServiceImpl implements FeedService {
 
         String country = geoService.getCountryByCity(feedRequestDto.getCity());
 
-        feed.update(
-                country,
-                feedRequestDto.getCity(),
-                feedRequestDto.getStartedAt(),
-                feedRequestDto.getEndedAt(),
-                feedRequestDto.getTitle(),
-                feedRequestDto.getContent(),
-                feedRequestDto.getCost(),
-                feedRequestDto.getTag()
-        );
+        updateFeedData(feed, feedRequestDto, country);
         feedRepository.save(feed);
 
         FeedResponseDto updatedFeed = findFeed(feedId);
@@ -327,7 +215,9 @@ public class FeedServiceImpl implements FeedService {
                 .collect(Collectors.groupingBy(
                         activity -> activity.getDays().getId(),
                         Collectors.mapping(activity -> {
-                            List<PhotoResponseDto> photoDtos = activity.getActivityPhotos().stream()
+                            List<PhotoResponseDto> photoDtos = activity
+                                    .getActivityPhotos()
+                                    .stream()
                                     .map(activityPhoto -> PhotoResponseDto.toDto(activityPhoto.getPhoto()))
                                     .toList();
 
@@ -662,6 +552,118 @@ public class FeedServiceImpl implements FeedService {
         return myFeeds;
     }
 
+    // todo 단일책임원칙적용
+
+    /**
+     *  피드 저장
+     *
+     * @param user
+     * @param feedRequestDto
+     * @param country
+     * @return
+     */
+    private Feed saveFeed(User user, FeedRequestDto feedRequestDto, String country) {
+        Feed feed = new Feed(
+                user,
+                country,
+                feedRequestDto.getCity(),
+                feedRequestDto.getStartedAt(),
+                feedRequestDto.getEndedAt(),
+                feedRequestDto.getTitle(),
+                feedRequestDto.getContent(),
+                feedRequestDto.getCost(),
+                feedRequestDto.getTag()
+        );
+        return feedRepository.save(feed);
+    }
+
+    /**
+     * 일정 및 활동 저장
+     *
+     * @param feed
+     * @param daysRequestDtos
+     * @return
+     */
+    private List<DaysResponseDto> saveDaysAndActivity(Feed feed, List<DaysRequestDto> daysRequestDtos) {
+        if (daysRequestDtos == null) return Collections.emptyList();
+
+        return daysRequestDtos.stream()
+                .map(daysRequestDto -> {
+                    Days savedDays = saveDays(feed, daysRequestDto);
+                    List<ActivityResponseDto> activities = saveActivities(savedDays, daysRequestDto.getActivity());
+                    return new DaysResponseDto(savedDays.getId(), savedDays.getDate(), activities);
+                })
+                .toList();
+    }
+
+
+    /**
+     * 일정 저장
+     *
+     * @param feed
+     * @param dto
+     * @return
+     */
+    private Days saveDays(Feed feed, DaysRequestDto dto) {
+        LocalDate date = dto.getDate();
+
+        if (date.isBefore(feed.getStartedAt().toLocalDate()) || date.isAfter(feed.getEndedAt().toLocalDate())) {
+            throw new GlobalException(FeedErrorCode.DATE_INVALID);
+        }
+
+        if (daysRepository.existsByFeedAndDate(feed, date)) {
+            throw new GlobalException(FeedErrorCode.DATE_DUPLICATE);
+        }
+
+        return daysRepository.save(new Days(feed, date));
+    }
+
+    private List<ActivityResponseDto> saveActivities(Days days, List<ActivityRequestDto> activityRequestDtos) {
+        if (activityRequestDtos == null) return Collections.emptyList();
+
+        return activityRequestDtos.stream()
+                .map(dto -> {
+                    Activity activity = new Activity(
+                            days,
+                            dto.getTitle(),
+                            dto.getStar(),
+                            dto.getMemo(),
+                            dto.getCity(),
+                            dto.getLatitude(),
+                            dto.getLongitude()
+                    );
+                    activityRepository.save(activity);
+
+                    List<PhotoResponseDto> photoDtos = activity.getActivityPhotos().stream()
+                            .map(activityPhoto -> PhotoResponseDto.toDto(activityPhoto.getPhoto()))
+                            .toList();
+
+                    return ActivityResponseDto.toDto(activity, photoDtos, activity.getRepresentativePhotoUrl());
+                })
+                .toList();
+    }
+
+    /**
+     * feed 수정
+     *
+     * @param feed
+     * @param feedRequestDto
+     * @param country
+     */
+    private void updateFeedData(Feed feed, FeedRequestDto feedRequestDto, String country) {
+        feed.update(
+                country,
+                feedRequestDto.getCity(),
+                feedRequestDto.getStartedAt(),
+                feedRequestDto.getEndedAt(),
+                feedRequestDto.getTitle(),
+                feedRequestDto.getContent(),
+                feedRequestDto.getCost(),
+                feedRequestDto.getTag()
+        );
+    }
+
+    // todo 임시 주석
     /**
      * 피드 Id로 피드 확인
      *
