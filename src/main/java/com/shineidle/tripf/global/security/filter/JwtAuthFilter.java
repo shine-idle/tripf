@@ -1,7 +1,5 @@
 package com.shineidle.tripf.global.security.filter;
 
-import com.shineidle.tripf.global.common.exception.GlobalException;
-import com.shineidle.tripf.global.common.exception.type.UserErrorCode;
 import com.shineidle.tripf.global.common.util.auth.AuthenticationScheme;
 import com.shineidle.tripf.global.common.util.provider.JwtProvider;
 import jakarta.servlet.FilterChain;
@@ -66,7 +64,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return bearerToken.substring(headerPrefix.length());
         }
 
-        throw new GlobalException(UserErrorCode.HEADER_TOKEN_NOT_FOUND);
+        return null;
     }
 
     /**

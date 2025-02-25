@@ -1,13 +1,9 @@
 package com.shineidle.tripf.global.security.oauth2.controller;
 
-import com.shineidle.tripf.global.common.exception.GlobalException;
-import com.shineidle.tripf.global.common.exception.type.UserErrorCode;
-import com.shineidle.tripf.global.common.util.auth.UserAuthorizationUtil;
+import com.shineidle.tripf.domain.user.service.RefreshTokenService;
 import com.shineidle.tripf.global.security.oauth2.user.OAuth2Provider;
 import com.shineidle.tripf.global.security.oauth2.user.OAuth2UserUnlinkManager;
 import com.shineidle.tripf.global.security.oauth2.util.CookieUtils;
-import com.shineidle.tripf.domain.user.entity.RefreshToken;
-import com.shineidle.tripf.domain.user.service.RefreshTokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,10 +37,6 @@ public class OAuth2UnlinkController {
     ) {
         String accessToken = authorizationHeader.replace("Bearer ", "");
         unlinkManager.unlink(provider, accessToken);
-
-        RefreshToken refreshToken = refreshTokenService.findByUserId(UserAuthorizationUtil.getLoginUserId()).orElseThrow(() ->
-                new GlobalException(UserErrorCode.TOKEN_NOT_FOUND));
-        refreshTokenService.deleteTokenAndUser(refreshToken);
 
         CookieUtils.deleteCookie(request, response, "refresh_token");
 
