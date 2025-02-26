@@ -90,9 +90,13 @@ public class JwtProvider {
      * @param token 토큰
      * @return 유효 여부 </br> true 유효, false 유효하지 않음
      */
-    public boolean validToken(String token) throws JwtException {
+    public boolean isInvalidToken(String token) {
+        return !isValidToken(token);
+    }
+
+    public boolean isValidToken(String token) throws JwtException {
         try {
-            return !this.tokenExpired(token);
+            return isTokenNotExpired(token);
         } catch (MalformedJwtException e) {
             log.error("Invalid JWT Token : {}", e.getMessage());
         } catch (ExpiredJwtException e) {
@@ -102,6 +106,10 @@ public class JwtProvider {
         }
 
         return false;
+    }
+
+    private boolean isTokenNotExpired(String token) {
+        return !this.tokenExpired(token);
     }
 
     /**

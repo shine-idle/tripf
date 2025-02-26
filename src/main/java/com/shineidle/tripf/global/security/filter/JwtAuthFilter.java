@@ -22,11 +22,9 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
-
     private final JwtProvider jwtProvider;
 
     private final UserDetailsService userDetailsService;
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -41,12 +39,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      */
     private void authenticate(HttpServletRequest request) {
         String token = this.getTokenFromRequest(request);
-        if (!jwtProvider.validToken(token)) {
+
+        if (jwtProvider.isInvalidToken(token)) {
             return;
         }
 
         String username = this.jwtProvider.getUsername(token);
-
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         this.setAuthentication(request, userDetails);
@@ -62,8 +60,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String headerPrefix = AuthenticationScheme.generateType(AuthenticationScheme.BEARER);
 
-        boolean tokenExist = StringUtils.hasText(bearerToken) && bearerToken.startsWith(headerPrefix);
-        if (tokenExist) {
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(headerPrefix)) {
             return bearerToken.substring(headerPrefix.length());
         }
 
