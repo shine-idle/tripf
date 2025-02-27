@@ -23,6 +23,7 @@ import com.shineidle.tripf.domain.notification.type.NotifyType;
 import com.shineidle.tripf.domain.photo.dto.PhotoResponseDto;
 import com.shineidle.tripf.domain.user.entity.User;
 import com.shineidle.tripf.domain.user.service.UserService;
+import com.shineidle.tripf.global.common.util.redis.RedisLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -58,7 +59,6 @@ public class FeedServiceImpl implements FeedService {
     private final FollowService followService;
     private final UserService userService;
     private final NotificationService notificationService;
-    private final RedissonClient redissonClient;
     private final JwtProvider jwtProvider;
     private final RedisFeedService redisFeedService;
     private final RedisTemplate<String, Object> feedRedisTemplate;
@@ -73,45 +73,28 @@ public class FeedServiceImpl implements FeedService {
      */
     @Override
     @Transactional
+    @RedisLock(key = "createFeed:lock:user:{userId}")
     public FeedResponseDto createFeed(FeedRequestDto feedRequestDto, String token) {
         Authentication authentication = jwtProvider.getAuthentication(token);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User userId = UserAuthorizationUtil.getLoginUser();
 
-        String lockKey = "createFeed:lock:user:" + userId.getId();
-        RLock lock = redissonClient.getLock(lockKey);
+        String country = geoService.getCountryByCity(feedRequestDto.getCity());
 
-        try {
-            if (lock.tryLock(10, 30, TimeUnit.SECONDS)) {
+        Feed savedFeed = saveFeed(userId, feedRequestDto, country);
 
-                String country = geoService.getCountryByCity(feedRequestDto.getCity());
+        List<DaysResponseDto> daysResponseDtos = saveDaysAndActivity(savedFeed, feedRequestDto.getDays());
 
-                Feed savedFeed = saveFeed(userId, feedRequestDto, country);
+        followerNewPostNotification(userId, savedFeed.getId());
 
-                List<DaysResponseDto> daysResponseDtos = saveDaysAndActivity(savedFeed, feedRequestDto.getDays());
+        FeedResponseDto newFeed = FeedResponseDto.toDto(savedFeed, daysResponseDtos);
 
-                followerNewPostNotification(userId, savedFeed.getId());
+        redisFeedService.updateCache(savedFeed.getId(), newFeed);
+        redisFeedService.deleteCache("publicHomeCache");
+        redisFeedService.deleteCache("region:" + country);
 
-                FeedResponseDto newFeed = FeedResponseDto.toDto(savedFeed, daysResponseDtos);
-
-                redisFeedService.updateCache(savedFeed.getId(), newFeed);
-
-                redisFeedService.deleteCache("publicHomeCache");
-                redisFeedService.deleteCache("region:" + country);
-
-                return newFeed;
-            } else {
-                throw new GlobalException(LockErrorCode.LOCK_ACQUISITION_FAILED);
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new GlobalException(LockErrorCode.LOCK_INTERRUPTED);
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock();
-            }
-        }
+        return newFeed;
     }
 
     /**
@@ -123,42 +106,25 @@ public class FeedServiceImpl implements FeedService {
      */
     @Override
     @Transactional
+    @RedisLock(key = "createFeed:lock:user:{userId}")
     public FeedResponseDto createFeed(FeedRequestDto feedRequestDto) {
         User userId = UserAuthorizationUtil.getLoginUser();
 
-        String lockKey = "createFeed:lock:user:" + userId.getId();
-        RLock lock = redissonClient.getLock(lockKey);
+        String country = geoService.getCountryByCity(feedRequestDto.getCity());
 
-        try {
-            if (lock.tryLock(10, 30, TimeUnit.SECONDS)) {
+        Feed savedFeed = saveFeed(userId, feedRequestDto, country);
 
-                String country = geoService.getCountryByCity(feedRequestDto.getCity());
+        List<DaysResponseDto> daysResponseDtos = saveDaysAndActivity(savedFeed, feedRequestDto.getDays());
 
-                Feed savedFeed = saveFeed(userId, feedRequestDto, country);
+        followerNewPostNotification(userId, savedFeed.getId());
 
-                List<DaysResponseDto> daysResponseDtos = saveDaysAndActivity(savedFeed, feedRequestDto.getDays());
+        FeedResponseDto newFeed = FeedResponseDto.toDto(savedFeed, daysResponseDtos);
 
-                followerNewPostNotification(userId, savedFeed.getId());
+        redisFeedService.updateCache(savedFeed.getId(), newFeed);
+        redisFeedService.deleteCache("publicHomeCache");
+        redisFeedService.deleteCache("region:" + country);
 
-                FeedResponseDto newFeed = FeedResponseDto.toDto(savedFeed, daysResponseDtos);
-
-                redisFeedService.updateCache(savedFeed.getId(), newFeed);
-
-                redisFeedService.deleteCache("publicHomeCache");
-                redisFeedService.deleteCache("region:" + country);
-
-                return newFeed;
-            } else {
-                throw new GlobalException(LockErrorCode.LOCK_ACQUISITION_FAILED);
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new GlobalException(LockErrorCode.LOCK_INTERRUPTED);
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock();
-            }
-        }
+        return newFeed;
     }
 
     /**
@@ -663,7 +629,6 @@ public class FeedServiceImpl implements FeedService {
         );
     }
 
-    // todo 임시 주석
     /**
      * 피드 Id로 피드 확인
      *
