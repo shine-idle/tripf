@@ -73,11 +73,6 @@ public interface UserService {
     JwtResponseDto updateToken(String refreshToken);
 
     /**
-     * 리프레시 토큰 삭제
-     */
-    void deleteRefreshToken();
-
-    /**
      * Id로 유저 조회
      *
      * @param id 유저 Id

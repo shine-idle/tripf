@@ -66,7 +66,6 @@ public class AccountController {
     @PostMapping("/logout")
     public ResponseEntity<PostMessageResponseDto> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
-            userService.deleteRefreshToken();
             new SecurityContextLogoutHandler().logout(request, response, authentication);
 
             log.info("인증 객체의 삭제 확인: {}", SecurityContextHolder.getContext().getAuthentication() == null);
