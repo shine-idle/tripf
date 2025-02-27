@@ -32,7 +32,7 @@ public class HomeViewController {
             @CookieValue(value = "Authorization", required = false) String token, // JWT 토큰 쿠키에서 가져오기
             Model model
     ) {
-        if (token != null && jwtProvider.validToken(token)) { // JWT가 존재하고 유효하면
+        if (token != null && jwtProvider.isValidToken(token)) { // JWT가 존재하고 유효하면
             Authentication authentication = jwtProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication); // 인증 객체 설정
 

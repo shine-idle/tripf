@@ -1,27 +1,30 @@
 package com.shineidle.tripf.domain.user.service;
 
+import com.shineidle.tripf.domain.user.entity.RefreshToken;
+import com.shineidle.tripf.domain.user.entity.User;
+import com.shineidle.tripf.domain.user.repository.UserRepository;
+import com.shineidle.tripf.domain.user.type.TokenType;
 import com.shineidle.tripf.global.common.exception.GlobalException;
 import com.shineidle.tripf.global.common.exception.type.UserErrorCode;
 import com.shineidle.tripf.global.common.util.provider.JwtProvider;
-import com.shineidle.tripf.domain.user.type.TokenType;
-import com.shineidle.tripf.domain.user.entity.RefreshToken;
-import com.shineidle.tripf.domain.user.entity.User;
-import com.shineidle.tripf.domain.user.repository.RefreshTokenRepository;
-import com.shineidle.tripf.domain.user.repository.UserRepository;
+import com.shineidle.tripf.global.common.util.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenServiceImpl implements RefreshTokenService {
-    private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
+    private final RedisUtils redisUtils;
+
+    private static final String REFRESH_TOKEN_PREFIX = "REFRESH_TOKEN:";
 
     /**
      * 리프레시 토큰 생성
@@ -37,44 +40,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new GlobalException(UserErrorCode.USER_NOT_FOUND));
 
-        RefreshToken refreshToken = new RefreshToken(
-                user,
-                jwtProvider.generateToken(authentication, isSocialLogin, TokenType.REFRESH),
-                Instant.now().plusMillis(jwtProvider.getRefreshExpiryMillis())
-        );
+        String token = jwtProvider.generateToken(authentication, isSocialLogin, TokenType.REFRESH);
+        RefreshToken refreshToken = new RefreshToken(user, token, Instant.now().plusMillis(jwtProvider.getRefreshExpiryMillis()));
 
-        return refreshTokenRepository.save(refreshToken);
-    }
+        String redisKey = REFRESH_TOKEN_PREFIX + refreshToken.getToken();
+        redisUtils.saveToRedis(redisKey, refreshToken, Duration.ofMillis(jwtProvider.getRefreshExpiryMillis()));
 
-    /**
-     * 리프레시 토큰 유효성 확인
-     *
-     * @param refreshToken {@link RefreshToken}
-     * @return {@link RefreshToken}
-     */
-    @Override
-    @Transactional
-    public void verifyExpiration(RefreshToken refreshToken) {
-        if (refreshToken.getExpiryDate().isBefore(Instant.now())) {
-            refreshTokenRepository.delete(refreshToken);
-            throw new GlobalException(UserErrorCode.EXPIRED_TOKEN);
-        }
-    }
-
-    /**
-     * 리프레시 토큰 갱신
-     *
-     * @param validRefreshToken {@link RefreshToken}
-     * @param authentication    {@link Authentication}}
-     * @return {@link RefreshToken} 새 리프레시 토큰
-     * @apiNote 기존의 리프레시 토큰을 삭제하고 새 리프레시 토큰을 저장
-     */
-    @Override
-    @Transactional
-    public RefreshToken rotateRefreshToken(RefreshToken validRefreshToken, Authentication authentication) {
-        refreshTokenRepository.delete(validRefreshToken);
-        boolean isSocialLogin = validRefreshToken.getUser().getProvider() != null;
-        return generateToken(validRefreshToken.getUser().getId(), authentication, isSocialLogin);
+        return refreshToken;
     }
 
     /**
@@ -84,41 +56,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
      * @return {@link RefreshToken}
      */
     public Optional<RefreshToken> findByToken(String token) {
-        return refreshTokenRepository.findByToken(token);
-    }
-
-    /**
-     * 유저 식별자로 리프레시 토큰 조회
-     *
-     * @param userId 유저 식별자
-     * @return {@link RefreshToken}
-     */
-    public Optional<RefreshToken> findByUserId(Long userId) {
-        return refreshTokenRepository.findByUserId(userId);
-    }
-
-    /**
-     * 리프레시 토큰 삭제
-     *
-     * @param userId 유저 식별자
-     */
-    @Override
-    @Transactional
-    public void deleteToken(Long userId) {
-        RefreshToken token = refreshTokenRepository.findByUserId(userId).orElseThrow(() ->
-                new GlobalException(UserErrorCode.TOKEN_NOT_FOUND));
-        refreshTokenRepository.delete(token);
-    }
-
-    /**
-     * 토큰과 유저 정보 삭제
-     *
-     * @param refreshToken {@link RefreshToken}
-     */
-    @Override
-    @Transactional
-    public void deleteTokenAndUser(RefreshToken refreshToken) {
-        refreshTokenRepository.delete(refreshToken);
-        userRepository.delete(refreshToken.getUser());
+        String key = REFRESH_TOKEN_PREFIX + token;
+        RefreshToken refreshToken = (RefreshToken) redisUtils.getFromRedis(key);
+        return Optional.ofNullable(refreshToken);
     }
 }

@@ -87,7 +87,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(dto.getEmail()).orElseThrow(() ->
                 new GlobalException(UserErrorCode.USER_NOT_FOUND));
 
-        // 탈퇴된 회원에 대한 예외처리
         if (user.getStatus().equals(UserStatus.DEACTIVATE)) {
             throw new GlobalException(UserErrorCode.USER_DEACTIVATED);
         }
@@ -101,11 +100,9 @@ public class UserServiceImpl implements UserService {
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 토큰 생성
         String accessToken = jwtProvider.generateToken(authentication, false, TokenType.ACCESS);
         RefreshToken refreshToken = refreshTokenService.generateToken(user.getId(), authentication, false);
 
-        // 쿠키 저장
         CookieUtils.addCookie(response, "Authorization", accessToken, jwtProvider.getAccessExpiryMillis().intValue());
         CookieUtils.addCookie(response, "refresh_token", refreshToken.getToken(), jwtProvider.getRefreshExpiryMillis().intValue());
 
@@ -123,14 +120,10 @@ public class UserServiceImpl implements UserService {
         RefreshToken validRefreshToken = refreshTokenService.findByToken(refreshToken).orElseThrow(() ->
                 new GlobalException(UserErrorCode.TOKEN_NOT_FOUND));
 
-        // 유효한 토큰인지 확인
-        refreshTokenService.verifyExpiration(validRefreshToken);
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String accessToken = jwtProvider.generateToken(authentication, false, TokenType.ACCESS);
-        RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(validRefreshToken, authentication);
 
-        return new JwtResponseDto(AuthenticationScheme.BEARER.getName(), accessToken, newRefreshToken.getToken());
+        return new JwtResponseDto(AuthenticationScheme.BEARER.getName(), accessToken, validRefreshToken.getToken());
     }
 
     /**
@@ -142,6 +135,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto findUser(Long userId) {
         User user = (User) redisUtils.getFromRedis("USER:" + userId.toString());
+
         if (user == null) {
             user = getUserById(userId);
             redisUtils.saveToRedis("USER:" + user.getId().toString(), user, Duration.ofMinutes(1));
@@ -163,8 +157,6 @@ public class UserServiceImpl implements UserService {
         validatePassword(dto.getPassword(), user.getPassword());
         user.updatePassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
-
-        refreshTokenService.deleteToken(user.getId());
 
         return new PostMessageResponseDto(PostMessage.PASSWORD_UPDATED);
     }
@@ -200,9 +192,6 @@ public class UserServiceImpl implements UserService {
         user.deactivate();
         userRepository.save(user);
 
-        // 리프레시 토큰 삭제
-        refreshTokenService.deleteToken(user.getId());
-
         return new PostMessageResponseDto(PostMessage.USER_DEACTIVATED);
     }
 
@@ -214,10 +203,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void verify(UserRequestDto dto) {
         validatePassword(dto.getPassword(), UserAuthorizationUtil.getLoginUserPassword());
-    }
-
-    public void deleteRefreshToken() {
-        refreshTokenService.deleteToken(UserAuthorizationUtil.getLoginUserId());
     }
 
     public User getUserById(Long id) {
@@ -240,5 +225,4 @@ public class UserServiceImpl implements UserService {
     public List<String> getActiveUserEmails() {
         return userRepository.findAllActiveEmails();
     }
-
 }

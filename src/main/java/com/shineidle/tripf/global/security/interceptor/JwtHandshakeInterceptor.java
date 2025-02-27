@@ -27,7 +27,7 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
             token = query.split("token=")[1].split("&")[0];
         }
 
-        if (token == null || !jwtProvider.validToken(token)) {
+        if (token == null || jwtProvider.isInvalidToken(token)) {
             log.error("Invalid or missing JWT token during WebSocket handshake");
             throw new GlobalException(UserErrorCode.TOKEN_NOT_FOUND);
         }
