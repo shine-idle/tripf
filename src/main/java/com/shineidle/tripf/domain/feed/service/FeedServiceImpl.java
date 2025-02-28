@@ -1,5 +1,13 @@
 package com.shineidle.tripf.domain.feed.service;
 
+import com.shineidle.tripf.global.common.exception.GlobalException;
+import com.shineidle.tripf.global.common.exception.type.FeedErrorCode;
+import com.shineidle.tripf.global.common.exception.type.LockErrorCode;
+import com.shineidle.tripf.global.common.message.constants.NotificationMessage;
+import com.shineidle.tripf.global.common.message.dto.PostMessageResponseDto;
+import com.shineidle.tripf.global.common.message.type.PostMessage;
+import com.shineidle.tripf.global.common.util.auth.UserAuthorizationUtil;
+import com.shineidle.tripf.global.common.util.provider.JwtProvider;
 import com.shineidle.tripf.domain.feed.dto.*;
 import com.shineidle.tripf.domain.feed.entity.Activity;
 import com.shineidle.tripf.domain.feed.entity.Days;
@@ -15,14 +23,7 @@ import com.shineidle.tripf.domain.notification.type.NotifyType;
 import com.shineidle.tripf.domain.photo.dto.PhotoResponseDto;
 import com.shineidle.tripf.domain.user.entity.User;
 import com.shineidle.tripf.domain.user.service.UserService;
-import com.shineidle.tripf.global.common.exception.GlobalException;
-import com.shineidle.tripf.global.common.exception.type.FeedErrorCode;
-import com.shineidle.tripf.global.common.exception.type.LockErrorCode;
-import com.shineidle.tripf.global.common.message.constants.NotificationMessage;
-import com.shineidle.tripf.global.common.message.dto.PostMessageResponseDto;
-import com.shineidle.tripf.global.common.message.type.PostMessage;
-import com.shineidle.tripf.global.common.util.auth.UserAuthorizationUtil;
-import com.shineidle.tripf.global.common.util.provider.JwtProvider;
+import com.shineidle.tripf.global.common.util.redis.RedisLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -30,10 +31,13 @@ import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +64,7 @@ public class FeedServiceImpl implements FeedService {
     private final RedisFeedService redisFeedService;
     private final RedisTemplate<String, Object> feedRedisTemplate;
 
+
     /**
      * 피드 생성
      * Redis 분산락 사용
@@ -69,6 +74,7 @@ public class FeedServiceImpl implements FeedService {
      */
     @Override
     @Transactional
+    @RedisLock(key = "createFeed:lock:user:{userId}")
     public FeedResponseDto createFeed(FeedRequestDto feedRequestDto) {
         User userId = UserAuthorizationUtil.getLoginUser();
 
