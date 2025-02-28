@@ -59,11 +59,10 @@ public class FeedViewController {
      */
     @PostMapping
     public String createFeed(
-            @CookieValue(name = "Authorization") String token,
             @RequestBody @Validated FeedRequestDto feedRequestDto,
             Model model
     ) {
-        FeedResponseDto feedResponseDto = feedService.createFeed(feedRequestDto, token);
+        FeedResponseDto feedResponseDto = feedService.createFeed(feedRequestDto);
         model.addAttribute("feed", feedResponseDto);
         return "redirect:/";
     }

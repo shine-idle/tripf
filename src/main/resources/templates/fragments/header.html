@@ -208,10 +208,9 @@
     <h1><a href="/">TripF</a></h1>
     <nav>
         <ul>
-            <li><a href="/products/goods">Goods</a></li>
+            <li><a href="/products">Products</a></li>
             <li><a href="/chat">Chat</a></li>
             <li><a href="/feeds/countries">Countries</a></li>
-            <li><a href="/products/tours">Tours</a></li>
         </ul>
     </nav>
     <div class="search-container">
@@ -252,11 +251,12 @@
     </div>
     <div class="account-logo dropdown">
         <a>Account</a>
-        <div class="dropdown-content">
-            <a href="/login">로그인</a>
-            <a href="/mypage">마이페이지</a>
-            <a href="/feeds/myFeed">나의여행</a>
-            <a href="/logout">로그아웃</a>
+        <div class="dropdown-content" id="accountDropdown">
+            <!-- JavaScript로 동적 처리 -->
         </div>
     </div>
 </div>
+
+<!-- JS 파일 모듈 로드 -->
+<script type="module" src="/js/account.js"></script>
+

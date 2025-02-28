@@ -13,7 +13,6 @@ public interface FeedService {
     /**
      * 피드 작성
      */
-    FeedResponseDto createFeed(@Valid FeedRequestDto feedRequestDto, String token);
     FeedResponseDto createFeed(@Valid FeedRequestDto feedRequestDto);
 
     /**
