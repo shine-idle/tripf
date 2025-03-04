@@ -99,4 +99,9 @@ public class AccountViewController {
     public String logoutPage() {
         return "user/logout";
     }
+
+    @GetMapping("/mypage")
+    public String myPage() {
+        return "user/my-page";
+    }
 }
