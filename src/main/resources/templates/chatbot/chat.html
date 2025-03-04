@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/default}">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tripf 챗봇</title>
+    <title>챗봇</title>
     <style>
         .chat-container {
             max-width: 800px;
@@ -77,8 +76,10 @@
             <div th:each="questionCategory : ${questions}" class="faq-category">
                 <h5 th:text="${questionCategory.category}"></h5>
                 <div th:each="question : ${questionCategory.question}">
-                    <button class="question-btn" th:text="${question}" 
-                            th:onclick="'sendQuestion(\'' + ${question} + '\')'"></button>
+                    <button class="question-btn"
+                            th:text="${question}"
+                            th:attr="data-question=${question}"
+                            onclick="sendQuestionFromButton(this)"></button>
                 </div>
             </div>
         </div>
@@ -112,6 +113,12 @@
                 scrollToBottom();
             })
             .catch(error => console.error('Error:', error));
+        }
+
+        function sendQuestionFromButton(button) {
+            const question = button.getAttribute('data-question');
+            document.getElementById('messageInput').value = question;
+            sendMessage();
         }
 
         function appendMessage(question, answer) {
