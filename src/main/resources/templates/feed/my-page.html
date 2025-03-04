@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지 - Tripf</title>
+    <style>
+        .mypage-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+            display: flex;
+            gap: 30px;
+        }
+        
+        /* 왼쪽 프로필 섹션 */
+        .profile-section {
+            flex: 0 0 250px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+        .profile-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .profile-info {
+            margin-bottom: 20px;
+        }
+        .username {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        .profile-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .edit-btn {
+            padding: 8px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .delete-btn {
+            padding: 8px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        /* 오른쪽 주문 목록 섹션 */
+        .orders-section {
+            flex: 1;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .orders-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            gap: 20px;
+        }
+        .order-date {
+            flex: 0 0 100px;
+            color: #666;
+        }
+        .order-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .order-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .order-status {
+            color: #007bff;
+            font-weight: bold;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+        .order-details {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .order-name {
+            font-weight: normal;
+            margin: 0;
+        }
+        .order-quantity {
+            color: #888;
+        }
+        .track-btn {
+            padding: 8px 15px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            position: relative;
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .close-btn {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .modal-title {
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        
+        .save-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        
+        .save-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="mypage-container">
+        <!-- 왼쪽 프로필 섹션 -->
+        <div class="profile-section">
+            <h2 class="profile-title">나의 프로필</h2>
+            <div class="profile-info">
+                <div class="username" th:text="${user?.username}">사용자명</div>
+                <div class="profile-buttons">
+                    <button class="edit-btn" onclick="openEditModal()">수정하기</button>
+                    <button class="delete-btn" onclick="confirmDelete()">탈퇴하기</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 오른쪽 주문 목록 섹션 -->
+        <div class="orders-section">
+            <h2 class="orders-title">주문 목록</h2>
+            <div th:each="order : ${orders}" class="order-item">
+                <div class="order-date" th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd')}">
+                    2024-03-21
+                </div>
+                <img class="order-image" th:src="${order.productImage}" 
+                     src="/images/default-product.jpg" alt="상품 이미지">
+                <div class="order-info">
+                    <div class="order-status" th:text="${order.status}">배송중</div>
+                    <div class="order-details">
+                        <span class="order-name" th:text="${order.productName}">상품명</span>
+                        <span class="order-quantity" th:text="'수량: ' + ${order.quantity} + '개'">수량: 1개</span>
+                    </div>
+                </div>
+                <button class="track-btn" th:onclick="'trackDelivery(\'' + ${order.trackingNumber} + '\')'">
+                    배송조회
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 모달 추가 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeEditModal()">&times;</span>
+            <h3 class="modal-title">프로필 수정</h3>
+            <form id="editForm" onsubmit="saveChanges(event)">
+                <div class="form-group">
+                    <label for="editUsername">사용자명</label>
+                    <input type="text" id="editUsername" th:value="${user?.username}" required>
+                </div>
+                <button type="submit" class="save-btn">저장하기</button>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        function confirmDelete() {
+            if (confirm('정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                fetch('/api/users/me', {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('탈퇴가 완료되었습니다.');
+                        window.location.href = '/';
+                    } else {
+                        alert('탈퇴 처리 중 오류가 발생했습니다.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+
+        function trackDelivery(trackingNumber) {
+            /* 배송 조회 팝업 또는 새 창으로 이동*/
+            window.open(`/delivery/track/${trackingNumber}`, 'delivery_tracking', 
+                'width=600,height=800');
+        }
+
+        function openEditModal() {
+            document.getElementById('editModal').style.display = 'block';
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+        
+        function saveChanges(event) {
+            event.preventDefault();
+            
+            const newUsername = document.getElementById('editUsername').value;
+            
+            fetch('/api/users/me', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: newUsername
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    /* 성공 시 화면의 사용자명 직접 업데이트*/
+                    document.querySelector('.username').textContent = newUsername;
+                    alert('프로필이 성공적으로 수정되었습니다.');
+                    closeEditModal();
+                } else {
+                    alert('프로필 수정 중 오류가 발생했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('프로필 수정 중 오류가 발생했습니다.');
+            });
+        }
+        
+        /* 모달 외부 클릭 시 닫기*/
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target == modal) {
+                closeEditModal();
+            }
+        }
+    </script>
+</div>
+</body>
+</html> 
