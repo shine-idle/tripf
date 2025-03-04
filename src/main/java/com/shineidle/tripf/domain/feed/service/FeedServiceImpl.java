@@ -1,13 +1,5 @@
 package com.shineidle.tripf.domain.feed.service;
 
-import com.shineidle.tripf.global.common.exception.GlobalException;
-import com.shineidle.tripf.global.common.exception.type.FeedErrorCode;
-import com.shineidle.tripf.global.common.exception.type.LockErrorCode;
-import com.shineidle.tripf.global.common.message.constants.NotificationMessage;
-import com.shineidle.tripf.global.common.message.dto.PostMessageResponseDto;
-import com.shineidle.tripf.global.common.message.type.PostMessage;
-import com.shineidle.tripf.global.common.util.provider.JwtProvider;
-import com.shineidle.tripf.global.common.util.auth.UserAuthorizationUtil;
 import com.shineidle.tripf.domain.feed.dto.*;
 import com.shineidle.tripf.domain.feed.entity.Activity;
 import com.shineidle.tripf.domain.feed.entity.Days;
@@ -23,6 +15,14 @@ import com.shineidle.tripf.domain.notification.type.NotifyType;
 import com.shineidle.tripf.domain.photo.dto.PhotoResponseDto;
 import com.shineidle.tripf.domain.user.entity.User;
 import com.shineidle.tripf.domain.user.service.UserService;
+import com.shineidle.tripf.global.common.exception.GlobalException;
+import com.shineidle.tripf.global.common.exception.type.FeedErrorCode;
+import com.shineidle.tripf.global.common.exception.type.LockErrorCode;
+import com.shineidle.tripf.global.common.message.constants.NotificationMessage;
+import com.shineidle.tripf.global.common.message.dto.PostMessageResponseDto;
+import com.shineidle.tripf.global.common.message.type.PostMessage;
+import com.shineidle.tripf.global.common.util.auth.UserAuthorizationUtil;
+import com.shineidle.tripf.global.common.util.provider.JwtProvider;
 import com.shineidle.tripf.global.common.util.redis.RedisLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,13 +31,10 @@ import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -59,43 +56,11 @@ public class FeedServiceImpl implements FeedService {
     private final FollowService followService;
     private final UserService userService;
     private final NotificationService notificationService;
+    private final RedissonClient redissonClient;
     private final JwtProvider jwtProvider;
     private final RedisFeedService redisFeedService;
     private final RedisTemplate<String, Object> feedRedisTemplate;
 
-    /**
-     * 피드 생성
-     * Redis 분산락 사용
-     *
-     * @param token          토큰
-     * @param feedRequestDto {@link FeedRequestDto} 피드 요청 Dto
-     * @return {@link FeedResponseDto} 피드 응답 Dto
-     */
-    @Override
-    @Transactional
-    @RedisLock(key = "createFeed:lock:user:{userId}")
-    public FeedResponseDto createFeed(FeedRequestDto feedRequestDto, String token) {
-        Authentication authentication = jwtProvider.getAuthentication(token);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        User userId = UserAuthorizationUtil.getLoginUser();
-
-        String country = geoService.getCountryByCity(feedRequestDto.getCity());
-
-        Feed savedFeed = saveFeed(userId, feedRequestDto, country);
-
-        List<DaysResponseDto> daysResponseDtos = saveDaysAndActivity(savedFeed, feedRequestDto.getDays());
-
-        followerNewPostNotification(userId, savedFeed.getId());
-
-        FeedResponseDto newFeed = FeedResponseDto.toDto(savedFeed, daysResponseDtos);
-
-        redisFeedService.updateCache(savedFeed.getId(), newFeed);
-        redisFeedService.deleteCache("publicHomeCache");
-        redisFeedService.deleteCache("region:" + country);
-
-        return newFeed;
-    }
 
     /**
      * 피드 생성
@@ -110,21 +75,39 @@ public class FeedServiceImpl implements FeedService {
     public FeedResponseDto createFeed(FeedRequestDto feedRequestDto) {
         User userId = UserAuthorizationUtil.getLoginUser();
 
-        String country = geoService.getCountryByCity(feedRequestDto.getCity());
+        String lockKey = "createFeed:lock:user:" + userId.getId();
+        RLock lock = redissonClient.getLock(lockKey);
 
-        Feed savedFeed = saveFeed(userId, feedRequestDto, country);
+        try {
+            if (lock.tryLock(10, 30, TimeUnit.SECONDS)) {
 
-        List<DaysResponseDto> daysResponseDtos = saveDaysAndActivity(savedFeed, feedRequestDto.getDays());
+                String country = geoService.getCountryByCity(feedRequestDto.getCity());
 
-        followerNewPostNotification(userId, savedFeed.getId());
+                Feed savedFeed = saveFeed(userId, feedRequestDto, country);
 
-        FeedResponseDto newFeed = FeedResponseDto.toDto(savedFeed, daysResponseDtos);
+                List<DaysResponseDto> daysResponseDtos = saveDaysAndActivity(savedFeed, feedRequestDto.getDays());
 
-        redisFeedService.updateCache(savedFeed.getId(), newFeed);
-        redisFeedService.deleteCache("publicHomeCache");
-        redisFeedService.deleteCache("region:" + country);
+                followerNewPostNotification(userId, savedFeed.getId());
 
-        return newFeed;
+                FeedResponseDto newFeed = FeedResponseDto.toDto(savedFeed, daysResponseDtos);
+
+                redisFeedService.updateCache(savedFeed.getId(), newFeed);
+
+                redisFeedService.deleteCache("publicHomeCache");
+                redisFeedService.deleteCache("region:" + country);
+
+                return newFeed;
+            } else {
+                throw new GlobalException(LockErrorCode.LOCK_ACQUISITION_FAILED);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new GlobalException(LockErrorCode.LOCK_INTERRUPTED);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
     }
 
     /**
@@ -629,6 +612,7 @@ public class FeedServiceImpl implements FeedService {
         );
     }
 
+    // todo 임시 주석
     /**
      * 피드 Id로 피드 확인
      *

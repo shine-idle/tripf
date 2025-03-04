@@ -1,4 +1,4 @@
-package com.shineidle.tripf.feed.service;
+package com.shineidle.tripf.domain.feed.service;
 
 import com.shineidle.tripf.domain.feed.dto.FeedRequestDto;
 import com.shineidle.tripf.domain.feed.dto.FeedResponseDto;
@@ -127,7 +127,7 @@ class FeedServiceImplTest {
         Authentication authMock = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities()
         );
-        when(jwtProvider.getAuthentication(anyString())).thenReturn(authMock);
+        //when(jwtProvider.getAuthentication(anyString())).thenReturn(authMock);
 
         when(redissonClient.getLock(anyString())).thenReturn(lock);
         when(lock.tryLock(10L, 30L, TimeUnit.SECONDS)).thenReturn(true);
@@ -140,7 +140,7 @@ class FeedServiceImplTest {
         });
 
         // When
-        FeedResponseDto response = feedService.createFeed(requestDto, "token");
+        FeedResponseDto response = feedService.createFeed(requestDto);
 
         // Then
         assertThat(response).isNotNull();

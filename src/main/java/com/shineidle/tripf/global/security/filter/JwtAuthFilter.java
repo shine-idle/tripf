@@ -1,9 +1,9 @@
 package com.shineidle.tripf.global.security.filter;
 
-import com.shineidle.tripf.global.common.util.auth.AuthenticationScheme;
 import com.shineidle.tripf.global.common.util.provider.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
@@ -41,6 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = this.getTokenFromRequest(request);
 
         if (jwtProvider.isInvalidToken(token)) {
+            //TODO : 토큰 만료 -> 프론트에서 다시 로그인 하도록 유도?
             return;
         }
 
@@ -57,14 +59,33 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      * @return 토큰 (찾지 못한 경우 null)
      */
     private String getTokenFromRequest(HttpServletRequest request) {
-        final String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        final String headerPrefix = AuthenticationScheme.generateType(AuthenticationScheme.BEARER);
+        String token = getTokenFromHeader(request);
+        if (token == null) {
+            token = getTokenFromCookie(request);
+        }
 
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(headerPrefix)) {
-            return bearerToken.substring(headerPrefix.length());
+        return token;
+    }
+
+    private String getTokenFromHeader(HttpServletRequest request) {
+        final String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (StringUtils.hasText(accessToken)) {
+            return accessToken.replace("Bearer ", "");
         }
 
         return null;
+    }
+
+    private String getTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() == null) {
+            return null;
+        }
+
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> "Authorization".equals(cookie.getName()))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElse(null);
     }
 
     /**
