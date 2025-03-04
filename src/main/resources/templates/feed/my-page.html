@@ -219,6 +219,7 @@
                 <div class="order-date" th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd')}">
                     2024-03-21
                 </div>
+                <!-- TODO: 상품 사진 가져오도록 수정 필요 -->
                 <img class="order-image" th:src="${order.productImage}" 
                      src="/images/default-product.jpg" alt="상품 이미지">
                 <div class="order-info">
