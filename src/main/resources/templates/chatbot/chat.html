@@ -214,6 +214,31 @@
             border-left: 3px solid var(--accent-color);
         }
 
+        .admin-link {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all var(--transition-speed);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .admin-link:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px var(--shadow-color);
+            color: white;
+        }
+
         @media (max-width: 768px) {
             .chat-container {
                 grid-template-columns: 1fr;
@@ -223,6 +248,12 @@
 </head>
 <body>
 <div layout:fragment="content">
+    <!-- 관리자 페이지 링크 -->
+    <a href="/chatbot/admin" class="admin-link">
+        <i class="fas fa-cog"></i>
+        관리자 설정
+    </a>
+
     <div class="chat-container">
         <!-- 사이드바: FAQ 및 대화 기록 -->
         <div class="sidebar">
