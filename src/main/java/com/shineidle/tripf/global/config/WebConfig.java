@@ -79,6 +79,7 @@ public class WebConfig {
                                 .requestMatchers("/topic/**").permitAll()
                                 .requestMatchers("/app/**").permitAll()
                                 .requestMatchers("/api/admin/**").hasAuthority("AUTH_admin")
+                                .requestMatchers("/admin/**").hasAuthority("AUTH_admin")
                                 .anyRequest().authenticated()
                 )
                 // Spring Security 예외에 대한 처리를 핸들러에 위임
