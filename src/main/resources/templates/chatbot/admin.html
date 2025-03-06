@@ -5,26 +5,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>챗봇 관리자</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f8f9fa;
+            --accent-color: #e74c3c;
+            --text-color: #333;
+            --border-color: #ddd;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
         .admin-container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 20px auto;
             padding: 20px;
         }
-        .category-section {
-            margin-bottom: 30px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 30px;
         }
+
+        .section-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            transition: transform var(--transition-speed);
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color var(--transition-speed);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all var(--transition-speed);
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #357abd;
+        }
+
+        .btn-warning {
+            background-color: #f0ad4e;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .category-section {
+            background: var(--secondary-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: background-color var(--transition-speed);
+        }
+
+        .category-section:hover {
+            background-color: #fff;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+
         .question-list {
             margin: 15px 0;
         }
+
         .question-item {
-            margin: 5px 0;
-            padding: 5px;
-            background-color: #f8f9fa;
-            border-radius: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px var(--shadow-color);
+        }
+
+        .answer-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -33,38 +152,64 @@
     <div class="admin-container">
         <h2 class="text-center mb-4">챗봇 관리자 페이지</h2>
 
-        <!-- 새 카테고리 추가 폼 -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <h4>새 카테고리 추가</h4>
-                <form id="categoryForm" class="mt-3">
-                    <div class="mb-3">
-                        <input type="text" class="form-control" id="categoryInput" placeholder="카테고리 이름">
+        <div class="grid-container">
+            <!-- 왼쪽: 카테고리 및 질문 관리 -->
+            <div class="section-card">
+                <h3 class="section-title">
+                    <i class="fas fa-folder-plus"></i>
+                    카테고리 및 질문 관리
+                </h3>
+                <form id="categoryForm">
+                    <div class="form-group">
+                        <label for="categoryInput">카테고리 이름</label>
+                        <input type="text" class="form-control" id="categoryInput" placeholder="예: 일반 문의">
                     </div>
-                    <div class="mb-3">
-                        <textarea class="form-control" id="questionsInput" rows="3" 
-                                placeholder="질문들 (줄바꿈으로 구분)"></textarea>
+                    <div class="form-group">
+                        <label for="questionsInput">질문 목록</label>
+                        <textarea class="form-control" id="questionsInput" rows="4" 
+                                placeholder="각 줄에 하나의 질문을 입력하세요"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">카테고리 추가</button>
+                    <div class="form-group">
+                        <label for="answerInput">답변 내용</label>
+                        <textarea class="form-control" id="answerInput" rows="4" 
+                                placeholder="이 카테고리의 질문들에 대한 답변을 입력하세요"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 저장하기
+                    </button>
                 </form>
             </div>
-        </div>
 
-        <!-- 기존 카테고리 및 질문 목록 -->
-        <div class="existing-categories">
-            <h4>기존 카테고리 및 질문</h4>
-            <div th:each="category : ${questions}" class="category-section">
-                <h5 th:text="${category.category}"></h5>
-                <div class="question-list">
-                    <div th:each="question : ${category.question}" class="question-item">
-                        <span th:text="${question}"></span>
+            <!-- 오른쪽: 기존 카테고리 목록 -->
+            <div class="section-card">
+                <h3 class="section-title">
+                    <i class="fas fa-list"></i>
+                    등록된 카테고리 목록
+                </h3>
+                <div class="existing-categories">
+                    <div th:each="category : ${questions}" class="category-section">
+                        <h4>
+                            <i class="fas fa-folder"></i>
+                            <span th:text="${category.category}"></span>
+                        </h4>
+                        <div class="question-list">
+                            <div th:each="question : ${category.question}" class="question-item">
+                                <span><i class="fas fa-question-circle"></i> <span th:text="${question}"></span></span>
+                            </div>
+                        </div>
+                        <div class="answer-section">
+                            <h5><i class="fas fa-comment-dots"></i> 답변</h5>
+                            <p th:text="${category.answer ?: '등록된 답변이 없습니다.'}"></p>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-warning" th:onclick="'editCategory(\'' + ${category.category} + '\')'">
+                                <i class="fas fa-edit"></i> 수정
+                            </button>
+                            <button class="btn btn-danger" th:onclick="'deleteCategory(\'' + ${category.category} + '\')'">
+                                <i class="fas fa-trash"></i> 삭제
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div class="mt-3">
-                    <button class="btn btn-sm btn-warning" 
-                            th:onclick="'editCategory(\'' + ${category.category} + '\')'">수정</button>
-                    <button class="btn btn-sm btn-danger" 
-                            th:onclick="'deleteCategory(\'' + ${category.category} + '\')'">삭제</button>
                 </div>
             </div>
         </div>
@@ -75,7 +220,13 @@
             e.preventDefault();
             
             const category = document.getElementById('categoryInput').value;
-            const questions = document.getElementById('questionsInput').value.split('\n');
+            const questions = document.getElementById('questionsInput').value.split('\n').filter(q => q.trim());
+            const answer = document.getElementById('answerInput').value;
+
+            if (!category || questions.length === 0 || !answer) {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
 
             fetch('/api/admin/chatbots/questions', {
                 method: 'POST',
@@ -84,29 +235,52 @@
                 },
                 body: JSON.stringify({
                     category: category,
-                    questions: questions
+                    questions: questions,
+                    answer: answer
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('네트워크 응답이 올바르지 않습니다.');
+                }
+                return response.json();
+            })
             .then(data => {
-                alert('카테고리가 추가되었습니다.');
+                alert('카테고리가 성공적으로 추가되었습니다.');
                 location.reload();
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                alert('오류가 발생했습니다: ' + error.message);
+            });
         });
 
         function editCategory(category) {
-            // 카테고리 수정 로직 구현
-            console.log('Edit category:', category);
+            if (confirm(`'${category}' 카테고리를 수정하시겠습니까?`)) {
+                // 카테고리 수정 로직 구현
+                console.log('Edit category:', category);
+            }
         }
 
         function deleteCategory(category) {
-            if (confirm('정말 삭제하시겠습니까?')) {
-                // 카테고리 삭제 로직 구현
-                console.log('Delete category:', category);
+            if (confirm(`'${category}' 카테고리를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
+                fetch(`/api/admin/chatbots/questions/${encodeURIComponent(category)}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('삭제 중 오류가 발생했습니다.');
+                    }
+                    alert('카테고리가 성공적으로 삭제되었습니다.');
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('삭제 중 오류가 발생했습니다: ' + error.message);
+                });
             }
         }
     </script>
 </div>
 </body>
-</html> 
+</html> </html> 
