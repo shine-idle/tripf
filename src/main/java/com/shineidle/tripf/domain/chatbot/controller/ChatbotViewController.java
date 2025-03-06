@@ -8,12 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
 @Controller
-@RequestMapping("/chatbot")
 @RequiredArgsConstructor
 public class ChatbotViewController {
     private final ChatbotService chatbotService;
@@ -25,7 +23,7 @@ public class ChatbotViewController {
      * @return 챗봇 메인 페이지 뷰 이름
      */
     @Operation(summary = "챗봇 메인 페이지 조회")
-    @GetMapping
+    @GetMapping("/chatbot")
     public String getChatbotPage(Model model) {
         List<ChatbotQuestionsResponseDto> questions = chatbotService.findAllChatbotQuestion();
         List<ChatbotResponseDto> conversationLogs = chatbotService.findConversationLogs();
@@ -43,7 +41,7 @@ public class ChatbotViewController {
      * @return 챗봇 관리자 페이지 뷰 이름
      */
     @Operation(summary = "챗봇 관리자 페이지 조회")
-    @GetMapping("/admin")
+    @GetMapping("/admin/chatbot")
     public String getAdminChatbotPage(Model model) {
         List<ChatbotQuestionsResponseDto> questions = chatbotService.findAllChatbotQuestion();
         model.addAttribute("questions", questions);
