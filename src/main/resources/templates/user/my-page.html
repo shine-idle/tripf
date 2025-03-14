@@ -203,9 +203,12 @@
         <div class="profile-section">
             <h2 class="profile-title">나의 프로필</h2>
             <div class="profile-info">
-                <div class="username" th:text="${user?.username}">사용자명</div>
+                <div class="username" th:text="${user?.name}">사용자명</div>
+                <div th:text="${user?.provider}">Provider 값 확인</div>
                 <div class="profile-buttons">
-                    <button class="edit-btn" onclick="openEditModal()">수정하기</button>
+                    <button class="edit-btn" th:if="${(user?.provider == 'google' or user?.provider == 'naver' or user?.provider == 'kakao')}" onclick="openEditModal()">
+                        수정하기
+                    </button>
                     <button class="delete-btn" onclick="confirmDelete()">탈퇴하기</button>
                 </div>
             </div>
@@ -242,10 +245,10 @@
             <h3 class="modal-title">프로필 수정</h3>
             <form id="editForm" onsubmit="saveChanges(event)">
                 <div class="form-group">
-                    <label for="editUsername">사용자명</label>
-                    <input type="text" id="editUsername" th:value="${user?.username}" required>
+                    <label for="editProfile">비밀번호</label>
+                    <input type="password" id="editProfile" th:value="${user?.password}" required>
                 </div>
-                <button type="submit" class="save-btn">저장하기</button>
+                <button type="submit" class="save-btn">확인</button>
             </form>
         </div>
     </div>
@@ -254,7 +257,7 @@
         function confirmDelete() {
             if (confirm('정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
                 fetch('/api/users/me', {
-                    method: 'DELETE'
+                    method: 'PATCH'
                 })
                 .then(response => {
                     if (response.ok) {
@@ -285,7 +288,7 @@
         function saveChanges(event) {
             event.preventDefault();
             
-            const newUsername = document.getElementById('editUsername').value;
+            const newUsername = document.getElementById('editProfile').value;
             
             fetch('/api/users/me', {
                 method: 'PATCH',
