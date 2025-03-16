@@ -121,7 +121,7 @@ public class UserViewController {
      */
     @PostMapping("/deactivate")
     public String deleteUser(@ModelAttribute UserRequestDto dto) {
-        userService.deleteUser(dto);
+        //userService.deleteUser(dto);
         return "redirect:/logout";
     }
 }

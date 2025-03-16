@@ -204,9 +204,9 @@
             <h2 class="profile-title">나의 프로필</h2>
             <div class="profile-info">
                 <div class="username" th:text="${user?.name}">사용자명</div>
-                <div th:text="${user?.provider}">Provider 값 확인</div>
                 <div class="profile-buttons">
-                    <button class="edit-btn" th:if="${(user?.provider == 'google' or user?.provider == 'naver' or user?.provider == 'kakao')}" onclick="openEditModal()">
+                    <button th:if="${user?.provider != 'google' and user?.provider != 'kakao' and user?.provider != 'naver'}"
+                            type="button" class="edit-btn" onclick="openEditModal()">
                         수정하기
                     </button>
                     <button class="delete-btn" onclick="confirmDelete()">탈퇴하기</button>
@@ -222,7 +222,7 @@
                     2024-03-21
                 </div>
                 <!-- TODO: 상품 사진 가져오도록 수정 필요 -->
-                <img class="order-image" th:src="${order.productImage}" 
+                <img class="order-image" th:src="${order.productImage}"
                      src="/images/default-product.jpg" alt="상품 이미지">
                 <div class="order-info">
                     <div class="order-status" th:text="${order.status}">배송중</div>
@@ -255,9 +255,24 @@
 
     <script th:inline="javascript">
         function confirmDelete() {
+                    /* Thymeleaf 변수를 JS에서 사용 */
+            const provider = [[${user?.provider}]];
+
+            if (provider === 'google' || provider === 'kakao' || provider === 'naver') {
+                alert('소셜 로그인 사용자는 해당 플랫폼에서 직접 탈퇴해야 합니다.');
+                return;
+            }
+
             if (confirm('정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-                fetch('/api/users/me', {
-                    method: 'PATCH'
+                const password = prompt('비밀번호를 입력해주세요.');
+                if (!password) return;
+
+                const requestData = { password };
+
+                fetch('/api/users/deactivate', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestData),
                 })
                 .then(response => {
                     if (response.ok) {
@@ -288,7 +303,7 @@
         function saveChanges(event) {
             event.preventDefault();
             
-            const newUsername = document.getElementById('editProfile').value;
+            const newUsername = document.getElementById('editUsername').value;
             
             fetch('/api/users/me', {
                 method: 'PATCH',
