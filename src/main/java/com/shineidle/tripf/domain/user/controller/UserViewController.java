@@ -50,13 +50,13 @@ public class UserViewController {
     /**
      * 사용자가 입력한 인증 정보를 처리, 프로필 페이지로 리다이렉션
      *
-     * @param dto 사용자 인증 요청 데이터
-     * @return 프로필 페이지로 리다이렌션
+     * @param password 비밀번호
+     * @return 프로필 페이지로 리다이렉션
      */
     @PostMapping("/verify")
-    public String verify(@ModelAttribute UserRequestDto dto) {
-        userService.verify(dto);
-        return "redirect:/users/profile";
+    public String verify(@RequestBody UserRequestDto password) {
+        userService.verify(password);
+        return "redirect:/mypage";
     }
 
     /**
@@ -121,7 +121,7 @@ public class UserViewController {
      */
     @PostMapping("/deactivate")
     public String deleteUser(@ModelAttribute UserRequestDto dto) {
-        userService.deleteUser(dto);
+        //userService.deleteUser(dto);
         return "redirect:/logout";
     }
 }

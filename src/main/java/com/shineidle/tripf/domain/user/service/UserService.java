@@ -3,6 +3,7 @@ package com.shineidle.tripf.domain.user.service;
 import com.shineidle.tripf.global.common.message.dto.PostMessageResponseDto;
 import com.shineidle.tripf.domain.user.dto.*;
 import com.shineidle.tripf.domain.user.entity.User;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
@@ -55,7 +56,7 @@ public interface UserService {
      * @param dto 유저 삭제 요청 데이터 (비밀번호)
      * @return 유저 삭제 확인 메시지
      */
-    PostMessageResponseDto deleteUser(UserRequestDto dto);
+    PostMessageResponseDto deleteUser(UserRequestDto dto, HttpServletRequest request, HttpServletResponse response);
 
     /**
      * 유저 인증을 검증

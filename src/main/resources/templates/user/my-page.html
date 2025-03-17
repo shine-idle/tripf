@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns="http://www.w3.org/1999/html"
+      layout:decorate="layout/default_layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지 - Tripf</title>
+    <style>
+        .mypage-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+            display: flex;
+            gap: 30px;
+        }
+
+        .profile-section, .orders-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-section { flex: 0 0 250px; height: fit-content; }
+        .orders-section { flex: 1; }
+
+        .profile-title, .orders-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .profile-buttons, .modal-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .edit-btn, .delete-btn, .save-btn, .track-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .edit-btn { background-color: #007bff; color: white; }
+        .delete-btn { background-color: #dc3545; color: white; }
+        .track-btn { background-color: #6c757d; color: white; }
+        .save-btn { background-color: #007bff; color: white; }
+        .save-btn:hover { background-color: #0056b3; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="mypage-container">
+        <div class="profile-section">
+            <h2 class="profile-title">나의 프로필</h2>
+            <div class="username" id="username" th:text="${user?.name}">사용자명</div>
+            <div class="profile-buttons">
+                <button th:if="${user?.provider == null}" type="button" class="edit-btn" onclick="openEditModal()">수정하기</button>
+                <button class="delete-btn" onclick="confirmDelete()">탈퇴하기</button>
+            </div>
+        </div>
+
+        <div class="orders-section">
+            <h2 class="orders-title">주문 목록</h2>
+            <div th:each="order : ${orders}" class="order-item">
+                <span th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd')}">2024-03-21</span>
+                <img th:src="${order.productImage}" src="/images/default-product.jpg" alt="상품 이미지">
+                <div>
+                    <div class="order-status" th:text="${order.status}">배송중</div>
+                    <div th:text="${order.productName}">상품명</div>
+                </div>
+                <button class="track-btn" th:onclick="'trackDelivery(\'' + ${order.trackingNumber} + '\')'">배송조회</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('editModal')">&times;</span>
+            <h3 class="modal-title">프로필 수정</h3>
+            <button onclick="openModal('changeNameModal')">이름 변경</button>
+            <button onclick="openModal('changePasswordModal')">비밀번호 변경</button>
+        </div>
+    </div>
+
+    <div id="changeNameModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('changeNameModal')">&times;</span>
+            <h3 class="modal-title">이름 변경</h3>
+            <form onsubmit="updateName(event)">
+                <input type="text" id="newName" required>
+                <button type="submit" class="save-btn">변경</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('changePasswordModal')">&times;</span>
+            <h3 class="modal-title">비밀번호 변경</h3>
+            <form onsubmit="updatePassword(event)">
+                <div>
+                    <label for="password">현재 비밀번호</label>
+                    <input type="password" id="password" required>
+                </div>
+                <br>
+                <div>
+                    <label for="newPassword">새 비밀번호</label>
+                    <input type="password" id="newPassword" required>
+                </div>
+                <br>
+                <button type="submit" class="save-btn">변경</button>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        function openModal(id) {
+            document.getElementById(id).style.display = 'block';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function openEditModal() {
+            openModal('editModal');
+        }
+
+        function confirmDelete() {
+            if (confirm('정말 탈퇴하시겠습니까?')) {
+                fetch('/api/users/deactivate', { method: 'DELETE' })
+                    .then(response => response.ok ? alert('탈퇴 완료') : alert('오류 발생'))
+                    .then(() => window.location.href = '/');
+            }
+        }
+
+        function updateName(event) {
+            event.preventDefault();
+            fetch('/api/users/me', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: document.getElementById('newName').value })
+            }).then(response => {
+                if (response.ok) {
+                    const newName = document.getElementById('newName').value;
+                    document.getElementById('username').innerText = newName;
+                    alert('이름 변경 완료');
+                } else {
+                    alert('변경 실패')
+                }
+            });
+            closeModal('changeNameModal');
+        }
+
+        function updatePassword(event) {
+            event.preventDefault();
+
+            const password = document.getElementById('password').value;
+            const newPassword = document.getElementById('newPassword').value;
+
+            fetch('/api/users/me', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password, newPassword })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('비밀번호 변경 완료');
+                    closeModal('changePasswordModal'); // 비밀번호 변경 완료 후 모달 닫기
+                } else {
+                    alert('변경 실패');
+                }
+            })
+            .catch(error => {
+                console.error('에러 발생:', error);
+                alert('서버와의 통신 중 오류가 발생했습니다.');
+            });
+        }
+
+         function confirmDelete() {
+            const provider = [[${user.provider}]];
+
+            if (provider === 'google' || provider === 'kakao' || provider === 'naver') {
+                alert('소셜 로그인 사용자는 해당 플랫폼에서 직접 탈퇴해야 합니다.');
+                return;
+            }
+
+            if (confirm('정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                const password = prompt('비밀번호를 입력해주세요.');
+                if (!password) return;
+
+                const requestData = { password };
+
+                fetch('/api/users/deactivate', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestData),
+                })
+                    .then(response => {
+                        if (response.ok)
+                        {
+                            alert('탈퇴가 완료되었습니다.');
+                            window.location.href = '/';
+                        } else
+                        {
+                            alert('탈퇴 처리 중 오류가 발생했습니다.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+
+    </script>
+</div>
+</body>
+</html>

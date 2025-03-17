@@ -1,11 +1,15 @@
 package com.shineidle.tripf.domain.user.controller;
 
 import com.shineidle.tripf.domain.user.dto.UserRequestDto;
+import com.shineidle.tripf.domain.user.entity.User;
 import com.shineidle.tripf.domain.user.service.UserService;
 import com.shineidle.tripf.global.common.exception.GlobalException;
+import com.shineidle.tripf.global.common.util.auth.UserAuthorizationUtil;
+import com.shineidle.tripf.global.security.auth.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -98,5 +102,16 @@ public class AccountViewController {
     @GetMapping("/logout")
     public String logoutPage() {
         return "user/logout";
+    }
+
+    @GetMapping("/mypage")
+    public String myPage(@AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+
+        User loginUser = UserAuthorizationUtil.getLoginUser();
+        model.addAttribute("user", loginUser);
+        return "user/my-page";
     }
 }

@@ -7,6 +7,8 @@ import com.shineidle.tripf.domain.user.dto.UserResponseDto;
 import com.shineidle.tripf.domain.user.dto.UsernameUpdateRequestDto;
 import com.shineidle.tripf.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -84,8 +86,10 @@ public class UserController {
     @Operation(summary = "회원탈퇴")
     @DeleteMapping("/deactivate")
     public ResponseEntity<PostMessageResponseDto> deleteUser(
-            @RequestBody UserRequestDto dto
+            @RequestBody UserRequestDto dto,
+            HttpServletRequest request,
+            HttpServletResponse response
     ) {
-        return new ResponseEntity<>(userService.deleteUser(dto), HttpStatus.OK);
+        return new ResponseEntity<>(userService.deleteUser(dto, request, response), HttpStatus.OK);
     }
 }

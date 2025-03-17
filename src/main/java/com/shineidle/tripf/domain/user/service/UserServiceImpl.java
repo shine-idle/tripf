@@ -15,6 +15,7 @@ import com.shineidle.tripf.domain.user.entity.User;
 import com.shineidle.tripf.domain.user.repository.UserRepository;
 import com.shineidle.tripf.domain.user.type.TokenType;
 import com.shineidle.tripf.domain.user.type.UserStatus;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -185,12 +186,15 @@ public class UserServiceImpl implements UserService {
      * @return {@link PostMessageResponseDto} 탈퇴처리 문구
      */
     @Override
-    public PostMessageResponseDto deleteUser(UserRequestDto dto) {
+    public PostMessageResponseDto deleteUser(UserRequestDto dto, HttpServletRequest request, HttpServletResponse response) {
         User user = UserAuthorizationUtil.getLoginUser();
         validatePassword(dto.getPassword(), user.getPassword());
 
         user.deactivate();
         userRepository.save(user);
+
+        CookieUtils.deleteCookie(request, response, "Authorization");
+        CookieUtils.deleteCookie(request, response, "refresh_token");
 
         return new PostMessageResponseDto(PostMessage.USER_DEACTIVATED);
     }
