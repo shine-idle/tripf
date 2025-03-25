@@ -51,7 +51,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public List<ProductResponseDto> findAllProduct() {
-        return productRepository.findAllExceptDiscontinuedProducts()
+        return productRepository.findAllExceptDiscontinuedProductsWithPhotos()
                 .stream()
                 .map(ProductResponseDto::toDto)
                 .toList();
@@ -64,8 +64,10 @@ public class ProductServiceImpl implements ProductService {
      * @return {@link ProductResponseDto}
      */
     @Override
+    @Transactional(readOnly = true)
     public ProductResponseDto findProduct(Long productId) {
-        Product product = getProductById(productId);
+        Product product = productRepository.findProductWithPhotoById(productId)
+                .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
         return ProductResponseDto.toDto(product);
     }

@@ -6,6 +6,8 @@ import com.shineidle.tripf.domain.product.entity.Product;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @RequiredArgsConstructor
 public class ProductResponseDto {
@@ -16,6 +18,7 @@ public class ProductResponseDto {
     private final Long price;
     private final String description;
     private final Long stock;
+    private final List<ProductPhotoDto> productPhotos;
 
     public static ProductResponseDto toDto(Product product) {
         return new ProductResponseDto(
@@ -25,7 +28,10 @@ public class ProductResponseDto {
                 product.getName(),
                 product.getPrice(),
                 product.getDescription(),
-                product.getStock()
+                product.getStock(),
+                product.getProductPhotos().stream()
+                        .map(ProductPhotoDto::toDto)
+                        .toList()
         );
     }
 }

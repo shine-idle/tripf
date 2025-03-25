@@ -1,10 +1,12 @@
 package com.shineidle.tripf.domain.product.repository;
 
 import com.shineidle.tripf.domain.product.entity.Product;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     /**
@@ -14,4 +16,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      */
     @Query("select pr from Product pr where pr.status != 'DISCONTINUED'")
     List<Product> findAllExceptDiscontinuedProducts();
+
+    @EntityGraph(attributePaths = {"productPhotos.photo"})
+    @Query("SELECT p FROM Product p WHERE p.status != 'DISCONTINUED'")
+    List<Product> findAllExceptDiscontinuedProductsWithPhotos();
+
+    @EntityGraph(attributePaths = {"productPhotos.photo"})
+    Optional<Product> findProductWithPhotoById(Long id);
 }
