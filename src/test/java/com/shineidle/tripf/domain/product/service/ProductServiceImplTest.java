@@ -56,29 +56,29 @@ class ProductServiceImplTest {
 
     @Test
     void findAllProductTest() {
-        when(productRepository.findAllExceptDiscontinuedProducts()).thenReturn(List.of(product));
+        when(productRepository.findAllExceptDiscontinuedProductsWithPhotos()).thenReturn(List.of(product));
 
         List<ProductResponseDto> products = productService.findAllProduct();
 
         assertThat(products).hasSize(1);
         assertThat(products.get(0).getName()).isEqualTo(product.getName());
-        verify(productRepository, times(1)).findAllExceptDiscontinuedProducts();
+        verify(productRepository, times(1)).findAllExceptDiscontinuedProductsWithPhotos();
     }
 
     @Test
     void findProductTest() {
-        when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
+        when(productRepository.findProductWithPhotoById(anyLong())).thenReturn(Optional.of(product));
 
         ProductResponseDto response = productService.findProduct(1L);
 
         assertThat(response).isNotNull();
         assertThat(response.getName()).isEqualTo(product.getName());
-        verify(productRepository, times(1)).findById(1L);
+        verify(productRepository, times(1)).findProductWithPhotoById(1L);
     }
 
     @Test
     void findProduct_NotFoundTest() {
-        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(productRepository.findProductWithPhotoById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(GlobalException.class, () -> productService.findProduct(1L));
     }
