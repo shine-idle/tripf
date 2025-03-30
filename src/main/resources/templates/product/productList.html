@@ -6,7 +6,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0px;
             background-color: #f4f4f4;
             color: #333;
         }
@@ -90,24 +90,25 @@
 </head>
 <body>
 <div layout:fragment="content">
-<h1>상품 목록</h1>
-<!-- TODO: 상품 사진 가져오도록 ProductDto 수정 및 로직 추가 필요 -->
-<div class="product-container">
-    <div class="product-card" th:each="product : ${products}">
-        <!-- 첫 번째 이미지 렌더링 -->
-        <img class="product-image" th:src="${product.photos[0].url}" alt="상품 이미지">
-        <div class="product-details">
-            <div class="product-name" th:text="${product.name}"></div>
-            <div class="product-price" th:text="${product.price} + ' 원'"></div>
-            <div class="product-category" th:text="'카테고리: ' + ${product.category}"></div>
-            <div class="product-status" th:text="'상태: ' + ${product.status}"></div>
-            <div class="product-buttons">
-                <a th:href="'/products/' + ${product.id}">상세 보기</a>
-                <a th:href="'/cart/add/' + ${product.id}">장바구니 추가</a>
+    <h1>상품 목록</h1>
+    <!-- TODO: 상품 사진 가져오도록 ProductDto 수정 및 로직 추가 필요 -->
+    <div class="product-container">
+        <div class="product-card" th:each="product : ${products}">
+            <!-- 첫 번째 이미지 렌더링, productPhotos가 비어 있지 않은 경우만 -->
+            <img class="product-image" th:if="${product.productPhotos != null and #lists.size(product.productPhotos) > 0}"
+                 th:src="${product.productPhotos[0].imageUrl}" alt="상품 이미지">
+            <div class="product-details">
+                <div class="product-name" th:text="${product.name}"></div>
+                <div class="product-price" th:text="${product.price} + ' 원'"></div>
+                <div class="product-category" th:text="'카테고리: ' + ${product.category}"></div>
+                <div class="product-status" th:text="'상태: ' + ${product.status}"></div>
+                <div class="product-buttons">
+                    <a th:href="'/products/' + ${product.id}">상세 보기</a>
+                    <a th:href="'/cart/add/' + ${product.id}">장바구니 추가</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </div>
 </body>
 </html>
