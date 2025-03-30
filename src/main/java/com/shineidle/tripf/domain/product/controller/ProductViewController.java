@@ -47,4 +47,12 @@ public class ProductViewController {
         model.addAttribute("product", product);
         return "product/productDetail";
     }
+
+    /**
+     * 상품 생성 페이지를 렌더링합니다.
+     */
+    @GetMapping("/admin/products/add")
+    public String addProduct() {
+        return "product/adminProductForm";
+    }
 }
