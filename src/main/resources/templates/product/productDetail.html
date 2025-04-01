@@ -89,21 +89,23 @@
 </head>
 <body>
 <div layout:fragment="content">
-<!-- TODO: 상품 사진 가져오도록 ProductDto 수정 및 로직 추가 필요 -->
-<div class="container">
-    <h1 th:text="${product.name}">상품 이름</h1>
-    <div class="product-details">
-        <p><strong>카테고리:</strong> <span th:text="${product.category}"></span></p>
-        <p><strong>가격:</strong> <span th:text="${product.price} + ' 원'"></span></p>
-        <p><strong>상태:</strong> <span th:text="${product.status}"></span></p>
-        <p><strong>설명:</strong> <span th:text="${product.description}"></span></p>
-        <p><strong>재고:</strong> <span th:text="${product.stock}"></span></p>
+    <!-- TODO: 상품 사진 가져오도록 ProductDto 수정 및 로직 추가 필요 -->
+    <div class="container">
+        <h1 th:text="${product.name}">상품 이름</h1>
+        <!-- 첫 번째 이미지 렌더링 -->
+        <img class="product-image" th:if="${not #lists.isEmpty(product.productPhotos)}" th:src="${product.productPhotos[0].imageUrl}" alt="상품 이미지">
+        <div class="product-details">
+            <p><strong>카테고리:</strong> <span th:text="${product.category}"></span></p>
+            <p><strong>가격:</strong> <span th:text="${product.price} + ' 원'"></span></p>
+            <p><strong>상태:</strong> <span th:text="${product.status}"></span></p>
+            <p><strong>설명:</strong> <span th:text="${product.description}"></span></p>
+            <p><strong>재고:</strong> <span th:text="${product.stock}"></span></p>
+        </div>
+        <div class="btn-container">
+            <a href="/products" class="btn back-btn">목록으로 돌아가기</a>
+            <a th:href="'/cart/add/' + ${product.id}" class="btn">장바구니 추가</a>
+        </div>
     </div>
-    <div class="btn-container">
-        <a href="/products" class="btn back-btn">목록으로 돌아가기</a>
-        <a th:href="'/cart/add/' + ${product.id}" class="btn">장바구니 추가</a>
-    </div>
-</div>
 </div>
 </body>
 </html>

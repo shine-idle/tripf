@@ -6,7 +6,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0px;
             background-color: #f4f4f4;
             color: #333;
         }
@@ -21,7 +21,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
-            justify-content: center;
+            justify-content: flex-start;
         }
 
         .product-card {
@@ -86,28 +86,52 @@
         .product-buttons a:hover {
             background-color: #2980b9;
         }
+
+        #adminAddProductBtn {
+            position: absolute;
+            top: 80px;  /* 헤더 바로 밑 */
+            right: 20px; /* 오른쪽 상단 */
+            background-color: #27ae60;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 5px;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s;
+        }
+
+        #adminAddProductBtn:hover {
+            background-color: #2ecc71;
+        }
     </style>
 </head>
 <body>
 <div layout:fragment="content">
-<h1>상품 목록</h1>
-<!-- TODO: 상품 사진 가져오도록 ProductDto 수정 및 로직 추가 필요 -->
-<div class="product-container">
-    <div class="product-card" th:each="product : ${products}">
-        <!-- 첫 번째 이미지 렌더링 -->
-        <img class="product-image" th:src="${product.photos[0].url}" alt="상품 이미지">
-        <div class="product-details">
-            <div class="product-name" th:text="${product.name}"></div>
-            <div class="product-price" th:text="${product.price} + ' 원'"></div>
-            <div class="product-category" th:text="'카테고리: ' + ${product.category}"></div>
-            <div class="product-status" th:text="'상태: ' + ${product.status}"></div>
-            <div class="product-buttons">
-                <a th:href="'/products/' + ${product.id}">상세 보기</a>
-                <a th:href="'/cart/add/' + ${product.id}">장바구니 추가</a>
+    <h1>상품 목록</h1>
+
+    <div class="product-container">
+        <!-- 상품 추가 버튼 -->
+        <div id="adminAddProductBtn">
+            <a href="/admin/products/add" class="btn">상품 추가</a>
+        </div>
+
+        <div class="product-card" th:each="product : ${products}">
+            <!-- 첫 번째 이미지 렌더링, productPhotos가 비어 있지 않은 경우만 -->
+            <img class="product-image" th:if="${product.productPhotos != null and #lists.size(product.productPhotos) > 0}"
+                 th:src="${product.productPhotos[0].imageUrl}" alt="상품 이미지">
+            <div class="product-details">
+                <div class="product-name" th:text="${product.name}"></div>
+                <div class="product-price" th:text="${product.price} + ' 원'"></div>
+                <div class="product-category" th:text="'카테고리: ' + ${product.category}"></div>
+                <div class="product-status" th:text="'상태: ' + ${product.status}"></div>
+                <div class="product-buttons">
+                    <a th:href="'/products/' + ${product.id}">상세 보기</a>
+                    <a th:href="'/cart/add/' + ${product.id}">장바구니 추가</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
-</div>
+
 </body>
 </html>
