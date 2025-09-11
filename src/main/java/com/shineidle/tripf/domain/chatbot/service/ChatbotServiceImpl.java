@@ -1,5 +1,6 @@
 package com.shineidle.tripf.domain.chatbot.service;
 
+import com.shineidle.tripf.domain.chatbot.dictionary.SynonymDictionary;
 import com.shineidle.tripf.domain.chatbot.dto.ChatbotQuestionsResponseDto;
 import com.shineidle.tripf.domain.chatbot.dto.ChatbotRequestDto;
 import com.shineidle.tripf.domain.chatbot.dto.ChatbotResponseDto;
@@ -21,16 +22,14 @@ import org.apache.lucene.analysis.ko.KoreanAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.io.StringReader;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -43,6 +42,9 @@ public class ChatbotServiceImpl implements ChatbotService {
     private final RedisChatbotService redisChatbotService;
     private DocumentCategorizerME categorizer;
     private final ChatbotRepository chatbotRepository;
+    private final SynonymDictionary synonymDictionary;
+    private final RedisTemplate<String, String> redisTemplate;
+
 
     /**
      * 애플리케이션 시작 시 NLP 모델 초기화
@@ -78,8 +80,14 @@ public class ChatbotServiceImpl implements ChatbotService {
 
         try {
             if (lock.tryLock(10, 30, TimeUnit.SECONDS)) {
+                String question = chatbotRequestDto.getQuestion();
 
-                String[] tokens = tokenizeKorean(chatbotRequestDto.getQuestion());
+                String mappedQuestion = synonymDictionary.findCategoryBySynonym(question);
+                if (mappedQuestion == null) {
+                    mappedQuestion = question;
+                }
+
+                String[] tokens = tokenizeKorean(mappedQuestion);
                 log.info("Tokens: " + Arrays.toString(tokens));
 
                 double[] outcomes = categorizer.categorize(tokens);
@@ -91,10 +99,13 @@ public class ChatbotServiceImpl implements ChatbotService {
                 double maxScore = Arrays.stream(outcomes).max().orElse(0.0);
                 log.info("Max Score: " + maxScore);
 
-                boolean isUnknown = maxScore < 0.5;
-                if (isUnknown) {
+                if (maxScore < 0.5) {
                     category = "UNKNOWN";
                 }
+
+                Set<String> keys = redisTemplate.keys("*");
+                log.info("Redis Keys in DB: {}", keys);
+                log.info("Trying to get answer for key: '{}'", category);
 
                 String answer = redisChatbotService.getAnswer(category);
                 if (answer == null) {
@@ -102,7 +113,7 @@ public class ChatbotServiceImpl implements ChatbotService {
                 }
                 log.info("Answer from Redis: " + answer);
 
-                ResponseStatus responseStatus = isUnknown || "알아듣지 못했어요.".equals(answer)
+                ResponseStatus responseStatus = "UNKNOWN".equals(category) || "알아듣지 못했어요.".equals(answer)
                         ? ResponseStatus.FAILURE
                         : ResponseStatus.SUCCESS;
 
