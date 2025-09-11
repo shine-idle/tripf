@@ -12,7 +12,6 @@ public class SynonymDictionary {
         synonymMap.put("안녕", new HashSet<>(Arrays.asList("ㅎㅇ", "반가워", "안뇽")));
         synonymMap.put("결제", new HashSet<>(Arrays.asList("카드", "현금", "취소", "비용", "거래")));
         synonymMap.put("문제 해결", new HashSet<>(Arrays.asList("문제", "안됨", "안돼", "에러", "도움", "이슈")));
-        // 예시: '감사' 카테고리에 포함되는 유사어들
         synonymMap.put("감사", new HashSet<>(Arrays.asList("감사", "수고", "고생", "고마워", "덕분에", "ㄱㅅ")));
     }
 

@@ -82,13 +82,11 @@ public class ChatbotServiceImpl implements ChatbotService {
             if (lock.tryLock(10, 30, TimeUnit.SECONDS)) {
                 String question = chatbotRequestDto.getQuestion();
 
-                // 1) 유사어 사전 검사 (없으면 원래 질문 사용)
                 String mappedQuestion = synonymDictionary.findCategoryBySynonym(question);
                 if (mappedQuestion == null) {
                     mappedQuestion = question;
                 }
 
-                // 2) 항상 Categorizer로 분류
                 String[] tokens = tokenizeKorean(mappedQuestion);
                 log.info("Tokens: " + Arrays.toString(tokens));
 
@@ -105,12 +103,10 @@ public class ChatbotServiceImpl implements ChatbotService {
                     category = "UNKNOWN";
                 }
 
-                // 키 목록과 현재 조회 키 확인
                 Set<String> keys = redisTemplate.keys("*");
                 log.info("Redis Keys in DB: {}", keys);
                 log.info("Trying to get answer for key: '{}'", category);
 
-                // 3. 분류된 카테고리로 답변 조회
                 String answer = redisChatbotService.getAnswer(category);
                 if (answer == null) {
                     answer = "알아듣지 못했어요.";
